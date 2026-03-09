@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AniTrack - Add to List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8d31e3",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#191121",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(25, 17, 33, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(141, 49, 227, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(141, 49, 227, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(141, 49, 227, 0.4);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen relative overflow-hidden">
+<!-- Background Mockup: Anime Detail Page -->
+<div class="absolute inset-0 z-0 opacity-40">
+<div class="h-96 w-full relative">
+<img class="w-full h-full object-cover" data-alt="Cinematic background of a futuristic neon city from an anime" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6RpPfT1J6TtpY-NT158NsgUu27dSWLVLzcPEIdqhEFfN-KPRsGMIjILeFjy29Oi_73KzVAePGdfXBK9EiPY8Mh_RVeJCWh4MBjZ1v4ZXhwt5wtZpnXkVNaqDC9NdIcmWQDG8aQXLOCLUM_zRTHzgfmXhmzWVUUvIxOBDBIHpdU2_MtbpyNzHCgmeES3vcs69DgmtsAswuUfqWPn1aw88FhNICZbkCjInj32GxSjoru6nsK3-_w4u3xFHIKKm6jyTdjw3k7z656Oo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark to-transparent"></div>
+</div>
+<div class="max-w-5xl mx-auto px-6 -mt-32 relative">
+<div class="flex gap-8">
+<div class="w-64 h-96 bg-slate-800 rounded-xl shadow-2xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Anime poster with vibrant purple and blue aesthetics" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP-I0B3aM0-uVHnVmBIJqOrIt-Cix-P86JhS2zlktIq88jMjca5OJtYCT6kwK8Und46-2EoZ2Ih8hVnGEjAJbwH6MdhpfQQi7hsffbNeCk42qntLSdoiG7n7xhQit8U1E4i8qsX-rhXEOQuewCp61ElmOK_7BCSJbat7I2hp4AMPc3eILcRh-v1rOW6b3W-E87TDqc4eNFWUa6MFH1huDtUooaajSI1N_EenBimP9wCFv0MGTTbCnCKAaVybx_QCZFg0s-HTFYd2I"/>
+</div>
+<div class="pt-36">
+<h1 class="text-5xl font-bold mb-4">Cyber Voyager</h1>
+<div class="flex gap-4 mb-6">
+<span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-semibold">Sci-Fi</span>
+<span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-semibold">Action</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+<!-- Modal Content -->
+<div class="glass-panel w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+<!-- Header -->
+<div class="p-6 border-b border-primary/10 flex justify-between items-center">
+<h2 class="text-2xl font-bold text-slate-100">Add to List</h2>
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Search Section -->
+<div class="px-6 py-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-slate-900/50 border border-primary/20 rounded-lg py-2.5 pl-10 pr-4 text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-500" placeholder="Search existing lists" type="text"/>
+</div>
+</div>
+<!-- Scrollable Collection List -->
+<div class="px-6 py-2 overflow-y-auto custom-scrollbar flex-1 space-y-1 min-h-[200px]">
+<label class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/10 cursor-pointer transition-colors group">
+<span class="text-slate-300 group-hover:text-white">Planning</span>
+<input class="w-5 h-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary/40 focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-lg bg-primary/20 border border-primary/30 cursor-pointer transition-colors group">
+<span class="text-white font-medium">Watching</span>
+<input checked="" class="w-5 h-5 rounded border-primary bg-primary text-white focus:ring-primary/40 focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/10 cursor-pointer transition-colors group">
+<span class="text-slate-300 group-hover:text-white">Completed</span>
+<input class="w-5 h-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary/40 focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/10 cursor-pointer transition-colors group">
+<span class="text-slate-300 group-hover:text-white">Winter 2024 Favorites</span>
+<input class="w-5 h-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary/40 focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/10 cursor-pointer transition-colors group">
+<span class="text-slate-300 group-hover:text-white">Must Watch Movies</span>
+<input class="w-5 h-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary/40 focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/10 cursor-pointer transition-colors group">
+<span class="text-slate-300 group-hover:text-white">Hidden Gems</span>
+<input class="w-5 h-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary/40 focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+<!-- Create New List Section -->
+<div class="p-6 border-t border-primary/10 bg-slate-900/30">
+<p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Create New List</p>
+<div class="flex gap-2">
+<input class="flex-1 bg-slate-900/50 border border-primary/20 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-600" placeholder="Enter list name..." type="text"/>
+<button class="bg-primary/20 text-primary hover:bg-primary hover:text-white p-2 rounded-lg transition-all flex items-center justify-center">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Action Button -->
+<div class="px-6 pb-8 pt-2">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-[0.98]">
+                    Save Selection
+                </button>
+</div>
+</div>
+</div>
+</body></html>

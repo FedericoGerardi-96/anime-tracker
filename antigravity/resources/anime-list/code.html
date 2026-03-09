@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AniTrack - Anime Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8d31e3",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }</script>
+<style>        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .sidebar-item-active {
+            background: rgba(141, 49, 227, 0.2);
+            border-left: 3px solid #8d31e3;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="fixed inset-y-0 left-0 border-r border-slate-200 dark:border-slate-800 flex flex-col glass h-full shrink-0 z-50 p-8 w-64">
+<div class="flex items-center gap-3 mb-10"><div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">auto_graph</span>
+</div>
+<div>
+<h1 class="text-lg font-bold tracking-tight">AniTrack</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400">Library Manager</p>
+</div></div>
+<nav class="flex-1 space-y-2"><a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-medium text-sm">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-lg bg-primary/10 border-l-4 border-primary text-primary transition-all" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-medium text-sm">Anime Library</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-medium text-sm">Manga Library</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+<span class="material-symbols-outlined">format_list_bulleted</span>
+<span class="font-medium text-sm">My Lists</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-medium text-sm">Favorites</span>
+</a>
+<div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-medium text-sm">Private Manual Entry</span>
+</a>
+</div></nav>
+<div class="mt-auto glass-card p-4 rounded-2xl flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-cover bg-center" data-alt="User avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBN5uDXe-IKsglDPE6HJaM6nA-uXxkiBR5s8AANx0b79WVvk2IygdfcAXLmasQ-gDDfMRN-Ex2Ekvg0GPIJehirZptNhYnVHxAKcH47FENBigSIuasWetHDJC4Cv0QCUgsARcvbYMwwSz67U5PxceVJkCIXr9y1jRgwUGwAvcnGWfOk-QuA7VCaF0UdphE0Ro4bnRHTzk_onv-xqk9_c_mPGdVMkSb0RaUOZbqxikIVS13eUtE3zGcBCJHfX2PzuKapws-9feUHDmI')"></div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">Zenith_Reader</p>
+<p class="text-[10px] text-primary">MASTER TIER</p>
+</div>
+<span class="material-symbols-outlined text-slate-500 text-sm">settings</span>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 pt-28 ml-64 p-12 space-y-12">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between px-8 fixed top-0 right-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40 h-20 left-64">
+<div class="flex-1 max-w-md">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800/50 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary transition-all" placeholder="Search anime, manga, characters..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-primary/30 transition-all">
+                        Import List
+                    </button>
+</div>
+</header>
+<!-- Library Content -->
+<section class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Filters Bar -->
+<div class="glass p-4 rounded-xl flex flex-wrap items-center gap-4 shadow-sm">
+<div class="flex items-center gap-2 px-3 py-2 bg-background-light dark:bg-background-dark/50 rounded-lg border border-primary/10">
+<span class="material-symbols-outlined text-primary text-xl">filter_list</span>
+<span class="text-sm font-semibold">Filters</span>
+</div>
+<div class="flex items-center gap-3 flex-wrap">
+<div class="relative group">
+<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
+<span>Genre</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="relative group">
+<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
+<span>Status: All</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="relative group">
+<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
+<span>Season: 2024 Winter</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="relative group">
+<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
+<span>Sort: Popularity</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<div class="ml-auto flex items-center gap-1 bg-primary/5 p-1 rounded-lg border border-primary/10">
+<button class="p-1.5 rounded bg-primary text-white">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+</button>
+<button class="p-1.5 rounded text-slate-400 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-sm">view_list</span>
+</button>
+</div>
+</div>
+<!-- Anime Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+<!-- Card 1 -->
+<div class="group relative flex flex-col gap-3">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Dramatic high fantasy anime poster" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAl9lqO3rPxk12QEsNUiZ4l2zhBQiufugpQAFCuU9um1xqw5nt-beZOKtEMLUQqv-3Ynf1DVNNLiZ9S2FXgJL7B8Skjg68hksahIkO-O4J5SuG5rTVwKBWT6cS9HVO31UXvLx8DBLg9Ey7J7U1HgZMATl2lfnIViZgWSAXVetUdqkhl9swA-5AfGnuMus6mWbAe9xf_bOKWzOjkEE21KAldR3cfraL-AhmxFEbIwrdkmNMaqVI9NdQllPFeUtGnO2z6fGiiiJeiqo')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 left-2 px-2 py-1 rounded bg-primary/80 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">Airing</div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
+</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
+<span class="text-xs font-bold text-white">9.12</span>
+</div></div>
+<div>
+<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Attack on Titan: Final Season</h3>
+<p class="text-xs text-slate-500 mt-1">MAPPA • 2024</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative flex flex-col gap-3">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Magical scenery with a solo traveler" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-BMO3k61H7H9d7RgX2Bdj1GQJrfvNZotGXm48pi-lywab0jdbYYKXMACCxpClTjGCYkd5Ipy3Zzws3WSAhvxZRqTSKL360TOeZFARUz2EhJpnF7QUqoJMho5mbs22NvZ72Uc-Durhr5XZxfN4mtwe_D5hBp41ufmz2l-Q0frSqv-IF3R3TeyGFN6jzWLb5oEGpZiPtvT3jfaR7ezaWBT1AyH8fC9fyTXafk0ZHEk2TGWl1Vdm73h62au7n960EnP3pTur_MI1QbY')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg text-red-500 fill-current">favorite</span></button>
+</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
+<span class="text-xs font-bold text-white">8.95</span>
+</div></div>
+<div>
+<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Frieren: Beyond Journey's End</h3>
+<p class="text-xs text-slate-500 mt-1">Madhouse • 2023</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative flex flex-col gap-3">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Cyberpunk city alleyway at night" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAa7stvd-NgqLw-dacC9GP42Xr38PL9PWf09qdp0LEitcs32JgBUsB8ywilCS-Qe7qGEQ_FBqxkR-7G969_JcGffmHT2KWluT8_cYuACuch6RHobKmtTidD9Mu2E8VujmDHNdlwR_X18n8VKWMeIoqQhpsxQdIn63gUDRMJrlFDalQjbFNK-43dTbVMgx_seN3HU9GkmC0UTD4ApXVP5gNqmJxzgcDtyhidfNkioND06VGMjOt9YoJIXwNn0f-4eO8MHNZakgPFhTI')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
+</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
+<span class="text-xs font-bold text-white">8.82</span>
+</div></div>
+<div>
+<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Cyberpunk: Edgerunners</h3>
+<p class="text-xs text-slate-500 mt-1">Trigger • 2022</p>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative flex flex-col gap-3">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Abstract colorful futuristic warrior" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDWcCpQmjo8uQXHnWFwWtQKJcxUY4ZsZo52GL6hDTah6-cdc9uo3nknmnF9a38YoGcxcFxwTw-r0ACefFu1OuNuNCsNe0Qm9gf6z5qadFDQTO1WNW13e53wmjoCgJppXSEXzv7JZpw6kBkbgOgrf8U2VK4sN58-dUHdShNBB1xVSmpLYlkY4QUmjMLOA6PZ0-R4ESM3pcMN0czVMjppY56_6-BxV7qmerMlRyz5pxI_8Rf3Q2SfkXPGWgK91omZaC21UbI6e6hoYI8')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
+</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
+<span class="text-xs font-bold text-white">8.76</span>
+</div></div>
+<div>
+<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Solo Leveling</h3>
+<p class="text-xs text-slate-500 mt-1">A-1 Pictures • 2024</p>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group relative flex flex-col gap-3">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Calm rural Japanese landscape" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDpl-WKmQa8PIMnnb4F-xXMklu4ph4ahlpv0D4UARuHrwYJxm3eEjtSni2ZPFHL77KapJ51-s00KuYib1TiYCvy9Qq3JDwSL0I6LZ3gpN2D6sXmxCBRiaz9Na-1XwY1HdcepQglDzUxG873w9jAJSkdSt5kfry3CBGjy81faGtqHmhRVxMSN5_akhobS80em_ra8SDW6W0CkwwYqgUT4X5zdoijN_0avUOpWwQFDo48TZn4B6JXmYm88cDtCAxTgSvWmItYAntTN-8')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
+</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
+<span class="text-xs font-bold text-white">8.44</span>
+</div></div>
+<div>
+<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">The Apothecary Diaries</h3>
+<p class="text-xs text-slate-500 mt-1">OLM • 2023</p>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="group relative flex flex-col gap-3">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Traditional Japanese temple in rain" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBjO4kIDbv61nHrahIEVKUyH438z1BANvHDQ1s2HnwFvTe9MpgHnTT_iD_WImTuKdcuImG8DIwuVJCELFgMV98oR8-fqeuAiI18Q9kMmQHlqaCgkvdUtcHAcLIzhZZERwd9DtMrluFUTsaDzjeGdQ5FnT3nCQW_Jt2qf2TLw9cmxXhjOuCPrIi-DJqnXSI2CLSwDZxfo2iU6zMwp17NHKUUny9OrlN9xiTEPq3IBRT-DsUf_R_N4w3dPwJqeGZAcq-tGrzm432uQ4c')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 left-2 px-2 py-1 rounded bg-primary/80 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">Airing</div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
+</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
+<span class="text-xs font-bold text-white">9.01</span>
+</div></div>
+<div>
+<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Jujutsu Kaisen Season 2</h3>
+<p class="text-xs text-slate-500 mt-1">MAPPA • 2023</p>
+</div>
+</div>
+</div>
+<!-- Load More -->
+<div class="flex justify-center py-8">
+<button class="flex items-center gap-2 px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full transition-all font-semibold">
+<span class="material-symbols-outlined">expand_more</span>
+                        Load More Anime
+                    </button>
+</div>
+</section>
+</main>
+</div>
+</body></html>
