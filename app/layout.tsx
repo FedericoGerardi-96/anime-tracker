@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -28,7 +29,9 @@ export default function RootLayout({
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
           <main className="flex-1 h-full overflow-y-auto flex flex-col relative">
-            <Topbar />
+            <Suspense fallback={<div className="h-20 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40" />}>
+              <Topbar />
+            </Suspense>
             {children}
           </main>
         </div>

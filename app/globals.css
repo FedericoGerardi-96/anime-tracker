@@ -16,6 +16,7 @@
 
   --color-slate-dark: #161b22;
   --color-deep-navy: #19322f;
+  --color-text-primary: #f8fafc;
   --color-text-muted: #94a3b8;
   --color-accent-gold: #eab308;
 
@@ -40,6 +41,10 @@ body {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   .sidebar-item-active {
     background: rgba(141, 49, 227, 0.1);

@@ -84,37 +84,37 @@ const FRIENDS_ACTIVITY = [
 
 export default function Home() {
   return (
-    <div className="p-12 space-y-12 pt-28">
+    <div className="p-4 sm:p-8 lg:p-12 space-y-8 lg:space-y-12 pt-24 lg:pt-28">
       {/* Hero Carousel */}
-      <section className="relative w-full h-[400px] rounded-2xl overflow-hidden group">
+      <section className="relative w-full h-[350px] sm:h-[400px] rounded-2xl overflow-hidden group">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
           style={{ backgroundImage: `url('${HERO_DATA.image}')` }}
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 p-10 space-y-4 max-w-2xl">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="bg-primary px-3 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wider">Trending Now</span>
-            <span className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white uppercase">Series • TV</span>
+        <div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 space-y-3 sm:space-y-4 max-w-2xl">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="bg-primary px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider">Trending Now</span>
+            <span className="bg-white/10 backdrop-blur-md px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold text-white uppercase">Series • TV</span>
           </div>
-          <h2 className="text-5xl font-black text-white leading-tight">{HERO_DATA.title}</h2>
-          <p className="text-slate-300 text-lg line-clamp-2">{HERO_DATA.description}</p>
-          <div className="flex items-center gap-4 pt-2">
-            <button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all transform hover:translate-y-[-2px]">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-              Watch Now
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">{HERO_DATA.title}</h2>
+          <p className="text-sm sm:text-base lg:text-lg text-slate-300 line-clamp-2 md:line-clamp-3">{HERO_DATA.description}</p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+            <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl text-sm sm:text-base font-bold flex items-center justify-center gap-2 transition-all transform hover:translate-y-[-2px]">
+              <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+              <span>Watch Now</span>
             </button>
-            <button className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all">
-              <span className="material-symbols-outlined">add</span>
-              Add to List
+            <button className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl text-sm sm:text-base font-bold flex items-center justify-center gap-2 transition-all">
+              <span className="material-symbols-outlined shrink-0">add</span>
+              <span>Add to List</span>
             </button>
           </div>
         </div>
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Main Grid Area */}
-        <div className="lg:col-span-3 space-y-8">
+        <div className="xl:col-span-3 space-y-8">
           {/* Airing Today */}
           <section>
             <div className="flex items-center justify-between mb-6">
@@ -124,7 +124,7 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
               {AIRING_TODAY.map((anime) => (
                 <div key={anime.id} className="group cursor-pointer">
-                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-3">
+                  <div className="relative aspect-3/4 rounded-xl overflow-hidden mb-3">
                     <div 
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" 
                       style={{ backgroundImage: `url('${anime.image}')` }}
@@ -199,7 +199,7 @@ export default function Home() {
           </section>
 
           {/* Quick List Sync Banner */}
-          <div className="bg-gradient-to-br from-primary to-indigo-600 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+          <div className="bg-linear-to-br from-primary to-indigo-600 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
             <div className="absolute -right-4 -bottom-4 opacity-20">
               <span className="material-symbols-outlined text-9xl">cloud_sync</span>
             </div>
