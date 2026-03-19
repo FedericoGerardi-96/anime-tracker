@@ -1,4 +1,5 @@
-
+import React from "react";
+import Link from "next/link";
 
 const HERO_DATA = {
   title: "Chainsaw Man: International Assassins Arc",
@@ -205,9 +206,11 @@ export default function Home() {
             </div>
             <h4 className="text-lg font-bold mb-2">My Lists</h4>
             <p className="text-sm text-white/80 mb-4 leading-relaxed">Login now to sync your progress, get tailored recommendations, and access your private entries.</p>
-            <button className="w-full bg-white text-primary py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors shadow-lg">
-              Login to Sync
-            </button>
+            <Link href="/login" className="block w-full">
+              <button className="w-full bg-white text-primary py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors shadow-lg cursor-pointer">
+                Login to Sync
+              </button>
+            </Link>
           </div>
 
           {/* Mini Community Feed */}

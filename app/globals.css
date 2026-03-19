@@ -1,55 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f6f8;
-  --foreground: #0f172a;
+  --background: #0f172a; /* Deep Navy - Restored to original */
+  --foreground: #f8fafc; /* Text Primary */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-display: 'Inter', sans-serif;
   
-  --color-primary: #8d31e3;
-  --color-background-light: #f7f6f8;
-  --color-background-dark: #0f172a;
-
+  --color-primary: #8d31e3; /* Electric Purple */
+  --color-deep-navy: #0f172a;
   --color-slate-dark: #161b22;
-  --color-deep-navy: #19322f;
   --color-text-primary: #f8fafc;
   --color-text-muted: #94a3b8;
   --color-accent-gold: #eab308;
+  
+  --font-display: 'Inter', system-ui, sans-serif; /* SF Pro Display fallback to Inter if not available */
+  --font-sans: 'Inter', system-ui, sans-serif;
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-  }
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
 }
 
 @layer utilities {
   .glass {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(30, 41, 59, 0.4);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
+  
   .glass-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
+
   .sidebar-item-active {
-    background: rgba(141, 49, 227, 0.1);
-    border-left: 4px solid #8d31e3;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    background: rgba(141, 49, 227, 0.15);
+    border-right: 4px solid #8d31e3;
+    transition: all 0.2s ease;
   }
 }

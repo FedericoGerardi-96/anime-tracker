@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import type { User } from "@supabase/supabase-js";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: "home" },
@@ -12,7 +13,7 @@ const NAV_ITEMS = [
   { href: "/favorites", label: "Favorites", icon: "favorite" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ user, profile }: { user?: User | null, profile?: any }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -74,41 +75,45 @@ export default function Sidebar() {
               </Link>
             );
           })}
-          <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
-            <Link 
-              className={`flex items-center gap-3 px-4 py-3 transition-all ${
-                pathname === "/private" 
-                  ? "sidebar-item-active text-primary rounded-r-lg" 
-                  : "rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400"
-              }`} 
-              href="/private"
-              onClick={() => setIsOpen(false)}
-            >
-              <span className="material-symbols-outlined" style={pathname === "/private" ? { fontVariationSettings: "'FILL' 1" } : undefined}>
-                lock
-              </span>
-              <span className="font-medium text-sm">Private Manual Entry</span>
-            </Link>
-          </div>
+          {user && (
+            <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+              <Link 
+                className={`flex items-center gap-3 px-4 py-3 transition-all ${
+                  pathname === "/private" 
+                    ? "sidebar-item-active text-primary rounded-r-lg" 
+                    : "rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400"
+                }`} 
+                href="/private"
+                onClick={() => setIsOpen(false)}
+              >
+                <span className="material-symbols-outlined" style={pathname === "/private" ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+                  lock
+                </span>
+                <span className="font-medium text-sm">Private Manual Entry</span>
+              </Link>
+            </div>
+          )}
         </nav>
 
-        <div className="p-4 mt-auto">
-          <Link 
-            href="/profile"
-            className="glass-card p-4 rounded-2xl flex items-center gap-3 hover:bg-primary/5 transition-all cursor-pointer"
-            onClick={() => setIsOpen(false)}
-          >
-            <div 
-              className="w-10 h-10 rounded-full bg-cover bg-center shrink-0 shadow-lg" 
-              style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuBN5uDXe-IKsglDPE6HJaM6nA-uXxkiBR5s8AANx0b79WVvk2IygdfcAXLmasQ-gDDfMRN-Ex2Ekvg0GPIJehirZptNhYnVHxAKcH47FENBigSIuasWetHDJC4Cv0QCUgsARcvbYMwwSz67U5PxceVJkCIXr9y1jRgwUGwAvcnGWfOk-QuA7VCaF0UdphE0Ro4bnRHTzk_onv-xqk9_c_mPGdVMkSb0RaUOZbqxikIVS13eUtE3zGcBCJHfX2PzuKapws-9feUHDmI')` }}
-            />
-            <div className="flex-1 overflow-hidden">
-              <p className="text-xs font-bold truncate text-text-primary">Zenith_Reader</p>
-              <p className="text-[10px] text-primary font-bold">MASTER TIER</p>
-            </div>
-            <span className="material-symbols-outlined text-slate-500 text-sm">settings</span>
-          </Link>
-        </div>
+        {user && (
+          <div className="p-4 mt-auto">
+            <Link 
+              href="/profile"
+              className="glass-card p-4 rounded-2xl flex items-center gap-3 hover:bg-primary/5 transition-all cursor-pointer"
+              onClick={() => setIsOpen(false)}
+            >
+              <div 
+                className="w-10 h-10 rounded-full bg-cover bg-center shrink-0 shadow-lg" 
+                style={{ backgroundImage: `url('${profile?.avatar || 'https://res.cloudinary.com/do3n04ysn/image/upload/v1692600735/anime-app/gw87wdnbncrslkemdxe4.png'}')` }}
+              />
+              <div className="flex-1 overflow-hidden">
+                <p className="text-xs font-bold truncate text-text-primary">{profile?.full_name || user?.user_metadata?.username || user?.email?.split('@')[0]}</p>
+                <p className="text-[10px] text-primary font-bold uppercase">SUPPORTER</p>
+              </div>
+              <span className="material-symbols-outlined text-slate-500 text-sm">settings</span>
+            </Link>
+          </div>
+        )}
       </aside>
     </>
   );

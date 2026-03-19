@@ -1,12 +1,6 @@
+import { createClient } from "@/lib/supabase/server";
 
 const PROFILE_DATA = {
-  user: {
-    name: "Zenith_Reader",
-    tier: "MASTER TIER",
-    avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAHQf_VIg068bYmxWTJXP9zxETeNaUXwiPvh8eHGSDDmGenO0J9fMnhwSZ3MrxQaskVeaASkaXxcu0foELvSxg617guUCE--DFCNZ3I6mJNq_4B88s33NVEz1R4gY-7fP5onANLkDbUueU29iP1RkEYe9sYdyeQONw5pGr9TwGCPib9YJj4mU2tu2iadDzJfbx-JMJnQXnn_VE5wZylV8RVnkbbGPg_efgoYCHgr2qk5hRMUZXcMTo_OBEkrHO9ehIsJBT8TocSkfo",
-    bio: "Otaku since 2021. Living in the 2D world. Top favorites: Steins;Gate and Berserk. Currently hunting for the next masterpiece.",
-    verified: true,
-  },
   stats: [
     { label: "Watch Time", value: "124h", color: "text-primary" },
     { label: "Chapters", value: "450", color: "text-primary" },
@@ -82,7 +76,28 @@ const PROFILE_DATA = {
   ]
 };
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let profile = {
+    name: "Unknown User",
+    avatar: "https://res.cloudinary.com/do3n04ysn/image/upload/v1692600735/anime-app/gw87wdnbncrslkemdxe4.png",
+    tier: "MEMBER",
+    bio: "I'm new here! Exploring the world of anime.",
+    verified: false,
+  };
+
+  if (user) {
+    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    if (data) {
+      profile.name = data.full_name;
+      profile.avatar = data.avatar;
+      profile.tier = data.roles?.includes('admin') ? 'ADMIN' : 'SUPPORTER';
+      profile.verified = true;
+    }
+  }
+
   return (
     <div className="flex-1 p-6 md:p-12 space-y-12 pt-24 lg:pt-28">
       {/* Profile Header */}
@@ -91,9 +106,9 @@ export default function ProfilePage() {
           <div className="relative">
             <div 
               className="w-40 h-40 rounded-3xl bg-cover bg-center shadow-2xl border-2 border-slate-200 dark:border-slate-800" 
-              style={{ backgroundImage: `url('${PROFILE_DATA.user.avatar}')` }}
+              style={{ backgroundImage: `url('${profile.avatar}')` }}
             />
-            {PROFILE_DATA.user.verified && (
+            {profile.verified && (
               <div className="absolute -bottom-2 -right-2 bg-primary text-white p-2 rounded-xl shadow-lg">
                 <span className="material-symbols-outlined text-xl">verified</span>
               </div>
@@ -102,13 +117,13 @@ export default function ProfilePage() {
           
           <div className="flex-1 text-center xl:text-left space-y-2 min-w-[280px]">
             <div className="flex flex-col xl:flex-row items-center gap-4">
-              <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-text-primary">{PROFILE_DATA.user.name}</h1>
+              <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-text-primary">{profile.name}</h1>
               <span className="px-3 py-1 bg-primary/20 text-primary text-[10px] lg:text-xs font-bold rounded-full uppercase tracking-widest whitespace-nowrap">
-                {PROFILE_DATA.user.tier}
+                {profile.tier}
               </span>
             </div>
             <p className="text-text-muted text-sm lg:text-base max-w-lg mx-auto xl:mx-0">
-              {PROFILE_DATA.user.bio}
+              {profile.bio}
             </p>
           </div>
 

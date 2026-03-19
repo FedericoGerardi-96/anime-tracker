@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#431a6b",
+                        "on-primary": "#490081",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "secondary-container": "#5b3383",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#f0dbff",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-low": "#1f1923",
+                        "inverse-primary": "#8424da",
+                        "surface-dim": "#16111b",
+                        "on-surface": "#eadfed",
+                        "on-secondary-fixed": "#2c0051",
+                        "outline-variant": "#4c4354",
+                        "on-secondary-fixed-variant": "#5b3383",
+                        "inverse-on-surface": "#342e39",
+                        "on-secondary-container": "#cfa2fb",
+                        "primary-container": "#8d31e3",
+                        "on-background": "#eadfed",
+                        "tertiary-fixed": "#ffdcbd",
+                        "secondary-fixed-dim": "#dcb8ff",
+                        "tertiary-fixed-dim": "#ffb86d",
+                        "on-error": "#690005",
+                        "primary-fixed": "#f0dbff",
+                        "tertiary-container": "#955800",
+                        "on-primary-container": "#f2dfff",
+                        "background": "#16111b",
+                        "surface-tint": "#dcb8ff",
+                        "surface-bright": "#3d3742",
+                        "surface-container-highest": "#39323d",
+                        "on-primary-fixed-variant": "#6800b5",
+                        "secondary": "#dcb8ff",
+                        "on-tertiary-container": "#ffe0c4",
+                        "surface-container-lowest": "#110c16",
+                        "inverse-surface": "#eadfed",
+                        "on-tertiary": "#492900",
+                        "on-primary-fixed": "#2c0051",
+                        "outline": "#988ca0",
+                        "surface": "#16111b",
+                        "primary-fixed-dim": "#dcb8ff",
+                        "surface-variant": "#39323d",
+                        "on-surface-variant": "#cfc2d7",
+                        "tertiary": "#ffb86d",
+                        "surface-container": "#231d28",
+                        "surface-container-high": "#2e2832",
+                        "primary": "#dcb8ff",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#2c1600"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(22, 17, 27, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden">
+<!-- Background Dashboard (Blurred) -->
+<div class="fixed inset-0 flex flex-row">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col h-screen w-64 border-r border-white/10 bg-gray-900/60 backdrop-blur-md font-inter antialiased text-sm font-medium shadow-2xl z-10">
+<div class="p-6">
+<h1 class="text-xl font-bold tracking-tight text-white">AniTrack</h1>
+<p class="text-xs text-gray-500 mt-1">Anime &amp; Manga</p>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-white border-r-4 border-violet-500 bg-violet-500/10">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-colors hover:bg-white/5 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span>My Library</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-colors hover:bg-white/5 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span>Seasonal</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-colors hover:bg-white/5 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Social</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-colors hover:bg-white/5 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</div>
+</nav>
+<div class="p-4 mt-auto border-t border-white/5">
+<button class="w-full bg-primary-container text-on-primary-container py-2.5 rounded-xl font-bold active:scale-95 transition-transform">Upgrade to Pro</button>
+<div class="flex items-center gap-3 px-4 py-3 mt-4 text-gray-400 hover:text-white transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen bg-surface-container-lowest">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between px-6 w-full h-16 sticky top-0 z-50 bg-gray-900/40 backdrop-blur-sm border-b border-white/5 shadow-sm font-inter text-sm">
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 material-symbols-outlined text-lg" data-icon="search">search</span>
+<input class="bg-surface-container-high border-none rounded-full pl-10 pr-4 py-1.5 w-64 focus:ring-2 focus:ring-violet-500 text-sm" placeholder="Search anime..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex gap-6">
+<span class="text-gray-300 hover:text-white transition-colors cursor-pointer">Browse</span>
+<span class="text-gray-300 hover:text-white transition-colors cursor-pointer">Manga</span>
+<span class="text-gray-300 hover:text-white transition-colors cursor-pointer">Community</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-gray-300 cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-gray-300 cursor-pointer" data-icon="bookmark">bookmark</span>
+<div class="h-8 w-8 rounded-full bg-surface-bright flex items-center justify-center border border-white/10 overflow-hidden">
+<img alt="User avatar" class="h-full w-full object-cover" data-alt="User profile illustration" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0jMGmiDkjNsSKwqnw2Dlfzv7OrMvoo5TZP2R8zZo11uzqqOW1J-EKa_gVNzg5SiuPN30ZGkiTHepvHet5WduaitTg7Tu7K-lM1sSY6iMl4E6mIf_Dy1Kjk46zcWHG13bapHruydqfz81BQEe8f9W4itWEy6xCqHsLWQFtpJWDwUbGOFiDGbIXT91AFji-bxdGn5G-rbL6KU4YIuRpup4U2pvnkhpg05uiC-c3enqQWs0V-zaIu_aPy2IZhhJtGapQdDvoS2f_rMM"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content (Blurred Content Mockup) -->
+<div class="p-8 space-y-8">
+<div class="h-48 rounded-2xl bg-gradient-to-r from-violet-900/40 to-indigo-900/40 border border-white/5 flex items-end p-8">
+<div class="space-y-2">
+<div class="h-6 w-48 bg-white/10 rounded"></div>
+<div class="h-4 w-32 bg-white/5 rounded"></div>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-6">
+<div class="aspect-[2/3] rounded-xl bg-surface-container-high border border-white/5"></div>
+<div class="aspect-[2/3] rounded-xl bg-surface-container-high border border-white/5"></div>
+<div class="aspect-[2/3] rounded-xl bg-surface-container-high border border-white/5"></div>
+<div class="aspect-[2/3] rounded-xl bg-surface-container-high border border-white/5"></div>
+</div>
+</div>
+</main>
+</div>
+<!-- Auth Modal Overlay -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+<!-- Auth Modal -->
+<div class="glass-panel w-full max-w-md rounded-3xl overflow-hidden shadow-2xl relative">
+<!-- Branding/Decorative Top -->
+<div class="h-32 bg-gradient-to-br from-primary-container/30 to-secondary-container/30 relative flex items-center justify-center">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+<div class="text-center z-10">
+<div class="inline-flex items-center justify-center p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 mb-2">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="play_circle" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+<h2 class="text-2xl font-black tracking-tighter text-white">AniTrack</h2>
+</div>
+<button class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Modal Content -->
+<div class="p-8 pt-6">
+<div class="text-center mb-8">
+<h3 class="text-xl font-bold text-on-surface">Welcome Back</h3>
+<p class="text-on-surface-variant text-sm mt-1">Sign in to sync your watch list</p>
+</div>
+<!-- Google Login -->
+<button class="w-full flex items-center justify-center gap-3 bg-white text-gray-900 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all active:scale-95 mb-6">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+                    Continue with Google
+                </button>
+<!-- Divider -->
+<div class="relative flex items-center mb-6">
+<div class="flex-grow border-t border-white/10"></div>
+<span class="flex-shrink mx-4 text-xs text-on-surface-variant font-medium uppercase tracking-widest">or email</span>
+<div class="flex-grow border-t border-white/10"></div>
+</div>
+<!-- Email Form -->
+<form class="space-y-4" onsubmit="return false;">
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-on-surface-variant uppercase ml-1">Email Address</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg" data-icon="mail">mail</span>
+<input class="w-full bg-surface-container-high border-white/5 rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<div class="flex justify-between items-center ml-1">
+<label class="text-xs font-bold text-on-surface-variant uppercase">Password</label>
+<a class="text-[10px] text-primary font-bold hover:underline" href="#">Forgot?</a>
+</div>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg" data-icon="lock">lock</span>
+<input class="w-full bg-surface-container-high border-white/5 rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all outline-none" placeholder="••••••••" type="password"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg cursor-pointer" data-icon="visibility">visibility</span>
+</div>
+</div>
+<button class="w-full bg-primary-container text-on-primary-container py-3.5 rounded-xl font-black text-lg shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40 active:scale-[0.98] transition-all mt-4">
+                        Login to AniTrack
+                    </button>
+</form>
+<!-- Toggle Footer -->
+<div class="mt-8 text-center">
+<p class="text-sm text-on-surface-variant">
+                        Don't have an account? 
+                        <button class="text-primary font-bold hover:underline ml-1">Create an account</button>
+</p>
+</div>
+</div>
+<!-- Bottom Note -->
+<div class="bg-surface-container-highest/30 px-8 py-4 text-center">
+<p class="text-[10px] text-outline leading-relaxed">
+                    By continuing, you agree to AniTrack's <a class="underline" href="#">Terms of Service</a> and <a class="underline" href="#">Privacy Policy</a>.
+                </p>
+</div>
+</div>
+</div>
+</body></html>
