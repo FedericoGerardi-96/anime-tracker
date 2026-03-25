@@ -43,6 +43,48 @@ export interface JikanAnime {
   }>;
 }
 
+export interface JikanManga {
+  mal_id: number;
+  url: string;
+  images: {
+    jpg: {
+      image_url: string;
+      small_image_url: string;
+      large_image_url: string;
+    };
+    webp: {
+      image_url: string;
+      small_image_url: string;
+      large_image_url: string;
+    };
+  };
+  title: string;
+  title_english: string | null;
+  type: string;
+  chapters: number | null;
+  volumes: number | null;
+  status: string;
+  publishing: boolean;
+  score: number | null;
+  scored_by: number | null;
+  rank: number | null;
+  popularity: number;
+  synopsis: string | null;
+  background: string | null;
+  authors: Array<{
+    mal_id: number;
+    type: string;
+    name: string;
+    url: string;
+  }>;
+  genres: Array<{
+    mal_id: number;
+    type: string;
+    name: string;
+    url: string;
+  }>;
+}
+
 export interface JikanPagination {
   last_visible_page: number;
   has_next_page: boolean;
@@ -71,6 +113,8 @@ export interface JikanSearchParams {
   sort?: "asc" | "desc";
   page?: number;
   limit?: number;
+  season?: string;
+  year?: number;
 }
 
 export interface JikanCharacter {
@@ -93,6 +137,12 @@ export interface JikanCharacter {
     person: {
       mal_id: number;
       name: string;
+      url: string;
+      images: {
+        jpg: {
+          image_url: string;
+        };
+      };
     };
     language: string;
   }>;
@@ -124,4 +174,3 @@ export interface JikanRecommendation {
   url: string;
   votes: number;
 }
-

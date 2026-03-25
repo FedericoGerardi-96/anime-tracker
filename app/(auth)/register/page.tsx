@@ -3,6 +3,12 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import AuthTabs from "@/components/ui/AuthTabs";
 import { register, signInWithGoogle } from "@/lib/actions/auth";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Register",
+  description: "Join AniTrack to track your progress and discover new anime/manga.",
+};
 
 export default async function RegisterPage({
   searchParams,

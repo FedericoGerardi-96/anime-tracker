@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-container": "#dcb8ff",
+              "on-secondary-fixed": "#0f172a",
+              "tertiary-fixed-dim": "#fdba74",
+              "surface-bright": "#1e293b",
+              "primary": "#8d31e3",
+              "on-primary": "#ffffff",
+              "background": "#0f172a",
+              "surface-container-low": "rgba(255, 255, 255, 0.03)",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#ffedd5",
+              "surface-container-lowest": "#020617",
+              "on-primary-fixed": "#2c0051",
+              "surface-tint": "#8d31e3",
+              "primary-container": "rgba(141, 49, 227, 0.2)",
+              "on-tertiary-fixed": "#451a03",
+              "on-secondary-container": "#cbd5e1",
+              "surface-variant": "#1e293b",
+              "secondary-fixed": "#e2e8f0",
+              "inverse-surface": "#f1f5f9",
+              "surface": "#0f172a",
+              "primary-fixed-dim": "#dcb8ff",
+              "on-primary-fixed-variant": "#6800b5",
+              "inverse-primary": "#a855f7",
+              "inverse-on-surface": "#0f172a",
+              "tertiary-container": "#78350f",
+              "on-error-container": "#fecaca",
+              "outline-variant": "rgba(255, 255, 255, 0.1)",
+              "secondary-container": "#334155",
+              "secondary": "#1e293b",
+              "primary-fixed": "#f0dbff",
+              "on-tertiary-container": "#fef3c7",
+              "on-tertiary": "#000000",
+              "on-surface-variant": "#94a3b8",
+              "surface-container-highest": "rgba(255, 255, 255, 0.12)",
+              "surface-dim": "#0f172a",
+              "on-secondary-fixed-variant": "#334155",
+              "error": "#ef4444",
+              "error-container": "#7f1d1d",
+              "outline": "#334155",
+              "tertiary": "#f59e0b",
+              "on-surface": "#f8fafc",
+              "surface-container-high": "rgba(255, 255, 255, 0.08)",
+              "on-background": "#f8fafc",
+              "on-tertiary-fixed-variant": "#92400e",
+              "surface-container": "rgba(255, 255, 255, 0.05)",
+              "secondary-fixed-dim": "#cbd5e1",
+              "on-secondary": "#f8fafc"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; }
+        .glass-card { backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); }
+        .glass-card:hover { border-color: rgba(141, 49, 227, 0.5); }
+        .sidebar-mask { mask-image: linear-gradient(to bottom, black 90%, transparent); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-64 fixed left-0 top-0 border-r border-white/10 bg-slate-900/60 backdrop-blur-md z-50 flex flex-col p-6 gap-2">
+<div class="text-xl font-black text-violet-500 mb-8 font-inter uppercase tracking-widest">AniTrack</div>
+<nav class="flex flex-col gap-2 flex-grow">
+<!-- Dashboard (Inactive) -->
+<a class="flex items-center gap-4 text-slate-400 px-4 py-3 hover:text-white hover:bg-white/10 transition-all hover:translate-x-1 duration-200 font-inter text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span>Dashboard</span>
+</a>
+<!-- Trending (Inactive) -->
+<a class="flex items-center gap-4 text-slate-400 px-4 py-3 hover:text-white hover:bg-white/10 transition-all hover:translate-x-1 duration-200 font-inter text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="local_fire_department">local_fire_department</span>
+<span>Trending</span>
+</a>
+<!-- Library (Active Semantic Match for My Favorites) -->
+<a class="flex items-center gap-4 bg-violet-600 text-white rounded-xl px-4 py-3 shadow-[0_0_20px_rgba(141,49,227,0.4)] hover:translate-x-1 duration-200 font-inter text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="video_library">video_library</span>
+<span>Library</span>
+</a>
+<!-- Schedule (Inactive) -->
+<a class="flex items-center gap-4 text-slate-400 px-4 py-3 hover:text-white hover:bg-white/10 transition-all hover:translate-x-1 duration-200 font-inter text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span>Schedule</span>
+</a>
+<!-- Settings (Inactive) -->
+<a class="flex items-center gap-4 text-slate-400 px-4 py-3 hover:text-white hover:bg-white/10 transition-all hover:translate-x-1 duration-200 font-inter text-sm font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-white/5">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center border border-primary/20">
+<img alt="User profile" class="w-full h-full object-cover rounded-full" data-alt="User profile avatar circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl1Cgk1RGF8cuUaxf8AcihPvr_13vEbPSUJs3Kic6SLjLvXyZ6Te-HeXaWHhSwMqcQYqEUB03cV8P4Dl0aLH-DVrkyIVnx5A3aGkztCckdgpmezUXGkMcP0kKixdKpPZtUOfl5ElkgviPIdctVETHb7eUsM-fP2hIorCmFVvJB-rE9GR2lV7QLBhgYesggDVfAcLsx7zIfUC80Tl-C0N5rQZtbv7OeSMJ_BEaCl6xQzR-9OvMy59GfSeSxC1ZPXbzqFyFE1YzlUFM"/>
+</div>
+<div>
+<div class="text-xs font-bold text-white uppercase tracking-tighter">Premium Member</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-widest">Tier 2 Supporter</div>
+</div>
+</div>
+<button class="w-full bg-violet-600 text-white font-bold py-3 rounded-xl shadow-[0_0_20px_rgba(141,49,227,0.3)] hover:scale-[1.02] active:scale-95 transition-all text-xs uppercase tracking-widest">Upgrade to Pro</button>
+</div>
+</aside>
+<main class="ml-64 min-h-screen relative">
+<!-- TopNavBar (Shared Component) -->
+<header class="w-full sticky top-0 z-40 bg-slate-900/40 backdrop-blur-xl bg-gradient-to-b from-slate-900/80 to-transparent shadow-2xl shadow-black/50 flex justify-between items-center h-20 px-12">
+<div class="flex items-center gap-12">
+<div class="text-2xl font-black tracking-tighter text-violet-500 font-inter antialiased">AniTrack</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 font-medium hover:text-slate-100 transition-colors font-inter antialiased tracking-tight" href="#">Explore</a>
+<a class="text-slate-400 font-medium hover:text-slate-100 transition-colors font-inter antialiased tracking-tight" href="#">Seasonal</a>
+<a class="text-violet-500 font-bold border-b-2 border-violet-500 pb-1 font-inter antialiased tracking-tight" href="#">My List</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-xl" data-icon="search">search</span>
+<input class="bg-white/5 border-none rounded-full py-2 pl-12 pr-6 text-sm w-64 focus:ring-2 focus:ring-primary/50 text-white placeholder:text-slate-500 transition-all focus:w-80" placeholder="Search favorite series..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-white transition-all active:scale-95"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="text-slate-400 hover:text-white transition-all active:scale-95"><span class="material-symbols-outlined" data-icon="account_circle">account_circle</span></button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<div class="p-12">
+<!-- Hero Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<nav class="flex items-center gap-2 text-xs font-bold text-violet-500 uppercase tracking-widest mb-4">
+<span>Library</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+<span class="text-slate-500">Favorites</span>
+</nav>
+<h1 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter mb-4">My Favorites</h1>
+<p class="text-slate-400 text-lg max-w-2xl font-medium antialiased">Your curated collection of top-rated stories and unforgettable characters.</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-900/20 active:scale-95">
+<span class="material-symbols-outlined" data-icon="table_chart">table_chart</span>
+<span class="uppercase text-xs tracking-widest">Export to Excel</span>
+</button>
+</div>
+</div>
+<!-- Filter Bar (Modern Glass Version) -->
+<div class="glass-card rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-6">
+<div class="flex flex-col gap-2 min-w-[180px]">
+<label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Genre</label>
+<div class="relative">
+<select class="w-full bg-slate-900/50 border-none text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer">
+<option>All Genres</option>
+<option>Action</option>
+<option>Sci-Fi</option>
+<option>Fantasy</option>
+<option>Psychological</option>
+</select>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 min-w-[180px]">
+<label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Status</label>
+<div class="relative">
+<select class="w-full bg-slate-900/50 border-none text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer">
+<option>All Status</option>
+<option>Watching</option>
+<option>Completed</option>
+<option>On Hold</option>
+</select>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 min-w-[180px]">
+<label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Sort By</label>
+<div class="relative">
+<select class="w-full bg-slate-900/50 border-none text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer">
+<option>MAL Score</option>
+<option>Alphabetical</option>
+<option>Date Added</option>
+<option>Year</option>
+</select>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="ml-auto flex items-center gap-3 self-end py-1">
+<button class="w-12 h-12 flex items-center justify-center rounded-xl bg-violet-600 text-white shadow-lg shadow-violet-900/30 transition-all"><span class="material-symbols-outlined" data-icon="grid_view">grid_view</span></button>
+<button class="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all"><span class="material-symbols-outlined" data-icon="view_list">view_list</span></button>
+</div>
+</div>
+<!-- Bento / Grid Content -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+<!-- Card 1 -->
+<div class="group relative flex flex-col gap-4">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden glass-card transition-all duration-500 hover:-translate-y-2 group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+<img alt="Anime Poster" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Stylized anime cyberpunk city poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFlqBlE13iFHcEG5CUAfoHSDbsS3Q4zFLphDk9UaF23UQIhnPGNwUTuAI8kt1mfXI2h0HrU6pjmjtYwCZ9oM7BF9ynlp9Dq7PPOg2FUw_NDuZWL_qjgxSVf7OQlrUzP6vbB9xKwTx2NhAoI11zSTMrDioZxrXRV5ctikWOZfSkn5976o8UD7L-g9P9CjNgTZZoO6a4b_MmY-0qSIKRS7O40_N4z6N-bK3RJX6hHIwcTMlUKPXm82sKbz1_Ir5evfHF7hvhIvH10vg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+<div class="absolute top-4 left-4 flex gap-2">
+<div class="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-white text-xs font-bold">9.24</span>
+</div>
+</div>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center shadow-lg text-white">
+<span class="material-symbols-outlined text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<button class="w-full bg-white text-slate-900 font-bold py-3 rounded-xl uppercase text-[10px] tracking-widest shadow-xl">Quick View</button>
+</div>
+</div>
+<div class="px-1">
+<h3 class="text-white font-bold text-lg leading-tight group-hover:text-violet-400 transition-colors">Neon Genesis Evangelion</h3>
+<p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">TV • 26 Episodes</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative flex flex-col gap-4">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden glass-card transition-all duration-500 hover:-translate-y-2 group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+<img alt="Anime Poster" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Sci-fi space odyssey anime poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKzhrq31nGdeHUKhhPZRPwOF59-aheZgaoT9xAbXFgwQsNMcqxqOCiVeet3EXDAI671GqZn32Ux5NePizCV7NO1wjsRNs-yWQC2JWQEzpySfZ9an-C3APU0eI3-iTN-oDTkuVnTMn3tPmiyzfMGTrJ_UvfPgXsJ1JmuXLavl3Sv2IRGZGEgcsAOjuLn5pAOWCF1h6KFos35Ujzg__tJT3rGO7LNApkneUT9pgDKdUAGqM96wijbBijiKMxvTIyjB75ZcXVbln-9uk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+<div class="absolute top-4 left-4 flex gap-2">
+<div class="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-white text-xs font-bold">8.76</span>
+</div>
+</div>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center shadow-lg text-white">
+<span class="material-symbols-outlined text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<button class="w-full bg-white text-slate-900 font-bold py-3 rounded-xl uppercase text-[10px] tracking-widest shadow-xl">Quick View</button>
+</div>
+</div>
+<div class="px-1">
+<h3 class="text-white font-bold text-lg leading-tight group-hover:text-violet-400 transition-colors">Cowboy Bebop</h3>
+<p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">TV • 26 Episodes</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative flex flex-col gap-4">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden glass-card transition-all duration-500 hover:-translate-y-2 group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+<img alt="Anime Poster" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Traditional Japanese style animated forest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxqWX9xodGAYv-YPkG5jujs24fvEPOdXwnhMjQvvN_8fvQEWeztmtTFA05-sFv_oxz6Idho0YwSzNZZtTv2GzQ60943jZ_gCQJkeU-JXrWN-MuU7OhAU0F-y2lnt4JGaHGTSYKSXJm9d_qUixdqlmQ9H8MmV8RdOj-UItUqnh1X0EdsOl60OgqvvbBFqr00sX1Go-beNbId1V98mphmCVYI8rJcfuxc1Alh_k9deMpb_wnj3ik9xLCNDa6MNskYlqXo9dh55kL48c"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+<div class="absolute top-4 left-4 flex gap-2">
+<div class="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-white text-xs font-bold">8.95</span>
+</div>
+</div>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center shadow-lg text-white">
+<span class="material-symbols-outlined text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<button class="w-full bg-white text-slate-900 font-bold py-3 rounded-xl uppercase text-[10px] tracking-widest shadow-xl">Quick View</button>
+</div>
+</div>
+<div class="px-1">
+<h3 class="text-white font-bold text-lg leading-tight group-hover:text-violet-400 transition-colors">Princess Mononoke</h3>
+<p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Movie • 133 Min</p>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative flex flex-col gap-4">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden glass-card transition-all duration-500 hover:-translate-y-2 group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+<img alt="Anime Poster" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Futuristic mech warrior anime concept" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfRCTzYluYjheSIxuCIyHlWTLCxMuH5uY9Xxf3bOJ2yTy9Q7NqyAdIxha3U2kOyBdjB_vAyZk0BfxBQr-U1Hw2Ni2xDspyABPCrmROEVd8TCNYvVJKZVY3p8jYNnf4MDmzVYOR9FNcS1hLHNMVmWuy0AJ8Aqg3CJcJfCEOHXH2yN3kCo5j2YyC-5AbIuqFXKm4_GZe44cGqYLdaHIECl_kRLEasy3PYLV29p02HPbz2CK-s1d0SZQGNQz6w9csP0ME6NKYjxHa8fk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+<div class="absolute top-4 left-4 flex gap-2">
+<div class="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-white text-xs font-bold">9.12</span>
+</div>
+</div>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center shadow-lg text-white">
+<span class="material-symbols-outlined text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<button class="w-full bg-white text-slate-900 font-bold py-3 rounded-xl uppercase text-[10px] tracking-widest shadow-xl">Quick View</button>
+</div>
+</div>
+<div class="px-1">
+<h3 class="text-white font-bold text-lg leading-tight group-hover:text-violet-400 transition-colors">Fullmetal Alchemist</h3>
+<p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">TV • 64 Episodes</p>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group relative flex flex-col gap-4">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden glass-card transition-all duration-500 hover:-translate-y-2 group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+<img alt="Anime Poster" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Dark fantasy gothic anime landscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5JdsYy6e4-aa0QcMcDzCc3SYVoEBpqWzqVnJzzTDYer9s5mc-yeFBt865fbkuD_PaM3iK9qKLH0qbCcYZpBJH6EzJbpN7ErgliRfrOXgjASxYD8w_xwkgHeJa_bLVml2OAiGcJ5w8jJfl7IvXPCoYACfPfKULwfG66m4qSDq_hL0LyaanHiWdd7hAXVYJLr3GoA2e85nqOdaygI6Xz1LnuJqYHNWWgBLvWnMCTQOrEEkFztGkcnIQYC-YTlask8HGx7-XyMa1mLk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+<div class="absolute top-4 left-4 flex gap-2">
+<div class="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-white text-xs font-bold">8.55</span>
+</div>
+</div>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center shadow-lg text-white">
+<span class="material-symbols-outlined text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<button class="w-full bg-white text-slate-900 font-bold py-3 rounded-xl uppercase text-[10px] tracking-widest shadow-xl">Quick View</button>
+</div>
+</div>
+<div class="px-1">
+<h3 class="text-white font-bold text-lg leading-tight group-hover:text-violet-400 transition-colors">Attack on Titan</h3>
+<p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">TV • 75 Episodes</p>
+</div>
+</div>
+</div>
+<!-- Pagination (Modern Glassmorphism Paginator) -->
+<div class="mt-20 flex justify-center">
+<nav class="glass-card flex items-center p-2 rounded-2xl gap-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-violet-600 text-white font-bold text-sm shadow-[0_0_15px_rgba(141,49,227,0.4)]">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all font-bold text-sm">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all font-bold text-sm">3</button>
+<span class="w-10 h-10 flex items-center justify-center text-slate-600">...</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all font-bold text-sm">12</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+<!-- Decorative background elements -->
+<div class="fixed top-0 right-0 -z-10 w-[600px] h-[600px] bg-violet-600/10 blur-[120px] rounded-full"></div>
+<div class="fixed bottom-0 left-64 -z-10 w-[400px] h-[400px] bg-blue-600/5 blur-[100px] rounded-full"></div>
+</main>
+<!-- FAB Suppression Rule Followed (Transactional/Settings/Focused page = No FAB) -->
+</body></html>

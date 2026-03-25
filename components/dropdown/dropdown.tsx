@@ -15,6 +15,8 @@ export interface DropdownProps {
   onChange?: (value: string) => void;
   placeholder?: string;
   className?: string; // Additional classes for the wrapper
+  buttonClassName?: string; // Additional classes for the button itself
+  menuClassName?: string; // Additional classes for the dropdown menu
 }
 
 export default function Dropdown({
@@ -23,7 +25,9 @@ export default function Dropdown({
   value,
   onChange,
   placeholder = 'Select an option',
-  className = ''
+  className = '',
+  buttonClassName = '',
+  menuClassName = ''
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalValue, setInternalValue] = useState(value || options[0]?.value || '');
@@ -57,8 +61,8 @@ export default function Dropdown({
     <div className={`relative group w-full sm:w-auto ${className}`} ref={dropdownRef}>
       <button 
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between gap-4 w-full sm:w-auto px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10 text-slate-900 dark:text-slate-100"
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); setIsOpen(!isOpen); }}
+        className={`flex items-center justify-between gap-4 w-full sm:w-auto px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10 text-slate-900 dark:text-slate-100 ${buttonClassName}`}
       >
         <span className="flex items-center gap-2">
           {selectedOption?.icon && (
@@ -80,17 +84,17 @@ export default function Dropdown({
 
       {/* Menú flotante estilo select - Usa absolute y z-index para no alterar el contenedor */}
       <div 
-        className={`absolute top-full left-0 mt-2 w-min min-w-full sm:min-w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-800/50 rounded-xl shadow-xl z-50 overflow-hidden transition-all duration-200 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+        className={`absolute top-full left-0 mt-2 w-min min-w-full sm:min-w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden transition-all duration-200 ${menuClassName} ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'}`}
       >
         <ul className="max-h-60 overflow-y-auto p-1">
           {options.map((opt) => (
             <li key={opt.value}>
               <button
-                onClick={() => handleSelect(opt.value)}
+                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleSelect(opt.value); }}
                 className={`flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
                   currentValue === opt.value
                     ? 'bg-primary/10 text-primary font-semibold'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
+                    : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300'
                 }`}
               >
                 {opt.icon && (

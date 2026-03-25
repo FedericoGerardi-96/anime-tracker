@@ -1,4 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
+import { Metadata } from 'next';
+import HContentToggle from "@/components/profile/HContentToggle";
+
+export const metadata: Metadata = {
+  title: "User Profile",
+  description: "View your personal anime and manga stats, manage your lists, and customize your profile.",
+};
 
 const PROFILE_DATA = {
   stats: [
@@ -86,15 +93,21 @@ export default async function ProfilePage() {
     tier: "MEMBER",
     bio: "I'm new here! Exploring the world of anime.",
     verified: false,
+    show_h_content: false,
   };
 
   if (user) {
+    // Initial fallback from user_metadata (useful for social logins like Google)
+    profile.name = user.user_metadata?.full_name || user.email?.split('@')[0] || "Unknown User";
+    profile.avatar = user.user_metadata?.avatar_url || profile.avatar;
+
     const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
     if (data) {
-      profile.name = data.full_name;
-      profile.avatar = data.avatar;
-      profile.tier = data.roles?.includes('admin') ? 'ADMIN' : 'SUPPORTER';
+      profile.name = data.full_name || profile.name;
+      profile.avatar = data.avatar || profile.avatar;
+      profile.tier = data.roles?.includes('admin') ? 'ADMIN' : (data.roles?.includes('supporter') ? 'SUPPORTER' : 'MEMBER');
       profile.verified = true;
+      profile.show_h_content = data.show_h_content ?? false;
     }
   }
 
@@ -256,6 +269,19 @@ export default async function ProfilePage() {
           </section>
         </div>
       </div>
+
+      {/* Settings */}
+      {user && (
+        <section>
+          <h3 className="text-xl font-bold flex items-center gap-2 text-text-primary mb-6">
+            <span className="material-symbols-outlined text-primary">tune</span>
+            Preferences
+          </h3>
+          <div className="max-w-lg">
+            <HContentToggle enabled={profile.show_h_content} />
+          </div>
+        </section>
+      )}
     </div>
   );
 }

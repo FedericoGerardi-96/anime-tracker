@@ -1,31 +1,38 @@
+
 'use client';
 
 import React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Dropdown from '@/components/dropdown/dropdown';
 
-export default function AnimeFilters() {
+interface AnimeFiltersProps {
+  seasonOptions?: any[];
+  hideSeason?: boolean;
+}
+
+export default function AnimeFilters({ seasonOptions = [], hideSeason = false }: AnimeFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const handleFilterChange = (key: string, value: string) => {
-    // searchParams.toString() safely generates a string for URLSearchParams
     const params = new URLSearchParams(searchParams.toString());
     
-    if (value) {
+    // Always reset to page 1 when filters change
+    params.set('page', '1');
+
+    if (value && value !== 'all') {
       params.set(key, value);
     } else {
       params.delete(key);
     }
     
-    // push to the current path with updated query params (scroll: false to avoid jumping)
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const selectedGenre = searchParams.get('genre') || 'action';
+  const selectedGenre = searchParams.get('genre') || '';
   const selectedStatus = searchParams.get('status') || 'all';
-  const selectedSeason = searchParams.get('season') || 'winter-2024';
+  const selectedSeason = searchParams.get('season') || (seasonOptions.length > 0 ? seasonOptions[seasonOptions.length - 1].value : '');
   const selectedSort = searchParams.get('sort') || 'popularity';
 
   return (
@@ -35,6 +42,7 @@ export default function AnimeFilters() {
         value={selectedGenre}
         onChange={(val) => handleFilterChange('genre', val)}
         options={[
+          { label: 'All Genres', value: 'all' },
           { label: 'Action', value: 'action' },
           { label: 'Adventure', value: 'adventure' },
           { label: 'Comedy', value: 'comedy' },
@@ -48,22 +56,25 @@ export default function AnimeFilters() {
         value={selectedStatus}
         onChange={(val) => handleFilterChange('status', val)}
         options={[
-          { label: 'All', value: 'all' },
+          { label: 'All Status', value: 'all' },
           { label: 'Airing', value: 'airing' },
           { label: 'Completed', value: 'completed' },
         ]}
       />
-      <Dropdown
-        label="Season"
-        value={selectedSeason}
-        onChange={(val) => handleFilterChange('season', val)}
-        options={[
-          { label: '2024 Winter', value: 'winter-2024' },
-          { label: '2023 Fall', value: 'fall-2023' },
-          { label: '2023 Summer', value: 'summer-2023' },
-          { label: '2023 Spring', value: 'spring-2023' },
-        ]}
-      />
+      
+      {/* Season Filter - Only if not hidden */}
+      {!hideSeason && seasonOptions.length > 0 && (
+        <Dropdown
+          label="Season"
+          value={selectedSeason}
+          onChange={(val) => handleFilterChange('season', val)}
+          options={[
+            { label: 'All Seasons', value: 'all' },
+            ...seasonOptions
+          ]}
+        />
+      )}
+
       <Dropdown
         label="Sort"
         value={selectedSort}

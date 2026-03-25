@@ -3,6 +3,12 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import AuthTabs from "@/components/ui/AuthTabs";
 import { login, signInWithGoogle } from "@/lib/actions/auth";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Login",
+  description: "Sign in to your AniTrack account to sync your progress and lists.",
+};
 
 export default async function LoginPage({
   searchParams,
@@ -79,7 +85,7 @@ export default async function LoginPage({
         </form>
 
         <p className="text-center mt-8 text-xs text-slate-400 font-medium">
-          Don't have an account? 
+          Don&apos;t have an account? 
           <a className="text-primary font-bold hover:underline ml-1" href="/register">Create an account</a>
         </p>
       </div>

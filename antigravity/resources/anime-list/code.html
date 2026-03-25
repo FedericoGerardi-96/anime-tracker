@@ -3,12 +3,12 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>AniTrack - Anime Library</title>
+<title>AniTrack - Frieren: Beyond Journey's End</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">        tailwind.config = {
+<script id="tailwind-config">
+        tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
@@ -23,233 +23,366 @@
                     borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
                 },
             },
-        }</script>
-<style>        .glass {
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .sidebar-item-active {
-            background: rgba(141, 49, 227, 0.2);
-            border-left: 3px solid #8d31e3;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cinematic-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
-<div class="flex h-screen overflow-hidden">
-<!-- Sidebar -->
-<aside class="fixed inset-y-0 left-0 border-r border-slate-200 dark:border-slate-800 flex flex-col glass h-full shrink-0 z-50 p-8 w-64">
-<div class="flex items-center gap-3 mb-10"><div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<div class="flex min-h-screen overflow-hidden">
+<!-- SideNavBar Component -->
+<aside class="w-64 fixed inset-y-0 left-0 border-r border-slate-200 dark:border-slate-800 z-50 flex flex-col p-6 bg-background-dark">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
 <span class="material-symbols-outlined">auto_graph</span>
 </div>
 <div>
 <h1 class="text-lg font-bold tracking-tight">AniTrack</h1>
 <p class="text-xs text-slate-500 dark:text-slate-400">Library Manager</p>
-</div></div>
-<nav class="flex-1 space-y-2"><a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-slate-600 dark:text-slate-400 transition-colors" href="#">
 <span class="material-symbols-outlined">home</span>
-<span class="font-medium text-sm">Home</span>
+<span class="text-sm font-medium">Home</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-r-lg bg-primary/10 border-l-4 border-primary text-primary transition-all" href="#">
-<span class="material-symbols-outlined">auto_stories</span>
-<span class="font-medium text-sm">Anime Library</span>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-slate-600 dark:text-slate-400 transition-colors" href="#">
+<span class="material-symbols-outlined">tv</span>
+<span class="text-sm font-medium">Anime Library</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-slate-600 dark:text-slate-400 transition-colors" href="#">
 <span class="material-symbols-outlined">menu_book</span>
-<span class="font-medium text-sm">Manga Library</span>
+<span class="text-sm font-medium">Manga Library</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
-<span class="material-symbols-outlined">format_list_bulleted</span>
-<span class="font-medium text-sm">My Lists</span>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-slate-600 dark:text-slate-400 transition-colors" href="#">
+<span class="material-symbols-outlined">view_list</span>
+<span class="text-sm font-medium">My Lists</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-slate-600 dark:text-slate-400 transition-colors" href="#">
 <span class="material-symbols-outlined">favorite</span>
-<span class="font-medium text-sm">Favorites</span>
+<span class="text-sm font-medium">Favorites</span>
 </a>
 <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
-<span class="material-symbols-outlined">lock</span>
-<span class="font-medium text-sm">Private Manual Entry</span>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-slate-600 dark:text-slate-400 transition-colors" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="text-sm font-medium">Manual Entry</span>
 </a>
-</div></nav>
-<div class="mt-auto glass-card p-4 rounded-2xl flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-cover bg-center" data-alt="User avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBN5uDXe-IKsglDPE6HJaM6nA-uXxkiBR5s8AANx0b79WVvk2IygdfcAXLmasQ-gDDfMRN-Ex2Ekvg0GPIJehirZptNhYnVHxAKcH47FENBigSIuasWetHDJC4Cv0QCUgsARcvbYMwwSz67U5PxceVJkCIXr9y1jRgwUGwAvcnGWfOk-QuA7VCaF0UdphE0Ro4bnRHTzk_onv-xqk9_c_mPGdVMkSb0RaUOZbqxikIVS13eUtE3zGcBCJHfX2PzuKapws-9feUHDmI')"></div>
+</div>
+</nav>
+<div class="mt-auto p-4 rounded-xl flex items-center gap-3 bg-slate-900">
+<div class="w-10 h-10 rounded-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBN5uDXe-IKsglDPE6HJaM6nA-uXxkiBR5s8AANx0b79WVvk2IygdfcAXLmasQ-gDDfMRN-Ex2Ekvg0GPIJehirZptNhYnVHxAKcH47FENBigSIuasWetHDJC4Cv0QCUgsARcvbYMwwSz67U5PxceVJkCIXr9y1jRgwUGwAvcnGWfOk-QuA7VCaF0UdphE0Ro4bnRHTzk_onv-xqk9_c_mPGdVMkSb0RaUOZbqxikIVS13eUtE3zGcBCJHfX2PzuKapws-9feUHDmI')"></div>
 <div class="flex-1 overflow-hidden">
-<p class="text-xs font-bold truncate">Zenith_Reader</p>
-<p class="text-[10px] text-primary">MASTER TIER</p>
+<p class="text-xs font-bold truncate">Alex Chen</p>
+<p class="text-[10px] text-primary">PREMIUM MEMBER</p>
 </div>
 <span class="material-symbols-outlined text-slate-500 text-sm">settings</span>
 </div>
 </aside>
-<!-- Main Content -->
-<main class="flex-1 pt-28 ml-64 p-12 space-y-12">
-<!-- Top Navigation Bar -->
-<header class="flex items-center justify-between px-8 fixed top-0 right-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40 h-20 left-64">
-<div class="flex-1 max-w-md">
-<div class="relative group">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-<input class="w-full bg-slate-100 dark:bg-slate-800/50 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary transition-all" placeholder="Search anime, manga, characters..." type="text"/>
-</div>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 p-8 min-h-screen relative">
+<header class="flex items-center justify-between mb-10 relative z-20">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary/50 transition-all outline-none" placeholder="Search anime, manga, users..." type="text"/>
 </div>
 <div class="flex items-center gap-4">
-<button class="text-slate-500 hover:text-primary transition-colors">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-500 hover:text-primary transition-colors">
 <span class="material-symbols-outlined">notifications</span>
 </button>
-<button class="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-primary/30 transition-all">
-                        Import List
-                    </button>
+<div class="w-10 h-10 rounded-xl bg-cover bg-center ring-2 ring-primary/20" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJ4IbLvbAMNC6ZcqONEo_E8x_DgyJ6HWwIX3LZuHbBJuxaU4htonR24GnPVWBcn4yFcbLciuERCzrv63XxhYglGbhHPqFcdsMgyZcc092Xs1OxYwBi_vjt1YenW_ayegSl-bxQ9B9kuhm-x1GDRhB-n6JyJjSUuat9sK-ewdp0tE_Jj1ViWTMF5E9cnJQsBDrpQXA53gMN_-i4cPXvNIZTK7F0_JbIFUv6g4OmApcs6-_Z_76Fcj43xPYU39MO6F95-yvz_tOWKfg')"></div>
 </div>
 </header>
-<!-- Library Content -->
-<section class="flex-1 overflow-y-auto p-8 space-y-8">
-<!-- Filters Bar -->
-<div class="glass p-4 rounded-xl flex flex-wrap items-center gap-4 shadow-sm">
-<div class="flex items-center gap-2 px-3 py-2 bg-background-light dark:bg-background-dark/50 rounded-lg border border-primary/10">
-<span class="material-symbols-outlined text-primary text-xl">filter_list</span>
-<span class="text-sm font-semibold">Filters</span>
+<!-- Hero Background (Blurred) -->
+<div class="absolute top-0 left-0 w-full h-[600px] z-0 pointer-events-none">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDU_Ah8Gz9yIHq0eMvYF60CKWJhPM14k4jVqN5S_oh3OTZwzL-uL9Jpmr1G5-gzGZQWe0MKy0WZdcwSYwpNo5MlVi8cW-iwvu3qDguT6elpdNkxyPAhVinxP3rmgdKcAq6moAhVJgf3yq2EQ1SLj0WqV-FWPhYo-QoZQqWpvtD0L8jEmJhMiS_FSH1qbHC1htYuziRIvbkmwEIvtIN0V4OieGFahWPwQb9MUxZCFZuUWpvamBA-HPL59Vu-BKlPs9BT8QtNvddeFJs')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent"></div>
 </div>
-<div class="flex items-center gap-3 flex-wrap">
-<div class="relative group">
-<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
-<span>Genre</span>
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</button>
+<div class="relative z-10 max-w-7xl mx-auto">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-8">
+<span>Browse</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Fantasy</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Frieren: Beyond Journey's End</span>
 </div>
-<div class="relative group">
-<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
-<span>Status: All</span>
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</button>
-</div>
-<div class="relative group">
-<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
-<span>Season: 2024 Winter</span>
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</button>
-</div>
-<div class="relative group">
-<button class="flex items-center justify-between gap-4 px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10">
-<span>Sort: Popularity</span>
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</button>
+<!-- Header Section -->
+<div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-end mb-12">
+<!-- Left: Poster -->
+<div class="w-full lg:w-[280px] shrink-0">
+<div class="rounded-2xl overflow-hidden cinematic-shadow border border-white/10">
+<img class="w-full aspect-[2/3] object-cover" data-alt="High quality anime poster showing an elf character" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbjssjRUw5j-O6Bzc5Xc-1io6KThb0bXhfpqwiDSrXn34lhztpY3RTBjeHQKG9DMVvj-XMzwlvMm72raSuUcPZSC6GdQBwr-ohwvdTqTjPaq-jH1bYrStRC1SWRh1PdnUt1k4mBiXkxwrsFNbyu6dft5lLN7zJdhiUYgNIoIbNU0iAUGCYyutzrg3ouYGPKW2a2wWIXKSQgfF8tZpYQXMeqF9t9TG2maWfmtDdV1z4pjC6gj3yfwI2drk5ohyxX3mKWY8P0FASh7I"/>
 </div>
 </div>
-<div class="ml-auto flex items-center gap-1 bg-primary/5 p-1 rounded-lg border border-primary/10">
-<button class="p-1.5 rounded bg-primary text-white">
-<span class="material-symbols-outlined text-sm">grid_view</span>
-</button>
-<button class="p-1.5 rounded text-slate-400 hover:bg-primary/10 transition-colors">
-<span class="material-symbols-outlined text-sm">view_list</span>
-</button>
+<!-- Right: Content Info -->
+<div class="flex-1 pb-4">
+<div class="flex flex-wrap items-center gap-3 mb-4">
+<span class="px-2 py-1 rounded bg-primary text-white text-[10px] font-bold tracking-wider uppercase">Trending #1</span>
+<span class="px-2 py-1 rounded bg-slate-800 text-white text-[10px] font-bold tracking-wider uppercase">TV Series</span>
+</div>
+<h1 class="text-5xl lg:text-7xl font-black text-white mb-6 leading-none">Frieren: Beyond Journey's End</h1>
+<div class="flex flex-wrap items-center gap-8 mb-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500 fill-1">star</span>
+<span class="text-2xl font-bold">9.39</span>
+<span class="text-xs text-slate-400 mt-1">MAL Score</span>
+</div>
+<div class="h-8 w-[1px] bg-white/10 hidden md:block"></div>
+<div class="flex flex-col">
+<span class="text-lg font-bold">28</span>
+<span class="text-xs text-slate-400">Episodes</span>
+</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold">Finished Airing</span>
+<span class="text-xs text-slate-400">Status</span>
+</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold">Madhouse</span>
+<span class="text-xs text-slate-400">Studio</span>
 </div>
 </div>
-<!-- Anime Grid -->
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-<!-- Card 1 -->
-<div class="group relative flex flex-col gap-3">
-<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Dramatic high fantasy anime poster" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAl9lqO3rPxk12QEsNUiZ4l2zhBQiufugpQAFCuU9um1xqw5nt-beZOKtEMLUQqv-3Ynf1DVNNLiZ9S2FXgJL7B8Skjg68hksahIkO-O4J5SuG5rTVwKBWT6cS9HVO31UXvLx8DBLg9Ey7J7U1HgZMATl2lfnIViZgWSAXVetUdqkhl9swA-5AfGnuMus6mWbAe9xf_bOKWzOjkEE21KAldR3cfraL-AhmxFEbIwrdkmNMaqVI9NdQllPFeUtGnO2z6fGiiiJeiqo')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 left-2 px-2 py-1 rounded bg-primary/80 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">Airing</div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+<!-- Action Bar Redesigned -->
+<div class="flex flex-wrap items-center gap-3 glass-panel p-3 rounded-2xl">
+<button class="px-6 py-3.5 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90 transition-all text-sm shrink-0">
 <span class="material-symbols-outlined text-lg">add</span>
+                                Add to List
+                            </button>
+<div class="h-10 w-[1px] bg-white/10 mx-1 hidden sm:block"></div>
+<div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-xl border border-white/10 flex-1 min-w-[140px]">
+<span class="text-[10px] font-bold text-slate-500 uppercase shrink-0">Status</span>
+<select class="bg-transparent border-none text-sm font-semibold text-white focus:ring-0 p-1 w-full cursor-pointer">
+<option class="bg-slate-900">Watching</option>
+<option class="bg-slate-900">Completed</option>
+<option class="bg-slate-900">On Hold</option>
+<option class="bg-slate-900">Dropped</option>
+<option class="bg-slate-900">Plan to Watch</option>
+</select>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-xl border border-white/10 flex-1 min-w-[120px]">
+<span class="text-[10px] font-bold text-slate-500 uppercase shrink-0">EP</span>
+<input class="bg-transparent border-none text-sm font-bold text-white focus:ring-0 p-1 w-full text-center" max="28" min="0" type="number" value="12"/>
+<span class="text-[10px] font-bold text-slate-600">/ 28</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-3.5 rounded-xl text-white hover:bg-white/10 transition-all border border-white/10">
+<span class="material-symbols-outlined text-lg">favorite</span>
 </button>
-<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
-</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
-<span class="text-xs font-bold text-white">9.12</span>
-</div></div>
-<div>
-<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Attack on Titan: Final Season</h3>
-<p class="text-xs text-slate-500 mt-1">MAPPA • 2024</p>
-</div>
-</div>
-<!-- Card 2 -->
-<div class="group relative flex flex-col gap-3">
-<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Magical scenery with a solo traveler" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-BMO3k61H7H9d7RgX2Bdj1GQJrfvNZotGXm48pi-lywab0jdbYYKXMACCxpClTjGCYkd5Ipy3Zzws3WSAhvxZRqTSKL360TOeZFARUz2EhJpnF7QUqoJMho5mbs22NvZ72Uc-Durhr5XZxfN4mtwe_D5hBp41ufmz2l-Q0frSqv-IF3R3TeyGFN6jzWLb5oEGpZiPtvT3jfaR7ezaWBT1AyH8fC9fyTXafk0ZHEk2TGWl1Vdm73h62au7n960EnP3pTur_MI1QbY')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-lg">add</span>
+<button class="p-3.5 rounded-xl text-white hover:bg-white/10 transition-all border border-white/10">
+<span class="material-symbols-outlined text-lg">share</span>
 </button>
-<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg text-red-500 fill-current">favorite</span></button>
-</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
-<span class="text-xs font-bold text-white">8.95</span>
-</div></div>
-<div>
-<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Frieren: Beyond Journey's End</h3>
-<p class="text-xs text-slate-500 mt-1">Madhouse • 2023</p>
-</div>
-</div>
-<!-- Card 3 -->
-<div class="group relative flex flex-col gap-3">
-<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Cyberpunk city alleyway at night" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAa7stvd-NgqLw-dacC9GP42Xr38PL9PWf09qdp0LEitcs32JgBUsB8ywilCS-Qe7qGEQ_FBqxkR-7G969_JcGffmHT2KWluT8_cYuACuch6RHobKmtTidD9Mu2E8VujmDHNdlwR_X18n8VKWMeIoqQhpsxQdIn63gUDRMJrlFDalQjbFNK-43dTbVMgx_seN3HU9GkmC0UTD4ApXVP5gNqmJxzgcDtyhidfNkioND06VGMjOt9YoJIXwNn0f-4eO8MHNZakgPFhTI')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-lg">add</span>
-</button>
-<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
-</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
-<span class="text-xs font-bold text-white">8.82</span>
-</div></div>
-<div>
-<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Cyberpunk: Edgerunners</h3>
-<p class="text-xs text-slate-500 mt-1">Trigger • 2022</p>
-</div>
-</div>
-<!-- Card 4 -->
-<div class="group relative flex flex-col gap-3">
-<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Abstract colorful futuristic warrior" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDWcCpQmjo8uQXHnWFwWtQKJcxUY4ZsZo52GL6hDTah6-cdc9uo3nknmnF9a38YoGcxcFxwTw-r0ACefFu1OuNuNCsNe0Qm9gf6z5qadFDQTO1WNW13e53wmjoCgJppXSEXzv7JZpw6kBkbgOgrf8U2VK4sN58-dUHdShNBB1xVSmpLYlkY4QUmjMLOA6PZ0-R4ESM3pcMN0czVMjppY56_6-BxV7qmerMlRyz5pxI_8Rf3Q2SfkXPGWgK91omZaC21UbI6e6hoYI8')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-lg">add</span>
-</button>
-<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
-</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
-<span class="text-xs font-bold text-white">8.76</span>
-</div></div>
-<div>
-<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Solo Leveling</h3>
-<p class="text-xs text-slate-500 mt-1">A-1 Pictures • 2024</p>
-</div>
-</div>
-<!-- Card 5 -->
-<div class="group relative flex flex-col gap-3">
-<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Calm rural Japanese landscape" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDpl-WKmQa8PIMnnb4F-xXMklu4ph4ahlpv0D4UARuHrwYJxm3eEjtSni2ZPFHL77KapJ51-s00KuYib1TiYCvy9Qq3JDwSL0I6LZ3gpN2D6sXmxCBRiaz9Na-1XwY1HdcepQglDzUxG873w9jAJSkdSt5kfry3CBGjy81faGtqHmhRVxMSN5_akhobS80em_ra8SDW6W0CkwwYqgUT4X5zdoijN_0avUOpWwQFDo48TZn4B6JXmYm88cDtCAxTgSvWmItYAntTN-8')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-lg">add</span>
-</button>
-<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
-</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
-<span class="text-xs font-bold text-white">8.44</span>
-</div></div>
-<div>
-<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">The Apothecary Diaries</h3>
-<p class="text-xs text-slate-500 mt-1">OLM • 2023</p>
-</div>
-</div>
-<!-- Card 6 -->
-<div class="group relative flex flex-col gap-3">
-<div class="relative aspect-[2/3] rounded-xl overflow-hidden shadow-xl shadow-black/20"><div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Traditional Japanese temple in rain" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBjO4kIDbv61nHrahIEVKUyH438z1BANvHDQ1s2HnwFvTe9MpgHnTT_iD_WImTuKdcuImG8DIwuVJCELFgMV98oR8-fqeuAiI18Q9kMmQHlqaCgkvdUtcHAcLIzhZZERwd9DtMrluFUTsaDzjeGdQ5FnT3nCQW_Jt2qf2TLw9cmxXhjOuCPrIi-DJqnXSI2CLSwDZxfo2iU6zMwp17NHKUUny9OrlN9xiTEPq3IBRT-DsUf_R_N4w3dPwJqeGZAcq-tGrzm432uQ4c')"></div><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="absolute top-2 left-2 px-2 py-1 rounded bg-primary/80 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">Airing</div><div class="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-lg">add</span>
-</button>
-<button class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav"><span class="material-symbols-outlined text-lg group-hover:text-red-500 transition-colors">favorite</span></button>
-</div><div class="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-<span class="material-symbols-outlined text-yellow-400 text-[14px] fill-current">star</span>
-<span class="text-xs font-bold text-white">9.01</span>
-</div></div>
-<div>
-<h3 class="font-bold text-sm leading-tight line-clamp-1 text-slate-100">Jujutsu Kaisen Season 2</h3>
-<p class="text-xs text-slate-500 mt-1">MAPPA • 2023</p>
 </div>
 </div>
 </div>
-<!-- Load More -->
-<div class="flex justify-center py-8">
-<button class="flex items-center gap-2 px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full transition-all font-semibold">
-<span class="material-symbols-outlined">expand_more</span>
-                        Load More Anime
-                    </button>
+</div>
+<!-- Synopsis & Stats Full Width -->
+<div class="glass-panel rounded-3xl p-8 lg:p-10 mb-16">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+<div class="lg:col-span-2">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-8 h-1 bg-primary rounded-full"></div>
+<h2 class="text-sm font-black uppercase tracking-widest text-primary">Synopsis</h2>
+</div>
+<p class="text-slate-300 text-lg leading-relaxed mb-6">
+                                After the party of heroes defeated the Demon King, they restored peace to the land and returned to their lives of solitude. Elf mage Frieren, her companions' many years of adventure come to a close. As she navigates a world where her human friends age and pass away while she remains unchanged, she begins to understand the weight of the bonds she once dismissed.
+                            </p>
+<div class="flex flex-wrap gap-2">
+<span class="px-4 py-1.5 rounded-full bg-slate-800 text-sm font-medium border border-white/5">Adventure</span>
+<span class="px-4 py-1.5 rounded-full bg-slate-800 text-sm font-medium border border-white/5">Drama</span>
+<span class="px-4 py-1.5 rounded-full bg-slate-800 text-sm font-medium border border-white/5">Fantasy</span>
+<span class="px-4 py-1.5 rounded-full bg-slate-800 text-sm font-medium border border-white/5">Magic</span>
+<span class="px-4 py-1.5 rounded-full bg-slate-800 text-sm font-medium border border-white/5">Shounen</span>
+</div>
+</div>
+<div class="lg:border-l lg:border-white/10 lg:pl-12 flex flex-col justify-center">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Global Progress</span>
+<span class="text-xs font-black text-primary">42%</span>
+</div>
+<div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-8">
+<div class="h-full bg-primary rounded-full shadow-[0_0_12px_rgba(141,49,227,0.5)]" style="width: 42%;"></div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between py-2 border-b border-white/5">
+<span class="text-sm text-slate-400">Score</span>
+<span class="text-sm font-bold">9.39 (954,120 votes)</span>
+</div>
+<div class="flex items-center justify-between py-2 border-b border-white/5">
+<span class="text-sm text-slate-400">Rank</span>
+<span class="text-sm font-bold">#1 Overall</span>
+</div>
+<div class="flex items-center justify-between py-2 border-b border-white/5">
+<span class="text-sm text-slate-400">Popularity</span>
+<span class="text-sm font-bold">#124</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Cast/Characters Section -->
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<h2 class="text-2xl font-bold">Main Characters</h2>
+<span class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-bold text-slate-400">6 TOTAL</span>
+</div>
+<a class="text-primary text-sm font-medium hover:underline flex items-center gap-1" href="#">
+                            View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 border border-white/10 group-hover:border-primary/50 transition-colors">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Frieren character portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc9fLa87EUOplxVTpM-oq0p6lolT2Tp-iQNz8Z1VvPPaYFUrfFL63Uc0EpmdIkAtyHGgS2XAqm9oE78xPW6X_lYkLMB_4eRPFs_OS90Z9Vsuly_bE6kfxZKpbttHbbSOAngsXHK4DOsd3cNO0QwZHJxqkwzAd8Hw7MVqU2XcJV6UqVzjFo87X26JWCA5_I6p3O_J6sZSO-QXKtC25JENCf4RoV5Lavu0oTJOvi7J9K3yDxIaWyAsm08-PLIAYE9zLCHERJNF3QW2c"/>
+</div>
+<p class="text-sm font-bold">Frieren</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Main Protagonist</p>
+</div>
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 border border-white/10 group-hover:border-primary/50 transition-colors">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Himmel character portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8dJud4gFAd499qOC06BAA5MSigaamgnFK7_7xBzuQW13u3mwUEyajvwOxTzVJGkOBcUMc9zhpEeeTS0s6HwUC9C5N9MmZJ3__Ws_Ewq1zoPo16X1MLMh4JD_48GgSd9zEAB7mZJLztkqxolfvow_3Vy028z7MT8zrHktHqgE2crRy6kUFBiZuG5cMqI1eG1Ir5szgGjmDsptlawRsfwPy8YxjyWEQLl78ncJzTaxJ9VhArrmT1kxf7dnzt-aMb5jm7WoZiEk2-jk"/>
+</div>
+<p class="text-sm font-bold">Himmel</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Hero</p>
+</div>
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 border border-white/10 group-hover:border-primary/50 transition-colors">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Fern character portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5yMRoRTW1jBaaodsYAd3xvi8fCV93UA5sxv0Nv6seQyPJXE_OgkHMqZfVCMBBWI1QioN3AcmUl4WaMEsUyyIlRh6cn2Q-K1iWCI0pvSxlb8r_jylcwU826YmrZuqyYKAxDDqWt37tpzATGghsuZ1nYJrAShX6ygWZ3a3iRH21vQSNV_hA52nBqBL5Fs2WtoT9VNF58EQju3Pli-zyqnRLXAVr-ThnItAcbgQimQv-o6uVdpyb_AhZV-H1AZ-YP2vS6LptBeHMjTg"/>
+</div>
+<p class="text-sm font-bold">Fern</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Mage apprentice</p>
+</div>
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 border border-white/10 group-hover:border-primary/50 transition-colors">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Stark character portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1mI5ZKhDlOMLPI6F41QclZXj2N_d2r-1saibSP64C72YBCeNDLDhK7QLK7DMYr8_zOWnN8MPJrYsrFr81kq964eZPQ0QypuQK28bAfPTfFP6V-LZ1umam1Tws4jYNWOXz3HUp5_aoUh3xBCXbBxZqVr2Po5xWMCViqCkExugQTjzHwBrPbxxBUeX87Zwb10mGbKkCmEUQbSNNhmsXSnXHc9arnbWszzyRo8SVPjQxQAQCqAzmngeDIBWJtd26_kNZ1q4t7_ydvqc"/>
+</div>
+<p class="text-sm font-bold">Stark</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Warrior</p>
+</div>
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 border border-white/10 group-hover:border-primary/50 transition-colors">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Heiter character portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1KRc9CtE4nwp2OCmTGCHoUMell8iI2_BB3EWnF3fRkpm67rvYsZDW6XZG5JFINaTQM5hGA_DdUNGk678Jokx9yDM533j_7f5npCKGNxyXSf373mrR5D8l4ohCGLLPFfbj2Xaqv2kKbfB1blxSBYZFgWugPoRlki21iaTt-L1fzEOW8blM9Tn28Q8Gafmjc2lG_1KJwGZvTLkwbt0VisBkYlLnwvnummSsjTc1lXqIYpXFsMdJD08qp_eJhFwoYHDdazr_C78uNW4"/>
+</div>
+<p class="text-sm font-bold">Heiter</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Priest</p>
+</div>
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 border border-white/10 group-hover:border-primary/50 transition-colors">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Eisen character portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9SPGiSwb4l11aEkb-I_9MjKFrPbHsaVULp2jynFuT9iXo81sQo5DwGZ6xdnsGiT4dCf-szTTfEQxCjuQfxW1sJRbUBQUqknQdXcmiT_O3rouQePwWQii-rN7VBPWTOAuHCE_wvooH5mehWsxv3J5VajPPNGz6BGwZRctk83MwR846OZ-KWwwjZvW-6uk2_CY4fs89q9FDc7KfdtdEYm1niAHC9iOxzf7GNKYgthp2WYcfrtn7CrBrJnVzC5oGuPlz-i5NHWC_g8g"/>
+</div>
+<p class="text-sm font-bold">Eisen</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Dwarf Warrior</p>
+</div>
 </div>
 </section>
+<!-- Episode List Section -->
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold">Recent Episodes</h2>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg bg-white/5 border border-white/10"><span class="material-symbols-outlined text-sm">filter_list</span></button>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="p-4 rounded-2xl flex items-center gap-4 hover:bg-white/5 transition-all group cursor-pointer glass-card">
+<div class="w-32 aspect-video rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Episode 28 thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsD1JVigL28uv0r94740EQlftreHwlHXiQIWGg-euDgRClnw-kvuEToJcqYoRgp1iZW9-JktV-0c6D3CsOIgyK7Q5BYSqESMvAKGUODQO5pQmEA-LVb3vqwpsUUIK_htxriSeuD4SUkdEtPNBxt1LlH-R9tD5uIuBzsDujDuAstt5tvxwfRtczhd33n9GGcp0tLmqwFHHUawgycfPx5Jv6ciDM1zyMxv6iEAVVyxVK4biCkxaHX1T05cGqKO0ivDPNHiiKB-sv4Ow"/>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-white">Episode 28: It Would Be Embarrassing When We Met Again</h4>
+<p class="text-xs text-slate-500">March 22, 2024</p>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-medium text-slate-500">24m</span>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">play_circle</span>
+</div>
+</div>
+<div class="p-4 rounded-2xl flex items-center gap-4 hover:bg-white/5 transition-all group cursor-pointer glass-card">
+<div class="w-32 aspect-video rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Episode 27 thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpiH65NKU-BbInHATnEEqgONYvBgqpRMu2lY8WRm5wy_eIRBwJNr36xXjcIY0I0FR1nlH2DRpRXb3OzFbhtz2DpDDDoBP_TSzaDtreQW_pNRsfIqNdT90AcuLvHNkTFUCE4ttEjhUr_oWNrMggQW-1sG-Uz6JN7GpVXs8tHzXuQt-tlPEx5vARy-IoPHr0QUefCOTSbIjGUREO4DHhWjRFFuatYtONgIrBls8FufBfxSqafmVl7Q47yuiMT4irNI7bK4nAbbklHn4"/>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-white">Episode 27: An Era of Humans</h4>
+<p class="text-xs text-slate-500">March 15, 2024</p>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-medium text-slate-500">24m</span>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">play_circle</span>
+</div>
+</div>
+<div class="p-4 rounded-2xl flex items-center gap-4 hover:bg-white/5 transition-all group cursor-pointer glass-card">
+<div class="w-32 aspect-video rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Episode 26 thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqrltrizi7iAqfRTMzyVo4JRtFomKvkfN7bgqEZd4Frt6C2xKki4DNLxyv8um9-5L5xp6acdVSzWUlVmSTI3uvtnSrLlBeJD95nNvQlOvTyEvp8oEUdtKkOxhdEwjM49tDOP5929wt5GRjDBNaVvy08hoID7UncB1szl57pRtnhE8CaGjb1V1rQfYT9L7xE-vCnuUPTwmYHW9Ucu76xJsi_1OUT8PKwNSraUhUXI4v7usEO2_rgag90x2p1EG9t7be-25Gzm5LLmY"/>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-white">Episode 26: Height of Magic</h4>
+<p class="text-xs text-slate-500">March 8, 2024</p>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-medium text-slate-500">24m</span>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">play_circle</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommendations Section -->
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold">More Like This</h2>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-3 shadow-lg group-hover:shadow-primary/20 transition-all border border-white/10">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Anime recommendation poster 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALqVlUv8ke8soSgxYuF9c_m9ymvTzb64ujMXGbcZl4PYQhkdjdaOknzkODjDHAU_pTzQCKwHgq_3fnLT8vsy3T_FZOwFMgnavRCBnbzUuYpzjrBjchgnW-nhbO1k30cJ_e9HKbkCFUa0kQIPmUhii9EN3z4TJ3LFgRNJUIkVaitU95HkQQr8SzvGW4bLF18aJbDi8Za9FDZWFPEkv5tIiW_-3zeNhBQnXM41-JptSHmuudFCr-Iv5sj37IkCcTRQzT-gQtKhO8Ttk"/>
+</div>
+<p class="font-bold text-sm truncate">Mushoku Tensei</p>
+<p class="text-xs text-slate-500">Adventure, Fantasy</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-3 shadow-lg group-hover:shadow-primary/20 transition-all border border-white/10">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Anime recommendation poster 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7QE_PGOX2ibSpjeyYoQHUJhd9SGL0v6VhebgnncIniPuiM08rj3mRBn6HfJia7iFMruSjJhkWndjHM1JaP2aH1YAqqknDcxNveA2kq1VojX09h7UjVyJ7GLPIG866p-bgdZCgH6n6lFM0ZuCBrQZ4gNB_GSV-YOBe8u44o5qkUetSxxoqDz3gcPoX9BILvSXjPK7_QCXCmglVWT1l6v069vT4WUtWJcAAf2TSvwRdwknH2_T7lokWeXp2a3tcoWV06GBEgmg-FU4"/>
+</div>
+<p class="font-bold text-sm truncate">Violet Evergarden</p>
+<p class="text-xs text-slate-500">Drama, Slice of Life</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-3 shadow-lg group-hover:shadow-primary/20 transition-all border border-white/10">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Anime recommendation poster 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4U6HLzh1DalRyg1u2u4QF8y_THO69cc7TlJl1pNCRLJ41n3rp1GsinXzNPmmuqs0XGdqC7RlC_hnzf9cIIEkzEgBBmYq3w8TKZ1ZtQu-j0ucOF-ryYLKyXgWP-SoDct7TDDjeqBuXGkNbiyzyclfVoKXfiqCiYVRNFbCm14Wosxsu7_vK-AjATBkvYZJeqo3Aar0svmT1QQVUbu0PqK9B7Ja4mj4ehDEGOga3td36yRCnaAPHrmMgaD-tSRo5embLNxigF0cLEkU"/>
+</div>
+<p class="font-bold text-sm truncate">The Ancient Magus' Bride</p>
+<p class="text-xs text-slate-500">Fantasy, Romance</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-3 shadow-lg group-hover:shadow-primary/20 transition-all border border-white/10">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Anime recommendation poster 4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC53iL7-uNA2vTgX1R96L8OXH0aRtGXqX8YoPmXjYWOOaWnbrg0sNnSxDeQk35QTrFAmJwHdZX0FEfXoF1kSGdJltb8MJR4hcVyjH2bJw_9PFAxtzWtdfHyX6WuaBkcxeXkF8BE51A3K_jyjU0OXDjdT9_H-1LIx-XqpvvmDFyNs30TapUbb9VbmM7y1fNcoHUd-jCyCs67rQYG0SChR6eK9o44srApjxRXSiX_MlT1aEhOmjj6mBmrrOz2VMAcCER3ts5bWFOurOw"/>
+</div>
+<p class="font-bold text-sm truncate">To Your Eternity</p>
+<p class="text-xs text-slate-500">Drama, Fantasy</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-[2/3] rounded-2xl overflow-hidden mb-3 shadow-lg group-hover:shadow-primary/20 transition-all border border-white/10">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Anime recommendation poster 5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8YQ_6-t-YNrHezh4CKXkWcs7Tj3vczvUZ8jjzIcb1ULt8T9zULtQeKsMtH-JtQ3IthWQq62ts6ns6vZbaTJBLnEDlLyT-WTwUcXBC5agAKMws3vr0np84btgi8shIHUGacD3iwnbhX2zuArFPHbnmVl7owdjGWWtl-ICfB9D-do6R2x7qRAiAZBGrmA9HV8SDVLfBIubFhaUlhRAKGZs2dh5jcbsgHfjOTvZp6wKyc-eUGlJuLjytRO0Lgb9xv72Q0deXacmh3lA"/>
+</div>
+<p class="font-bold text-sm truncate">Ranking of Kings</p>
+<p class="text-xs text-slate-500">Adventure, Action</p>
+</div>
+</div>
+</section>
+</div>
 </main>
 </div>
 </body></html>

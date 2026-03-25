@@ -6,14 +6,13 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#e11d48", // Deep Crimson accent for private section
+                        "primary": "#7c3aed", // Violet accent
                         "background-light": "#f8fafc",
                         "background-dark": "#0f172a",
                     },
@@ -25,7 +24,8 @@
             },
         }
     </script>
-<style content="        .glass {
+<style>
+        .glass {
             background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(12px);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -33,7 +33,7 @@
         .glass-panel {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(225, 29, 72, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.2);
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
@@ -41,17 +41,7 @@
         }
         input:focus, select:focus, textarea:focus {
             ring: 2px;
-            ring-color: #e11d48;
-            outline: none;
-        }">
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(225, 29, 72, 0.2);
-        }
-        input:focus, select:focus, textarea:focus {
-            ring: 2px;
-            ring-color: #e11d48;
+            ring-color: #7c3aed;
             outline: none;
         }
     </style>
@@ -59,14 +49,18 @@
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
 <div class="flex h-screen overflow-hidden">
 <!-- Sidebar -->
-<aside class="fixed inset-y-0 left-0 border-r border-slate-200 dark:border-slate-800 flex flex-col glass h-full shrink-0 z-50 p-8 w-64"><div class="flex items-center gap-3 mb-10"><div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<aside class="fixed inset-y-0 left-0 border-r border-slate-200 dark:border-slate-800 flex flex-col glass h-full shrink-0 z-50 p-8 w-64">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
 <span class="material-symbols-outlined">auto_graph</span>
 </div>
 <div>
 <h1 class="text-lg font-bold tracking-tight text-white">AniTrack</h1>
 <p class="text-xs text-slate-500 dark:text-slate-400">Library Manager</p>
-</div></div>
-<nav class="flex-1 space-y-2"><a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 transition-all" href="#">
 <span class="material-symbols-outlined">home</span>
 <span class="font-medium text-sm">Home</span>
 </a>
@@ -87,15 +81,17 @@
 <span class="material-symbols-outlined">settings</span>
 <span class="font-medium text-sm">Settings</span>
 </a>
-</div></nav>
+</div>
+</nav>
 <div class="mt-auto glass-card p-4 rounded-2xl flex items-center gap-3">
 <div class="w-10 h-10 rounded-full bg-cover bg-center" data-alt="User avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDs3RiT3F6Yl0DVfHsuKODvvtVQCGNgT_K5BsvBikRt4MgHROdqlHKqBE9xgon294LU-BqfvrqsjG1gWyf2v0N0GWGlGYjoLvge5p8q-MKFobrvguBZwK57zz6NcalY3hZ2XpfIZDVeqy3yQDGNicVBLQJKmivmOIDkMt4hvDgjR7jknjQGrZPqF7MYNv-IEd_od6b9-eqzGpPGCZfbbV0c4fuRYV-FaIZrjOysZSE705sF2GwX_MgRh36Fnzby_PfZab2Tj-nkIz0')"></div>
 <div class="flex-1 overflow-hidden">
 <p class="text-xs font-bold truncate text-white">Alex Vault</p>
-<p class="text-[10px] text-primary font-bold">PREMIUM MEMBER</p>
+<p class="text-[10px] text-primary font-bold uppercase">Premium Member</p>
 </div>
 <span class="material-symbols-outlined text-slate-500 text-sm">settings</span>
-</div></aside>
+</div>
+</aside>
 <!-- Main Content -->
 <main class="flex-1 pt-28 ml-64 p-12 space-y-12 overflow-y-auto">
 <!-- Background Accent Glow -->
@@ -137,55 +133,28 @@
 <input class="w-full bg-slate-900/50 border-slate-700 rounded-lg p-3 text-slate-100 placeholder:text-slate-600" placeholder="Enter series or movie title" type="text"/>
 </div>
 <div class="space-y-2">
-<label class="text-sm font-semibold text-slate-300">Cover Image URL</label>
-<div class="flex gap-2">
-<div class="flex-1 relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">link</span>
-<input class="w-full bg-slate-900/50 border-slate-700 rounded-lg p-3 pl-10 text-slate-100 placeholder:text-slate-600" placeholder="https://image-host.com/cover.jpg" type="text"/>
-</div>
-<button class="px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors flex items-center gap-2" type="button">
-<span class="material-symbols-outlined text-sm">upload</span>
-<span class="text-xs font-bold uppercase">Upload</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Metadata Section -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-<div class="space-y-2">
-<label class="text-sm font-semibold text-slate-300">Status</label>
+<label class="text-sm font-semibold text-slate-300">Type</label>
 <div class="relative">
 <select class="w-full bg-slate-900/50 border-slate-700 rounded-lg p-3 text-slate-100 appearance-none">
-<option>Planning</option>
-<option selected="">Watching</option>
-<option>Completed</option>
-<option>Dropped</option>
+<option value="anime">Anime</option>
+<option value="manga">Manga</option>
 </select>
 <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">expand_more</span>
 </div>
 </div>
+</div>
+<!-- Image URL Section -->
 <div class="space-y-2">
-<label class="text-sm font-semibold text-slate-300">Rating (1-10)</label>
-<div class="flex items-center gap-4 bg-slate-900/50 border border-slate-700 rounded-lg p-3">
-<input class="flex-1 accent-primary h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer" max="10" min="1" type="range" value="7"/>
-<span class="text-lg font-bold text-primary w-8 text-center">7</span>
+<label class="text-sm font-semibold text-slate-300">Image URL</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">link</span>
+<input class="w-full bg-slate-900/50 border-slate-700 rounded-lg p-3 pl-10 text-slate-100 placeholder:text-slate-600" placeholder="https://image-host.com/cover.jpg" type="text"/>
 </div>
 </div>
+<!-- Description Section -->
 <div class="space-y-2">
-<label class="text-sm font-semibold text-slate-300">Adult Content</label>
-<div class="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg p-3 h-[50px]">
-<span class="text-xs font-medium text-slate-400 uppercase tracking-tighter">Restriction Active</span>
-<label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer" type="checkbox"/>
-<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-</label>
-</div>
-</div>
-</div>
-<!-- Notes Section -->
-<div class="space-y-2">
-<label class="text-sm font-semibold text-slate-300">Private Notes</label>
-<textarea class="w-full bg-slate-900/50 border-slate-700 rounded-lg p-4 text-slate-100 placeholder:text-slate-600 resize-none" placeholder="Add personal reflections, tags, or specific details for your archive..." rows="4"></textarea>
+<label class="text-sm font-semibold text-slate-300">Description</label>
+<textarea class="w-full bg-slate-900/50 border-slate-700 rounded-lg p-4 text-slate-100 placeholder:text-slate-600 resize-none" placeholder="Add a brief description of the entry..." rows="4"></textarea>
 </div>
 <!-- Form Actions -->
 <div class="flex items-center justify-between pt-6 border-t border-slate-800/50">
@@ -197,8 +166,8 @@
 <button class="px-6 py-3 text-sm font-semibold text-slate-400 hover:text-white transition-colors" type="button">Discard</button>
 <button class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-bold text-sm uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2 transition-all active:scale-[0.98]" type="submit">
 <span class="material-symbols-outlined text-sm">save</span>
-                                        Save to Private List
-                                    </button>
+                                    Save to Private List
+                                </button>
 </div>
 </div>
 </form>
