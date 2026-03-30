@@ -65,7 +65,7 @@ export default async function ProfilePage() {
     getProgressStats(),
   ]);
 
-  const watching = watchingRaw as Array<{
+  const watching = watchingRaw as unknown as Array<{
     id: string;
     status: string;
     current_episode: number;

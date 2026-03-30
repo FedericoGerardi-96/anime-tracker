@@ -4,6 +4,7 @@ import { getCharacterFullById } from '@/lib/jikan-service';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import BackButton from '@/components/navigation/BackButton';
+import { slugify } from '@/lib/utils';
 
 interface Props {
   params: Promise<{ slug: string }>;
