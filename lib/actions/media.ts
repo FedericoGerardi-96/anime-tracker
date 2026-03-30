@@ -4,6 +4,28 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
+export async function getFavoritesWithMedia() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return []
+
+  const { data, error } = await supabase
+    .from('favorites')
+    .select('id, media!inner(mal_id, title, image)')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  if (error || !data) return []
+
+  return data.map((row: any) => ({
+    id: row.id as string,
+    mal_id: row.media.mal_id as number,
+    title: row.media.title as string,
+    image: row.media.image as string,
+  }))
+}
+
 export async function getFavoriteMalIds(): Promise<number[] | null> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

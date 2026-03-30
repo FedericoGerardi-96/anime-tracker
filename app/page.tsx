@@ -81,30 +81,32 @@ export default async function Home() {
 
         {/* Sidebar Right */}
         <div className="space-y-8">
-          {/* Personal Stats */}
-          <section className="glass rounded-2xl p-6 border border-slate-200 dark:border-slate-800/50">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">analytics</span>
-              My Progress
-            </h3>
-            <StatsDonut stats={stats} />
-          </section>
-
-          {/* Quick List Sync Banner */}
-          <div className="bg-linear-to-br from-primary to-indigo-600 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
-            <div className="absolute -right-4 -bottom-4 opacity-20">
-              <span className="material-symbols-outlined text-9xl">cloud_sync</span>
+          {stats === null ? (
+            /* Not logged in — show login banner */
+            <div className="bg-linear-to-br from-primary to-indigo-600 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+              <div className="absolute -right-4 -bottom-4 opacity-20">
+                <span className="material-symbols-outlined text-9xl">cloud_sync</span>
+              </div>
+              <h4 className="text-lg font-bold mb-2">My Lists</h4>
+              <p className="text-sm text-white/80 mb-4 leading-relaxed">
+                Login now to sync your progress, get tailored recommendations, and access your private entries.
+              </p>
+              <Link href="/login" className="block w-full">
+                <button className="w-full bg-white text-primary py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors shadow-lg cursor-pointer">
+                  Login to Sync
+                </button>
+              </Link>
             </div>
-            <h4 className="text-lg font-bold mb-2">My Lists</h4>
-            <p className="text-sm text-white/80 mb-4 leading-relaxed">
-              Login now to sync your progress, get tailored recommendations, and access your private entries.
-            </p>
-            <Link href="/login" className="block w-full">
-              <button className="w-full bg-white text-primary py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors shadow-lg cursor-pointer">
-                Login to Sync
-              </button>
-            </Link>
-          </div>
+          ) : (
+            /* Logged in — show progress stats */
+            <section className="glass rounded-2xl p-6 border border-slate-200 dark:border-slate-800/50">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">analytics</span>
+                My Progress
+              </h3>
+              <StatsDonut stats={stats} />
+            </section>
+          )}
 
           {/* Friends Activity */}
           <section className="glass rounded-2xl p-6 border border-slate-200 dark:border-slate-800/50">
