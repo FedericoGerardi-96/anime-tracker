@@ -1,19 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/services/supabase";
+import { getUserProfile } from "@/services/profile";
 import SidebarClient from "./SidebarClient";
 import { IProfile } from "@/types/profile";
 
 export default async function Sidebar() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
 
   let profile: IProfile | null = null;
   if (user) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-    profile = data;
+    profile = await getUserProfile(user.id);
   }
 
   return <SidebarClient user={user} profile={profile} />;

@@ -1,7 +1,5 @@
 
 'use client';
-
-import React from 'react';
 import { useRouter } from 'next/navigation';
 
 interface BackButtonProps {
@@ -10,14 +8,14 @@ interface BackButtonProps {
   className?: string;
 }
 
-export default function BackButton({ label, fallback, className }: BackButtonProps) {
+export default function BackButton({ label, fallback, className }: Readonly<BackButtonProps>) {
   const router = useRouter();
 
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
     
     // If the referrer is from our own domain, we can safely go back
-    if (typeof window !== 'undefined' && window.history.length > 2) {
+    if (typeof globalThis !== 'undefined' && globalThis.history.length > 2) {
       router.back();
     } else {
       router.push(fallback);

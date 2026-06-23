@@ -51,9 +51,10 @@ export default async function ProfilePage() {
 
     const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
     if (data) {
+      const rol = data.roles?.includes('supporter') ? 'SUPPORTER' : 'MEMBER';
       profile.name = data.full_name || profile.name;
       profile.avatar = data.avatar || profile.avatar;
-      profile.tier = data.roles?.includes('admin') ? 'ADMIN' : (data.roles?.includes('supporter') ? 'SUPPORTER' : 'MEMBER');
+      profile.tier = data.roles?.includes('admin') ? 'ADMIN' : rol;
       profile.verified = true;
       profile.show_h_content = data.show_h_content ?? false;
     }
@@ -83,9 +84,9 @@ export default async function ProfilePage() {
       ];
 
   return (
-    <div className="flex-1 p-6 md:p-12 space-y-12 pt-24 lg:pt-28">
+    <div className="flex-1 p-6 md:p-12 space-y-12">
       {/* Profile Header */}
-      <section>
+      <section className="pt-12 xl:pt-0">
         <div className="flex flex-col xl:flex-row gap-8 items-center xl:items-end">
           <div className="relative">
             <div
@@ -93,7 +94,7 @@ export default async function ProfilePage() {
               style={{ backgroundImage: `url('${profile.avatar}')` }}
             />
             {profile.verified && (
-              <div className="absolute -bottom-2 -right-2 bg-primary text-white p-2 rounded-xl shadow-lg">
+              <div className="absolute flex -bottom-2 -right-2 bg-primary text-white p-2 rounded-xl shadow-lg">
                 <span className="material-symbols-outlined text-xl">verified</span>
               </div>
             )}
@@ -112,8 +113,8 @@ export default async function ProfilePage() {
           </div>
 
           <div className="flex flex-wrap justify-center xl:justify-end gap-3 lg:gap-4 shrink-0">
-            {statCards.map((stat, index) => (
-              <div key={index} className="glass-card px-4 lg:px-6 py-3 lg:py-4 rounded-2xl text-center min-w-[100px] lg:min-w-[120px]">
+            {statCards.map((stat) => (
+              <div key={stat.value} className="glass-card px-4 lg:px-6 py-3 lg:py-4 rounded-2xl text-center min-w-[100px] lg:min-w-[120px]">
                 <p className={`text-xl lg:text-2xl font-bold ${stat.color}`}>{stat.value}</p>
                 <p className="text-[9px] lg:text-[10px] uppercase text-text-muted font-semibold tracking-widest">{stat.label}</p>
               </div>
@@ -129,7 +130,7 @@ export default async function ProfilePage() {
           <section>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold flex items-center gap-2 text-text-primary">
-                <span className="material-symbols-outlined text-primary">history</span>
+                <span className="material-symbols-outlined text-primary">history</span>{''}
                 Recent Activity
               </h3>
               <button className="text-primary text-sm font-semibold hover:underline cursor-pointer">View All</button>
@@ -171,7 +172,7 @@ export default async function ProfilePage() {
           <section>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold flex items-center gap-2 text-text-primary">
-                <span className="material-symbols-outlined text-primary">play_circle</span>
+                <span className="material-symbols-outlined text-primary">play_circle</span>{''}
                 Currently Watching
               </h3>
               <Link href="/lists" className="text-primary text-sm font-semibold hover:underline">
@@ -222,7 +223,7 @@ export default async function ProfilePage() {
           <section>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold flex items-center gap-2 text-text-primary">
-                <span className="material-symbols-outlined text-primary">grade</span>
+                <span className="material-symbols-outlined text-primary">grade</span>{''}
                 Favorites
               </h3>
             </div>
@@ -234,16 +235,16 @@ export default async function ProfilePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-2 gap-4">
-                {favorites.map((fav) => {
+                {favorites?.slice(0, 8).map((fav) => {
                   const slug = `${fav.mal_id}-${slugify(fav.title)}`;
                   return (
                     <Link key={fav.id} href={`/anime/${slug}`}>
-                      <div className="relative group rounded-xl overflow-hidden aspect-[2/3] cursor-pointer">
+                      <div className="relative group rounded-xl overflow-hidden aspect-2/3 cursor-pointer">
                         <div
                           className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                           style={{ backgroundImage: `url('${fav.image}')` }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
                           <h5 className="text-xs font-bold text-white truncate">{fav.title}</h5>
                         </div>
                       </div>
@@ -266,7 +267,7 @@ export default async function ProfilePage() {
       {user && (
         <section>
           <h3 className="text-xl font-bold flex items-center gap-2 text-text-primary mb-6">
-            <span className="material-symbols-outlined text-primary">tune</span>
+            <span className="material-symbols-outlined text-primary">tune</span>{''}
             Preferences
           </h3>
           <div className="max-w-lg">

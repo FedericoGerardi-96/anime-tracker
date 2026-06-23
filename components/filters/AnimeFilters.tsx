@@ -1,8 +1,7 @@
 
 'use client';
-
-import React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+
 import Dropdown from '@/components/dropdown/dropdown';
 
 interface AnimeFiltersProps {
@@ -10,7 +9,7 @@ interface AnimeFiltersProps {
   hideSeason?: boolean;
 }
 
-export default function AnimeFilters({ seasonOptions = [], hideSeason = false }: AnimeFiltersProps) {
+export default function AnimeFilters({ seasonOptions = [], hideSeason = false }: Readonly<AnimeFiltersProps>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,7 +31,7 @@ export default function AnimeFilters({ seasonOptions = [], hideSeason = false }:
 
   const selectedGenre = searchParams.get('genre') || '';
   const selectedStatus = searchParams.get('status') || 'all';
-  const selectedSeason = searchParams.get('season') || (seasonOptions.length > 0 ? seasonOptions[seasonOptions.length - 1].value : '');
+  const selectedSeason = searchParams.get('season') || (seasonOptions.length > 0 ? seasonOptions.at(-1)?.value ?? '' : '');
   const selectedSort = searchParams.get('sort') || 'popularity';
 
   return (

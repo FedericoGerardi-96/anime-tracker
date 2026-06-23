@@ -1,15 +1,15 @@
 'use client';
-
 import { useState, useEffect, useMemo } from 'react';
+
 import AddToListModal from '@/components/ui/AddToListModal';
 import AuthModal from '@/components/auth/AuthModal';
 import { getLists, getMediaByProgressStatus, getListMedia } from '@/lib/actions/lists';
 import { useToast } from '@/components/ui/Toast';
+import ListsTabs, { TABS } from '@/components/lists/ListsTabs';
+import LibrarySearch from '@/components/lists/LibrarySearch';
+import MediaGrid from '@/components/lists/MediaGrid';
+import CustomListsGrid from '@/components/lists/CustomListsGrid';
 
-import ListsTabs, { TABS } from './ListsTabs';
-import LibrarySearch from './LibrarySearch';
-import MediaGrid from './MediaGrid';
-import CustomListsGrid from './CustomListsGrid';
 
 interface ListsContentProps {
   initialUser: { id: string } | null;
@@ -17,7 +17,7 @@ interface ListsContentProps {
   initialCustomLists: any[];
 }
 
-export default function ListsContent({ initialUser, initialMediaItems, initialCustomLists }: ListsContentProps) {
+export default function ListsContent({ initialUser, initialMediaItems, initialCustomLists }: Readonly<ListsContentProps>) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('watching');
   const [selectedList, setSelectedList] = useState<{ id: string; name: string } | null>(null);
@@ -72,11 +72,11 @@ export default function ListsContent({ initialUser, initialMediaItems, initialCu
   };
 
   const handleCreateNew = () => {
-    if (!user) {
+    if (user) {
+      setIsModalOpen(true);
+    } else {
       error('Please login to create custom lists');
       setIsAuthModalOpen(true);
-    } else {
-      setIsModalOpen(true);
     }
   };
 
@@ -105,6 +105,58 @@ export default function ListsContent({ initialUser, initialMediaItems, initialCu
   const showMediaSearch = activeTab !== 'custom_lists' || selectedList !== null;
   const currentTabLabel = TABS.find((t) => t.id === activeTab)?.label || '';
 
+  let content;
+  if (loading) {
+    content = (
+      <div className='py-32 flex justify-center'>
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary' />
+      </div>
+    );
+  } else if (activeTab === 'custom_lists' && !selectedList) {
+    content = (
+      <CustomListsGrid
+        lists={filteredLists}
+        onOpenList={handleOpenList}
+        onCreateNew={handleCreateNew}
+      />
+    );
+  } else {
+    content = (
+      <div className='space-y-6'>
+        {selectedList && (
+          <div className='flex justify-between items-center bg-white/5 rounded-2xl p-4 border border-white/10'>
+            <div className='flex items-center gap-4'>
+              <button
+                onClick={() => {
+                  setSelectedList(null);
+                  setSearchQuery('');
+                }}
+                className='w-10 h-10 rounded-xl bg-white/5 hover:bg-primary/20 hover:text-primary flex items-center justify-center transition-colors cursor-pointer text-white'
+              >
+                <span className='material-symbols-outlined'>arrow_back</span>
+              </button>
+              <div>
+                <h2 className='text-xl font-black text-white'>{selectedList.name}</h2>
+                <p className='text-xs text-slate-400 font-bold uppercase tracking-wider'>
+                  {filteredItems.length} items
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6'>
+          <MediaGrid
+            items={filteredItems}
+            searchQuery={searchQuery}
+            activeTabLabel={currentTabLabel}
+            selectedListName={selectedList?.name}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Page Header */}
@@ -118,7 +170,7 @@ export default function ListsContent({ initialUser, initialMediaItems, initialCu
             onClick={handleCreateNew}
             className='flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 cursor-pointer'
           >
-            <span className='material-symbols-outlined text-xl'>add_circle</span>
+            <span className='material-symbols-outlined text-xl'>add_circle</span>{''}
             New Custom List
           </button>
         )}
@@ -133,7 +185,7 @@ export default function ListsContent({ initialUser, initialMediaItems, initialCu
           <LibrarySearch value={searchQuery} onChange={setSearchQuery} />
           {searchQuery && (
             <p className='text-xs text-slate-500 mt-2 ml-1'>
-              {filteredItems.length} result{filteredItems.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
+              {filteredItems.length} result{filteredItems.length !== 1 && 's'} for &quot;{searchQuery}&quot;
             </p>
           )}
         </div>
@@ -145,7 +197,7 @@ export default function ListsContent({ initialUser, initialMediaItems, initialCu
           <LibrarySearch value={searchQuery} onChange={setSearchQuery} />
           {searchQuery && (
             <p className='text-xs text-slate-500 mt-2 ml-1'>
-              {filteredLists.length} list{filteredLists.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
+              {filteredLists.length} list{filteredLists.length !== 1 && 's'} for &quot;{searchQuery}&quot;
             </p>
           )}
         </div>
@@ -153,50 +205,7 @@ export default function ListsContent({ initialUser, initialMediaItems, initialCu
 
       {/* Content Area */}
       <div className='min-h-[50vh]'>
-        {loading ? (
-          <div className='py-32 flex justify-center'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary' />
-          </div>
-        ) : activeTab === 'custom_lists' && !selectedList ? (
-          <CustomListsGrid
-            lists={filteredLists}
-            onOpenList={handleOpenList}
-            onCreateNew={handleCreateNew}
-          />
-        ) : (
-          <div className='space-y-6'>
-            {selectedList && (
-              <div className='flex justify-between items-center bg-white/5 rounded-2xl p-4 border border-white/10'>
-                <div className='flex items-center gap-4'>
-                  <button
-                    onClick={() => {
-                      setSelectedList(null);
-                      setSearchQuery('');
-                    }}
-                    className='w-10 h-10 rounded-xl bg-white/5 hover:bg-primary/20 hover:text-primary flex items-center justify-center transition-colors cursor-pointer text-white'
-                  >
-                    <span className='material-symbols-outlined'>arrow_back</span>
-                  </button>
-                  <div>
-                    <h2 className='text-xl font-black text-white'>{selectedList.name}</h2>
-                    <p className='text-xs text-slate-400 font-bold uppercase tracking-wider'>
-                      {filteredItems.length} items
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6'>
-              <MediaGrid
-                items={filteredItems}
-                searchQuery={searchQuery}
-                activeTabLabel={currentTabLabel}
-                selectedListName={selectedList?.name}
-              />
-            </div>
-          </div>
-        )}
+        {content}
       </div>
 
       {/* Modals */}

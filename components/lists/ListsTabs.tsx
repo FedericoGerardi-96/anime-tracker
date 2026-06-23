@@ -14,7 +14,7 @@ interface ListsTabsProps {
   onTabChange: (tabId: string) => void;
 }
 
-export default function ListsTabs({ activeTab, onTabChange }: ListsTabsProps) {
+export default function ListsTabs({ activeTab, onTabChange }: Readonly<ListsTabsProps>) {
   return (
     <div className='flex items-center gap-2 border-b border-white/10 mb-4 overflow-x-auto no-scrollbar pb-1'>
       {TABS.map((tab) => (

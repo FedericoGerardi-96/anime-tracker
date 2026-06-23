@@ -9,7 +9,7 @@ const STATUSES = [
 const R = 36;
 const C = 2 * Math.PI * R;
 
-export default function StatsDonut({ stats }: { stats: Record<string, number> | null }) {
+export default function StatsDonut({ stats }: Readonly<{ stats: Record<string, number> | null }>) {
   if (!stats) {
     return (
       <p className="text-sm text-slate-500 text-center py-2">Login to see your stats</p>

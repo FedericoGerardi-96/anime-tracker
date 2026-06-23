@@ -10,7 +10,7 @@ interface CharactersClientProps {
   animeTitle: string;
 }
 
-export default function CharactersClient({ initialCharacters, animeTitle }: CharactersClientProps) {
+export default function CharactersClient({ initialCharacters, animeTitle }: Readonly<CharactersClientProps>) {
   const [selectedChar, setSelectedChar] = useState<JikanCharacter | null>(initialCharacters[0] || null);
   const [fullCharData, setFullCharData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function CharactersClient({ initialCharacters, animeTitle }: Char
           {initialCharacters.map((char) => {
             const isActive = selectedChar?.character.mal_id === char.character.mal_id;
             return (
-              <div 
+              <button 
                 key={char.character.mal_id}
                 onClick={() => setSelectedChar(char)}
                 className={`group relative bg-slate-900/40 rounded-2xl overflow-hidden border-2 cursor-pointer transition-all hover:scale-[1.02] ${
@@ -51,7 +51,7 @@ export default function CharactersClient({ initialCharacters, animeTitle }: Char
               >
                 <div className="aspect-[3/4] relative">
                   <img 
-                    className={`w-full h-full object-cover transition-all duration-500 ${!isActive ? 'grayscale group-hover:grayscale-0' : ''}`} 
+                    className={`w-full h-full object-cover transition-all duration-500 ${!isActive && 'grayscale group-hover:grayscale-0'}`} 
                     src={char.character.images.webp?.image_url || char.character.images.jpg.image_url} 
                     alt={char.character.name}
                   />
@@ -65,7 +65,7 @@ export default function CharactersClient({ initialCharacters, animeTitle }: Char
                   </div>
                   <h3 className="font-bold text-white text-sm md:text-base truncate">{char.character.name}</h3>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

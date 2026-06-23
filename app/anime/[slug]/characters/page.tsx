@@ -1,6 +1,6 @@
 
-import React from 'react';
 import Link from 'next/link';
+
 import { getAnimeById, getAnimeCharacters } from '@/lib/jikan-service';
 import CharactersClient from '@/components/anime/CharactersClient';
 import BackButton from '@/components/navigation/BackButton';
@@ -9,11 +9,11 @@ interface CharactersPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export default async function CharactersPage({ params }: CharactersPageProps) {
+export default async function CharactersPage({ params }: Readonly<CharactersPageProps>) {
   const { slug } = await params;
-  const animeId = parseInt(slug.split('-')[0]);
+  const animeId = Number.parseInt(slug.split('-')[0]);
 
-  if (isNaN(animeId)) {
+  if (Number.isNaN(animeId)) {
     return <div className="p-12 text-center">Invalid Anime ID</div>;
   }
 
@@ -23,7 +23,7 @@ export default async function CharactersPage({ params }: CharactersPageProps) {
   ]);
 
   return (
-    <main className="min-h-screen pt-24 lg:pt-28 pb-12">
+    <main className="min-h-screen pb-6">
       <div className="max-w-[1600px] mx-auto p-6 md:p-10">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 mb-8 text-xs font-bold uppercase tracking-widest text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-hide">

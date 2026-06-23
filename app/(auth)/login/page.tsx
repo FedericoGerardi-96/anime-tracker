@@ -1,9 +1,9 @@
-import React from "react";
+import { Metadata } from "next";
+
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import AuthTabs from "@/components/ui/AuthTabs";
 import { login, signInWithGoogle } from "@/lib/actions/auth";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Login",
@@ -12,14 +12,14 @@ export const metadata: Metadata = {
 
 export default async function LoginPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
+}>) {
   const resolvedParams = await searchParams;
   const error = resolvedParams.error as string;
 
   return (
-    <div className="flex-1 flex items-center justify-center p-6 relative min-h-screen pt-24 lg:pt-28">
+    <div className="flex-1 flex items-center justify-center p-6 relative">
       {/* Decorative background elements matching code.html blurs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[120px] -z-10 animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -z-10 animate-transition delay-1000"></div>
@@ -85,16 +85,9 @@ export default async function LoginPage({
         </form>
 
         <p className="text-center mt-8 text-xs text-slate-400 font-medium">
-          Don&apos;t have an account? 
+          Don&apos;t have an account?{''}
           <a className="text-primary font-bold hover:underline ml-1" href="/register">Create an account</a>
         </p>
-      </div>
-
-      {/* Footer-like meta info */}
-      <div className="absolute bottom-6 left-0 w-full flex justify-center gap-8 text-[9px] text-slate-600 font-bold uppercase tracking-[0.25em]">
-        <a className="hover:text-primary transition-colors" href="#">Privacy Policy</a>
-        <a className="hover:text-primary transition-colors" href="#">Terms of Service</a>
-        <a className="hover:text-primary transition-colors" href="#">Help Center</a>
       </div>
     </div>
   );

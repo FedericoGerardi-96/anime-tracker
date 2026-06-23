@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { JikanAnime } from "@/types/jikan";
 import { slugify } from "@/lib/utils";
 
@@ -7,13 +8,13 @@ interface AiringTodayProps {
   favoriteMalIds: number[] | null; // null = not logged in
 }
 
-export default function AiringToday({ todayAnime, favoriteMalIds }: AiringTodayProps) {
+export default function AiringToday({ todayAnime, favoriteMalIds }: Readonly<AiringTodayProps>) {
   const isLoggedIn = favoriteMalIds !== null;
 
   // Logged in: filter to only favorites. Not logged in: show all (capped at 4)
   const displayed = isLoggedIn
     ? todayAnime.filter(a => favoriteMalIds.includes(a.mal_id))
-    : todayAnime.slice(0, 4);
+    : todayAnime;
 
   const isEmpty = displayed.length === 0;
 
@@ -51,7 +52,7 @@ export default function AiringToday({ todayAnime, favoriteMalIds }: AiringTodayP
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold opacity-60 cursor-not-allowed"
             title="Coming soon"
           >
-            <span className="material-symbols-outlined text-base">event</span>
+            <span className="material-symbols-outlined text-base">event</span>{''}
             View Release Calendar
           </button>
         </div>

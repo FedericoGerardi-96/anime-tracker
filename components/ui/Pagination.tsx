@@ -1,8 +1,7 @@
 
 'use client';
-
-import React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 interface PaginationProps {
   currentPage: number;
@@ -10,14 +9,18 @@ interface PaginationProps {
   hasNextPage: boolean;
 }
 
-export default function Pagination({ currentPage, totalPages, hasNextPage }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, hasNextPage }: Readonly<PaginationProps>) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    router.push(`/anime?${params.toString()}`);
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', page.toString());
+      router.push(`${pathname}?${params.toString()}`);
+    });
   };
 
   const pages = [];
@@ -34,10 +37,10 @@ export default function Pagination({ currentPage, totalPages, hasNextPage }: Pag
   }
 
   return (
-    <div className="flex justify-center items-center gap-2 py-12">
+    <div className={`flex justify-center items-center gap-2 py-12 ${isPending ? 'opacity-60 pointer-events-none' : ''} transition-opacity duration-200`}>
       <button
         onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
+        disabled={isPending || currentPage <= 1}
         className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
       >
         <span className="material-symbols-outlined text-sm">chevron_left</span>
@@ -47,7 +50,8 @@ export default function Pagination({ currentPage, totalPages, hasNextPage }: Pag
         <>
           <button
             onClick={() => handlePageChange(1)}
-            className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 font-bold text-sm cursor-pointer"
+            disabled={isPending}
+            className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 font-bold text-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           >
             1
           </button>
@@ -59,7 +63,8 @@ export default function Pagination({ currentPage, totalPages, hasNextPage }: Pag
         <button
           key={page}
           onClick={() => handlePageChange(page)}
-          className={`size-10 flex items-center justify-center rounded-xl transition-all border font-bold text-sm cursor-pointer ${
+          disabled={isPending}
+          className={`size-10 flex items-center justify-center rounded-xl transition-all border font-bold text-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
             currentPage === page
               ? "bg-primary border-primary text-white shadow-lg shadow-primary/30"
               : "glass border-white/5 text-text-muted hover:bg-primary/20 hover:text-text-primary"
@@ -74,7 +79,8 @@ export default function Pagination({ currentPage, totalPages, hasNextPage }: Pag
           {endPage < totalPages - 1 && <span className="text-text-muted px-1 text-xs">...</span>}
           <button
             onClick={() => handlePageChange(totalPages)}
-            className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 font-bold text-sm cursor-pointer"
+            disabled={isPending}
+            className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 font-bold text-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {totalPages}
           </button>
@@ -83,7 +89,7 @@ export default function Pagination({ currentPage, totalPages, hasNextPage }: Pag
 
       <button
         onClick={() => handlePageChange(currentPage + 1)}
-        disabled={!hasNextPage}
+        disabled={isPending || !hasNextPage}
         className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
       >
         <span className="material-symbols-outlined text-sm">chevron_right</span>

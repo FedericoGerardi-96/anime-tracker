@@ -107,7 +107,15 @@ export async function getScheduleToday(): Promise<JikanAnime[]> {
   });
   if (!response.ok) return [];
   const { data } = await response.json();
-  return data ?? [];
+  
+  if (!data) return [];
+
+  const seen = new Set<number>();
+  return data.filter((anime: JikanAnime) => {
+    if (seen.has(anime.mal_id)) return false;
+    seen.add(anime.mal_id);
+    return true;
+  });
 }
 
 export async function getSeasonNow(limit: number = 12): Promise<JikanAnime[]> {
@@ -208,7 +216,17 @@ async function getMediaList(type: 'anime' | 'manga', params: FilterParams = {}):
     throw new Error(`Jikan API error: ${response.status} ${response.statusText}`);
   }
 
-  return response.json();
+  const result = await response.json();
+  if (result && Array.isArray(result.data)) {
+    const seen = new Set<number>();
+    result.data = result.data.filter((item: any) => {
+      if (seen.has(item.mal_id)) return false;
+      seen.add(item.mal_id);
+      return true;
+    });
+  }
+
+  return result;
 }
 
 export function mapJikanToAnimeCard(anime: JikanAnime): AnimeCardProps {

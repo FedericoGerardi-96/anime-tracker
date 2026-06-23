@@ -1,8 +1,8 @@
 "use client";
-
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+
 import type { User } from "@supabase/supabase-js";
 import { IProfile } from "@/types/profile";
 
@@ -14,9 +14,14 @@ const NAV_ITEMS = [
   { href: "/favorites", label: "Favorites", icon: "favorite" },
 ];
 
-export default function SidebarClient({ user, profile }: { user?: User | null, profile?: IProfile | null }) {
+export default function SidebarClient({ user, profile }: Readonly<{ user?: User | null, profile?: IProfile | null }>) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+
+  const rolesClass = () => {
+    const classSupporter = profile?.roles?.includes('supporter') ? 'SUPPORTER' : 'MEMBER';
+    return profile?.roles?.includes('admin') ? 'ADMIN' : classSupporter;
+  }
 
   return (
     <>
@@ -32,7 +37,7 @@ export default function SidebarClient({ user, profile }: { user?: User | null, p
 
       {/* Overlay for mobile */}
       {isOpen && (
-        <div 
+        <button 
           className="md:hidden fixed inset-0 bg-black/60 z-40 transition-opacity"
           onClick={() => setIsOpen(false)}
         />
@@ -46,7 +51,7 @@ export default function SidebarClient({ user, profile }: { user?: User | null, p
         w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-white dark:bg-slate-dark h-full shrink-0
       `}>
         <div className="p-6 flex items-center gap-3">
-          <div className="bg-primary p-1.5 rounded-lg">
+          <div className="flex bg-primary p-1.5 rounded-lg">
             <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>movie_filter</span>
           </div>
           <div>
@@ -111,7 +116,7 @@ export default function SidebarClient({ user, profile }: { user?: User | null, p
               <div className="flex-1 overflow-hidden">
                 <p className="text-xs font-bold truncate text-text-primary">{profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0]}</p>
                 <p className="text-[10px] text-primary font-bold uppercase">
-                  {profile?.roles?.includes('admin') ? 'ADMIN' : (profile?.roles?.includes('supporter') ? 'SUPPORTER' : 'MEMBER')}
+                  {rolesClass()}
                 </p>
               </div>
               <span className="material-symbols-outlined text-slate-500 text-sm">settings</span>

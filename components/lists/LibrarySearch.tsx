@@ -7,7 +7,7 @@ interface LibrarySearchProps {
   onChange: (v: string) => void;
 }
 
-export default function LibrarySearch({ value, onChange }: LibrarySearchProps) {
+export default function LibrarySearch({ value, onChange }: Readonly<LibrarySearchProps>) {
   return (
     <div className='relative group w-full max-w-md'>
       <span className='material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-[20px]'>

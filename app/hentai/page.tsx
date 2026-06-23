@@ -1,12 +1,13 @@
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getHentaiEntries, HentaiEntry } from "@/lib/actions/hentai";
-import HentaiSearch from "./_components/HentaiSearch";
-import HentaiPaginator from "./_components/HentaiPaginator";
-import HentaiActions from "./_components/HentaiActions";
-import DeleteHentaiButton from "./_components/DeleteHentaiButton";
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+
+import { createClient } from "@/lib/supabase/server";
+import { getHentaiEntries } from "@/lib/actions/hentai";
+import HentaiSearch from "@/components/hentai/HentaiSearch";
+import HentaiPaginator from "@/components/hentai/HentaiPaginator";
+import HentaiActions from "@/components/hentai/HentaiActions";
+import DeleteHentaiButton from "@/components/hentai/DeleteHentaiButton";
 
 export const metadata: Metadata = {
   title: "Hentai Vault",
@@ -22,9 +23,9 @@ interface SearchParams {
 
 export default async function HentaiPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<SearchParams>;
-}) {
+}>) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -39,19 +40,19 @@ export default async function HentaiPage({
   if (!profile?.show_h_content) redirect("/");
 
   const params = await searchParams;
-  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
+  const currentPage = Math.max(1, Number.parseInt(params.page ?? "1", 10));
   const query = (params.q ?? "").trim();
 
   const { data, count, error: _error } = await getHentaiEntries(currentPage, PAGE_SIZE, query);
 
   const totalCount = count || 0;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-  const hentaiList = (data || []) as HentaiEntry[];
+  const hentaiList = (data || []);
   const hasResults = hentaiList.length > 0;
   const isSearching = query.length > 0;
 
   return (
-    <div className="flex-1 min-h-screen relative px-4 sm:px-8 lg:px-12 pb-20 pt-24 lg:pt-28">
+    <div className="flex-1 relative px-4 sm:px-8 lg:px-12 pb-8">
       {/* Background Accent Glow */}
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/10 blur-[130px] rounded-full -mr-48 -mt-48 pointer-events-none -z-10" />
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/5 blur-[110px] rounded-full -ml-32 -mb-32 pointer-events-none -z-10" />
@@ -97,22 +98,8 @@ export default async function HentaiPage({
 
       {/* Content Grid */}
       <div className="max-w-7xl mx-auto">
-        {!hasResults ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center glass-panel rounded-3xl border border-dashed border-white/10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-            <span className="material-symbols-outlined text-7xl text-slate-700 mb-6" style={{ fontVariationSettings: "'FILL' 0" }}>
-              {isSearching ? "search_off" : "lock"}
-            </span>
-            <h2 className="text-3xl font-black text-white mb-3">
-              {isSearching ? `No results for "${query}"` : "The Vault is Empty"}
-            </h2>
-            <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
-              {isSearching 
-                ? "Try a different search term or clear filters to see your collection."
-                : "You haven't manually added any entries yet. Use the 'Add New Entry' button to begin your private archive."}
-            </p>
-          </div>
-        ) : (
-          <>
+        {hasResults ? (
+                    <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-8">
               {hentaiList.map((entry) => (
                 <div key={entry.id} className="group relative flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -165,6 +152,21 @@ export default async function HentaiPage({
               Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, totalCount)} of {totalCount} vault entries
             </p>
           </>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-32 text-center glass-panel rounded-3xl border border-dashed border-white/10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <span className="material-symbols-outlined text-7xl text-slate-700 mb-6" style={{ fontVariationSettings: "'FILL' 0" }}>
+              {isSearching ? "search_off" : "lock"}
+            </span>
+            <h2 className="text-3xl font-black text-white mb-3">
+              {isSearching ? `No results for "${query}"` : "The Vault is Empty"}
+            </h2>
+            <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
+              {isSearching 
+                ? "Try a different search term or clear filters to see your collection."
+                : "You haven't manually added any entries yet. Use the 'Add New Entry' button to begin your private archive."}
+            </p>
+          </div>
+
         )}
       </div>
     </div>

@@ -1,6 +1,7 @@
 
 import { Metadata } from 'next';
 import Link from 'next/link';
+
 import { getCharacterList } from '@/lib/jikan-service';
 import { slugify } from '@/lib/utils';
 import Pagination from '@/components/ui/Pagination';
@@ -14,7 +15,7 @@ interface Props {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function CharacterSearchPage({ searchParams }: Props) {
+export default async function CharacterSearchPage({ searchParams }: Readonly<Props>) {
   const params = await searchParams;
   const query = typeof params.q === 'string' ? params.q : '';
   const page = Number(params.page) || 1;
@@ -22,7 +23,7 @@ export default async function CharacterSearchPage({ searchParams }: Props) {
   const { data: characters, pagination } = await getCharacterList(query, page);
 
   return (
-    <main className="min-h-screen pt-24 lg:pt-28 pb-12">
+    <main className="pb-6">
       <div className="max-w-[1400px] mx-auto p-6 md:p-10">
         <header className="mb-12">
           <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
@@ -38,13 +39,13 @@ export default async function CharacterSearchPage({ searchParams }: Props) {
               href={`/characters/${char.mal_id}-${slugify(char.name)}`}
               className="group bg-slate-900/40 rounded-3xl overflow-hidden border border-white/5 hover:border-primary/50 transition-all hover:scale-[1.02] shadow-xl"
             >
-              <div className="aspect-[3/4] relative overflow-hidden">
+              <div className="aspect-3/4 relative overflow-hidden">
                 <img 
                   src={char.images.webp?.image_url || char.images.jpg.image_url} 
                   alt={char.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
               </div>
               <div className="p-4">
                 <h3 className="text-white font-bold group-hover:text-primary transition-colors truncate">{char.name}</h3>

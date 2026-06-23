@@ -22,7 +22,7 @@ export default function AuthTabs() {
         href="/register"
         className={`
           flex-1 py-2 text-sm font-semibold rounded-lg text-center transition-all
-          ${!isLogin ? "bg-white/10 text-white shadow-sm" : "text-slate-400 hover:text-white"}
+          ${isLogin ? "text-slate-400 hover:text-white" : "bg-white/10 text-white shadow-sm"}
         `}
       >
         Register

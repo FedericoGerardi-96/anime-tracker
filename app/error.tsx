@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import './not-found.css';
 
-export default function Error({ error, unstable_retry }: { error: Error & { digest?: string }; unstable_retry: () => void }) {
+export default function ErrorPage({ error, unstable_retry }: Readonly<{ error: Error & { digest?: string }; unstable_retry: () => void }>) {
   useEffect(() => {
     console.error(error);
   }, [error]);

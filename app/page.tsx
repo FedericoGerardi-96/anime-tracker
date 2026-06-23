@@ -26,7 +26,7 @@ export default async function Home() {
   ]);
 
   // Use the top-scored anime from today's schedule as recommendations base
-  const topAiring = todayAnime.find(a => a.score) ?? todayAnime[0];
+  const topAiring = todayAnime.find(a => a.popularity) ?? todayAnime[0];
   const recommendations = topAiring
     ? await getAnimeRecommendations(topAiring.mal_id)
     : [];
@@ -34,7 +34,7 @@ export default async function Home() {
   const recommendedList = recommendations.slice(0, 4);
 
   return (
-    <div className="p-4 sm:p-8 lg:p-12 space-y-8 lg:space-y-12 pt-24 lg:pt-28">
+    <div className="p-4 sm:p-8 lg:p-12 space-y-8 lg:space-y-12">
       {/* Hero Carousel — Upcoming Season */}
       <HeroCarousel anime={upcomingAnime} />
 
@@ -101,7 +101,7 @@ export default async function Home() {
             /* Logged in — show progress stats */
             <section className="glass rounded-2xl p-6 border border-slate-200 dark:border-slate-800/50">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">analytics</span>
+                <span className="material-symbols-outlined text-primary">analytics</span>{''}
                 My Progress
               </h3>
               <StatsDonut stats={stats} />

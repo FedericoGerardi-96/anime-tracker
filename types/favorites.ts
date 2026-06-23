@@ -12,4 +12,6 @@ export interface Media {
     mal_id:      number;
     season:      string;
     description: string;
+    score?:      number;
 }
+

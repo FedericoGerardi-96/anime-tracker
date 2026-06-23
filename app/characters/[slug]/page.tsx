@@ -1,8 +1,8 @@
 
-import React from 'react';
-import { getCharacterFullById } from '@/lib/jikan-service';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+
+import { getCharacterFullById } from '@/lib/jikan-service';
 import BackButton from '@/components/navigation/BackButton';
 import { slugify } from '@/lib/utils';
 
@@ -10,11 +10,11 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export default async function GlobalCharacterDetailPage({ params }: Props) {
+export default async function GlobalCharacterDetailPage({ params }: Readonly<Props>) {
   const { slug } = await params;
   const idMatch = slug.match(/^(\d+)/);
   if (!idMatch) return notFound();
-  const charId = parseInt(idMatch[1]);
+  const charId = Number.parseInt(idMatch[1]);
 
   let char;
   try {
@@ -25,7 +25,7 @@ export default async function GlobalCharacterDetailPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen pt-24 lg:pt-28 pb-12 relative overflow-hidden">
+    <main className="pb-6 relative overflow-hidden">
       {/* Background Accent */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 blur-[150px] rounded-full -mr-64 -mt-64 z-0 pointer-events-none"></div>
 
@@ -42,7 +42,7 @@ export default async function GlobalCharacterDetailPage({ params }: Props) {
           {/* Visual Profile (4 cols) */}
           <div className="xl:col-span-4 lg:sticky lg:top-28">
             <div className="glass-panel p-6 rounded-[2.5rem] shadow-2xl relative group">
-              <div className="aspect-[3/4] rounded-[2rem] overflow-hidden border-2 border-primary/20 shadow-xl relative">
+              <div className="aspect-3/4 rounded-4x overflow-hidden border-2 border-primary/20 shadow-xl relative">
                 <img 
                   src={char.images.webp?.image_url || char.images.jpg.image_url} 
                   alt={char.name}
@@ -111,7 +111,7 @@ export default async function GlobalCharacterDetailPage({ params }: Props) {
                       href={`/anime/${entry.anime.mal_id}-${slugify(entry.anime.title)}`}
                       className="group relative"
                     >
-                      <div className="aspect-[2/3] rounded-2xl overflow-hidden border border-white/5 relative">
+                      <div className="aspect-2/3 rounded-2xl overflow-hidden border border-white/5 relative">
                         <img 
                           src={entry.anime.images.webp?.large_image_url || entry.anime.images.jpg.large_image_url} 
                           alt={entry.anime.title} 

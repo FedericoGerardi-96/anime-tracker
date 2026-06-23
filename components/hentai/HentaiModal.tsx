@@ -9,7 +9,7 @@ interface HentaiModalProps {
   onClose: () => void;
 }
 
-export default function HentaiModal({ isOpen, onClose }: HentaiModalProps) {
+export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalProps>) {
   const { success, error } = useToast();
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -31,7 +31,7 @@ export default function HentaiModal({ isOpen, onClose }: HentaiModalProps) {
   }
 
   return (
-    <div 
+    <button 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onClick={onClose}
     >
@@ -64,9 +64,10 @@ export default function HentaiModal({ isOpen, onClose }: HentaiModalProps) {
             {/* Basic Info Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Title</label>
+                <label htmlFor="title" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Title</label>
                 <input
                   name="title"
+                  id="title"
                   required
                   className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   placeholder="Enter title..."
@@ -74,9 +75,10 @@ export default function HentaiModal({ isOpen, onClose }: HentaiModalProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Type</label>
+                <label htmlFor="type" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Type</label>
                 <div className="relative">
                   <select
+                    id="type"
                     name="type"
                     className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white appearance-none focus:ring-2 focus:ring-primary/50 outline-none transition-all cursor-pointer"
                   >
@@ -92,13 +94,14 @@ export default function HentaiModal({ isOpen, onClose }: HentaiModalProps) {
 
             {/* Image URL Section */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Image URL</label>
+              <label htmlFor="image" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Image URL</label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
                   link
                 </span>
                 <input
                   name="image"
+                  id="image"
                   className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 pl-12 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   placeholder="https://image-host.com/cover.jpg"
                   type="text"
@@ -108,9 +111,10 @@ export default function HentaiModal({ isOpen, onClose }: HentaiModalProps) {
 
             {/* Description Section */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Description</label>
+              <label htmlFor="description" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Description</label>
               <textarea
                 name="description"
+                id="description"
                 className="custom-scrollbar w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-600 resize-none focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                 placeholder="Add a brief description..."
                 rows={4}
@@ -140,6 +144,6 @@ export default function HentaiModal({ isOpen, onClose }: HentaiModalProps) {
           </form>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

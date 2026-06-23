@@ -1,14 +1,15 @@
 
-import React from 'react';
-import { getMangaById, getMangaCharacters, getMangaRecommendations } from '@/lib/jikan-service';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import Link from 'next/link';
+
+import { getMangaById, getMangaCharacters, getMangaRecommendations } from '@/lib/jikan-service';
 import { slugify } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/server';
+import { getAuthenticatedUser } from '@/services/supabase';
+import { checkIsMangaFavorite } from '@/services/favorites';
 import { getMediaListAssociations, getMediaProgress } from '@/lib/actions/lists';
 import AnimeActions from '@/components/anime/AnimeActions';
 import BackButton from '@/components/navigation/BackButton';
-import { Metadata } from 'next';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const idMatch = slug.match(/^(\d+)/);
   if (!idMatch) return { title: "Manga Not Found" };
   
-  const mangaId = parseInt(idMatch[1]);
+  const mangaId = Number.parseInt(idMatch[1]);
   try {
     const manga = await getMangaById(mangaId);
     return {
@@ -34,13 +35,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function MangaDetailPage({ params }: Props) {
+export default async function MangaDetailPage({ params }: Readonly<Props>) {
   const { slug } = await params;
   
   const idMatch = slug.match(/^(\d+)/);
   if (!idMatch) return notFound();
   
-  const mangaId = parseInt(idMatch[1]);
+  const mangaId = Number.parseInt(idMatch[1]);
 
   let mangaData;
   try {
@@ -55,41 +56,17 @@ export default async function MangaDetailPage({ params }: Props) {
     return notFound();
   }
 
-  const { manga, characters, recommendations } = mangaData;
-  const mainCharacters = characters.slice(0, 6); // Manga characters don't always have roles in the basic response
+  const { manga, recommendations } = mangaData;
   const topRecommendations = recommendations.slice(0, 5);
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
 
   let isFavorite = false;
   let initialListIds: string[] = [];
   let progress = null;
 
   if (user) {
-    // Check standard favorites
-    const { data: favSimple } = await supabase
-      .from('favorites')
-      .select('id, media!inner(mal_id, type)')
-      .eq('user_id', user.id)
-      .eq('media.mal_id', mangaId)
-      .eq('media.type', 'manga')
-      .single();
-
-    if (favSimple) {
-      isFavorite = true;
-    } else {
-      // Check hentai vault
-      const { data: hentaiFav } = await supabase
-        .from('hentai')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('mal_id', mangaId)
-        .single();
-      
-      isFavorite = !!hentaiFav;
-    }
-
+    isFavorite = await checkIsMangaFavorite(user.id, mangaId);
     initialListIds = await getMediaListAssociations(mangaId);
     progress = await getMediaProgress(mangaId);
   }
@@ -107,7 +84,7 @@ export default async function MangaDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="flex-1 min-h-screen relative px-4 sm:px-8 lg:px-12 pb-20 pt-24 lg:pt-28">
+    <div className="flex-1 relative px-4 sm:px-8 lg:px-12 pb-8">
       {/* Background Blur */}
       <div className="absolute top-0 left-0 w-full h-[600px] z-0 opacity-20 pointer-events-none overflow-hidden">
         <div 

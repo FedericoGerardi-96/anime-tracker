@@ -1,7 +1,7 @@
 
 'use client'
+import { useState } from 'react';
 
-import React, { useState } from 'react';
 import AnimeCard from '@/components/cards/AnimeCard';
 import AddToListModal from '@/components/ui/AddToListModal';
 import AuthModal from '@/components/auth/AuthModal';
@@ -12,12 +12,11 @@ interface AnimeListContentProps {
   userId?: string;
 }
 
-export default function AnimeListContent({ animeList, userId }: AnimeListContentProps) {
+export default function AnimeListContent({ animeList, userId }: Readonly<AnimeListContentProps>) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<any>(null);
   const [initialListIds, setInitialListIds] = useState<string[]>([]);
-  const [isLoadingAssociations, setIsLoadingAssociations] = useState(false);
 
   const handleAddClick = async (anime: any) => {
     if (!userId) {
@@ -26,13 +25,9 @@ export default function AnimeListContent({ animeList, userId }: AnimeListContent
     }
     setSelectedAnime(anime);
     setIsModalOpen(true);
-    setIsLoadingAssociations(true);
     
-    // Fetch current associations for this anime
-    // This helps the user see where it's already added
     const associations = await getAnimeListAssociations(Number(anime.id));
     setInitialListIds(associations);
-    setIsLoadingAssociations(false);
   };
 
   return (
@@ -69,7 +64,8 @@ export default function AnimeListContent({ animeList, userId }: AnimeListContent
           synopsis: selectedAnime.synopsis,
           season: selectedAnime.season,
           tags: selectedAnime.tags,
-          episodes: selectedAnime.episodes
+          episodes: selectedAnime.episodes,
+          score: selectedAnime.score
         } : undefined}
         initialListIds={initialListIds}
       />

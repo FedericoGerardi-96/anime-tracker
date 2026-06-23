@@ -8,7 +8,7 @@ interface DeleteHentaiButtonProps {
   id: string;
 }
 
-export default function DeleteHentaiButton({ id }: DeleteHentaiButtonProps) {
+export default function DeleteHentaiButton({ id }: Readonly<DeleteHentaiButtonProps>) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { success, error } = useToast();
 
@@ -16,7 +16,7 @@ export default function DeleteHentaiButton({ id }: DeleteHentaiButtonProps) {
     e.preventDefault();
     e.stopPropagation();
     
-    if (!window.confirm("Are you sure you want to remove this from your Vault?")) {
+    if (!globalThis.confirm("Are you sure you want to remove this from your Vault?")) {
       return;
     }
 

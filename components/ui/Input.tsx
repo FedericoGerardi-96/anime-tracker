@@ -1,5 +1,3 @@
-import React from "react";
-
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   icon?: string;
@@ -7,7 +5,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   forgotLink?: string;
 }
 
-export default function Input({ label, icon, error, forgotLink, ...props }: InputProps) {
+export default function Input({ label, icon, error, forgotLink, ...props }: Readonly<InputProps>) {
   return (
     <div className="space-y-1.5 w-full">
       <div className="flex justify-between items-center ml-1">

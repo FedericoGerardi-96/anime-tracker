@@ -151,6 +151,7 @@ export async function addMediaToLists(mediaData: {
   synopsis?: string;
   season?: string;
   tags?: string[];
+  score?: number;
 }, listIds: string[], progressData?: {
   status?: string;
   current_episode?: number;
@@ -183,6 +184,7 @@ export async function addMediaToLists(mediaData: {
         description: mediaData.synopsis,
         season: mediaData.season,
         tags: mediaData.tags || [],
+        score: mediaData.score || 0,
       })
       .select('id')
       .single()

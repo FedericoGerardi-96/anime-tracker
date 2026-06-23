@@ -10,7 +10,7 @@ interface HeroCarouselProps {
   anime: JikanAnime[];
 }
 
-export default function HeroCarousel({ anime: rawAnime }: HeroCarouselProps) {
+export default function HeroCarousel({ anime: rawAnime }: Readonly<HeroCarouselProps>) {
   const anime = rawAnime.filter((a, i, arr) => arr.findIndex(b => b.mal_id === a.mal_id) === i);
   const [current, setCurrent] = useState(0);
 
@@ -80,7 +80,7 @@ export default function HeroCarousel({ anime: rawAnime }: HeroCarouselProps) {
           <div className="flex items-center gap-3 pt-1">
             <Link href={`/anime/${item.mal_id}-${slugify(item.title_english || item.title)}`}>
               <button className="bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 rounded-xl font-bold flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-primary/25">
-                <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>info</span>
+                <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>info</span>{''}
                 View Details
               </button>
             </Link>

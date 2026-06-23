@@ -1,20 +1,17 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { getAuthenticatedUser } from "@/services/supabase"
+import { updateProfileShowHContent } from "@/services/profile"
 import { revalidatePath } from "next/cache"
 
 export async function updateShowHContent(value: boolean) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthenticatedUser()
 
   if (!user) return { error: "Not authenticated" }
 
-  const { error } = await supabase
-    .from("profiles")
-    .update({ show_h_content: value })
-    .eq("id", user.id)
+  const result = await updateProfileShowHContent(user.id, value)
 
-  if (error) return { error: error.message }
+  if (result.error) return { error: result.error }
 
   revalidatePath("/profile")
   revalidatePath("/")

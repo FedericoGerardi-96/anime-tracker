@@ -1,45 +1,24 @@
-
 "use server"
 
+import { getAuthenticatedUser } from "@/services/supabase"
+import { getFavoritesWithMedia as fetchFavoritesWithMedia, getFavoriteMalIds as fetchFavoriteMalIds, getAllFavoritesFull } from "@/services/favorites"
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 export async function getFavoritesWithMedia() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthenticatedUser()
 
   if (!user) return []
 
-  const { data, error } = await supabase
-    .from('favorites')
-    .select('id, media!inner(mal_id, title, image)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  if (error || !data) return []
-
-  return data.map((row: any) => ({
-    id: row.id as string,
-    mal_id: row.media.mal_id as number,
-    title: row.media.title as string,
-    image: row.media.image as string,
-  }))
+  return fetchFavoritesWithMedia(user.id)
 }
 
 export async function getFavoriteMalIds(): Promise<number[] | null> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthenticatedUser()
 
   if (!user) return null
 
-  const { data, error } = await supabase
-    .from('favorites')
-    .select('media!inner(mal_id)')
-    .eq('user_id', user.id)
-
-  if (error || !data) return []
-
-  return data.map((row: any) => row.media.mal_id)
+  return fetchFavoriteMalIds(user.id)
 }
 
 export async function toggleFavorite(mediaData: {
@@ -50,6 +29,7 @@ export async function toggleFavorite(mediaData: {
   synopsis?: string;
   season?: string;
   tags?: string[];
+  score?: number;
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -110,6 +90,7 @@ export async function toggleFavorite(mediaData: {
         description: mediaData.synopsis,
         season: mediaData.season,
         tags: mediaData.tags || [],
+        score: mediaData.score || 0,
       })
       .select('id')
       .single()
@@ -154,4 +135,24 @@ export async function toggleFavorite(mediaData: {
   revalidatePath('/profile')
   
   return { success: true, isFavorite: !existingFav }
+}
+
+export async function exportFavoritesAction() {
+  const user = await getAuthenticatedUser();
+  if (!user) throw new Error("Not authenticated");
+  
+  const data = await getAllFavoritesFull(user.id);
+  return data.map((fav: any) => {
+    const media = Array.isArray(fav.media) ? fav.media[0] : fav.media;
+    return {
+      "ID": fav.id,
+      "MAL ID": media?.mal_id,
+      "Title": media?.title,
+      "Type": media?.type ? media.type.toUpperCase() : "",
+      "Score": media?.score || 0,
+      "Season": media?.season || "",
+      "Tags": Array.isArray(media?.tags) ? media.tags.join(", ") : "",
+      "Description": media?.description || "",
+    };
+  });
 }

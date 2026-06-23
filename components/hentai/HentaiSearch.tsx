@@ -4,7 +4,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-export default function HentaiSearch({ defaultValue }: { defaultValue?: string }) {
+export default function HentaiSearch({ defaultValue }: Readonly<{ defaultValue?: string }>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

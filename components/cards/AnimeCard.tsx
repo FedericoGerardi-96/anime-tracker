@@ -41,7 +41,7 @@ export default function AnimeCard({
   type = 'anime',
   userId,
   onAddClick
-}: AnimeCardProps) {
+}: Readonly<AnimeCardProps>) {
   const [isPending, startTransition] = useTransition();
   const [optimisticFavorite, setOptimisticFavorite] = useState(isFavorite);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -68,11 +68,12 @@ export default function AnimeCard({
         type,
         synopsis,
         season,
-        tags
+        tags,
+        score
       });
       // if there's an error, revert state
       if (result?.error) {
-        setOptimisticFavorite(optimisticFavorite);
+        setOptimisticFavorite(prev => !prev);
         error(result.error);
       }
     });
@@ -110,7 +111,11 @@ export default function AnimeCard({
           <button 
             onClick={handleFavoriteClick}
             disabled={isPending}
-            className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-transform group/fav cursor-pointer disabled:opacity-50"
+            className={`w-8 h-8 rounded-full flex items-center justify-center hover:scale-110 transition-all group/fav cursor-pointer ${
+              optimisticFavorite 
+                ? 'bg-red-500/20 border border-red-500/30 text-red-500 shadow-md shadow-red-500/10' 
+                : 'bg-white/10 backdrop-blur-md text-white hover:bg-white/20 border border-white/5'
+            }`}
           >
             <span 
               className={`material-symbols-outlined text-lg transition-colors ${optimisticFavorite ? 'text-red-500' : 'group-hover/fav:text-red-500'}`}

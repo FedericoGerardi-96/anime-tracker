@@ -25,7 +25,7 @@ export default function AnimeActions({
   initialProgress,
   maxEpisodes = 0,
   userId
-}: AnimeActionsProps) {
+}: Readonly<AnimeActionsProps>) {
   const [isPending, startTransition] = useTransition();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,7 +62,8 @@ export default function AnimeActions({
         type: animeData.type || 'anime',
         synopsis: animeData.synopsis,
         season: animeData.season,
-        tags: animeData.tags
+        tags: animeData.tags,
+        score: animeData.score
       });
       if (result?.error) {
         setIsFavorite(!nextState);
@@ -79,8 +80,8 @@ export default function AnimeActions({
       return;
     }
     setIsSavingProgress(true);
-    const s = newStatus !== undefined ? newStatus : status;
-    const e = newEpisode !== undefined ? newEpisode : episode;
+    const s = newStatus ?? status;
+    const e = newEpisode ?? episode;
 
     const result = await addMediaToLists(
       {
@@ -90,7 +91,8 @@ export default function AnimeActions({
         type: animeData.type || 'anime',
         synopsis: animeData.synopsis,
         season: animeData.season,
-        tags: animeData.tags
+        tags: animeData.tags,
+        score: animeData.score
       },
       initialListIds,
       {
@@ -106,22 +108,27 @@ export default function AnimeActions({
     setIsSavingProgress(false);
   };
 
+  const buttonIconClass = (): string => {
+    const savingProgress = isSavingProgress ? 'sync' : 'save';
+    return showSuccess ? 'check_circle' : savingProgress;
+  }
+
   return (
     <div className="w-full">
       <div className="flex flex-wrap items-center gap-3 glass-panel p-3 rounded-2xl">
         <button 
           onClick={() => {
-            if (!userId) {
+            if (userId) {
+              setIsModalOpen(true);
+            } else {
               error('Please login to manage your lists');
               setAuthMode('login');
               setIsAuthModalOpen(true);
-            } else {
-              setIsModalOpen(true);
             }
           }}
           className="px-6 py-3.5 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90 transition-all text-sm shrink-0 cursor-pointer"
         >
-          <span className="material-symbols-outlined text-lg">add</span>
+          <span className="material-symbols-outlined text-lg">add</span>{''}
           Add to List
         </button>
 
@@ -195,7 +202,7 @@ export default function AnimeActions({
             className={`p-3.5 rounded-xl transition-all border border-white/10 cursor-pointer ${showSuccess ? 'text-green-500 bg-green-500/10 border-green-500/20' : 'text-white hover:bg-white/10'}`}
           >
             <span className="material-symbols-outlined text-lg">
-              {showSuccess ? 'check_circle' : isSavingProgress ? 'sync' : 'save'}
+              {buttonIconClass()}
             </span>
           </button>
 
@@ -217,7 +224,8 @@ export default function AnimeActions({
           synopsis: animeData.synopsis,
           season: animeData.season,
           tags: animeData.tags,
-          episodes: maxEpisodes
+          episodes: maxEpisodes,
+          score: animeData.score
         }}
         initialListIds={initialListIds}
       />

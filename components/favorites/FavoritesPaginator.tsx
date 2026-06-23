@@ -8,7 +8,7 @@ interface Props {
   totalPages: number;
 }
 
-export default function HentaiPaginator({ currentPage, totalPages }: Props) {
+export default function FavoritesPaginator({ currentPage, totalPages }: Readonly<Props>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -27,6 +27,7 @@ export default function HentaiPaginator({ currentPage, totalPages }: Props) {
     router.push(`${pathname}?${createQueryString(page)}`);
   };
 
+  // Build visible page numbers — max 5 shown around current
   const buildPages = () => {
     const pages: (number | "...")[] = [];
     if (totalPages <= 7) {
@@ -44,31 +45,32 @@ export default function HentaiPaginator({ currentPage, totalPages }: Props) {
   };
 
   if (totalPages <= 1) return null;
+
   const pages = buildPages();
 
   return (
     <div className="mt-20 flex justify-center">
-      <nav className="glass-card flex items-center p-2 rounded-2xl gap-1 border border-white/10 bg-white/5 backdrop-blur-md shadow-xl">
+      <nav className="glass-card flex items-center p-2 rounded-2xl gap-1 border border-white/10 bg-white/5 backdrop-blur-md">
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
-          className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined">chevron_left</span>
         </button>
 
-        {pages.map((p, i) =>
+        {pages.map((p) =>
           p === "..." ? (
-            <span key={`dots-${i}`} className="w-10 h-10 flex items-center justify-center text-slate-600 select-none">
+            <span key={`dots-${p}`} className="w-10 h-10 flex items-center justify-center text-slate-600 select-none">
               ...
             </span>
           ) : (
             <button
               key={p}
-              onClick={() => goToPage(p as number)}
-              className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold text-sm transition-all cursor-pointer ${
+              onClick={() => goToPage(p)}
+              className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold text-sm transition-all ${
                 p === currentPage
-                  ? "bg-primary text-white shadow-[0_0_15px_rgba(141,49,227,0.4)] shadow-primary/40"
+                  ? "bg-primary text-white shadow-[0_0_15px_rgba(141,49,227,0.4)]"
                   : "text-slate-400 hover:text-white hover:bg-white/10"
               }`}
             >
@@ -80,7 +82,7 @@ export default function HentaiPaginator({ currentPage, totalPages }: Props) {
         <button
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined">chevron_right</span>
         </button>

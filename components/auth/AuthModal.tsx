@@ -11,7 +11,7 @@ interface AuthModalProps {
   initialMode?: 'login' | 'signup'
 }
 
-export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Readonly<AuthModalProps>) {
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -36,7 +36,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${globalThis.location.origin}/auth/callback`,
           },
         })
         if (error) throw error
@@ -62,7 +62,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${globalThis.location.origin}/auth/callback`,
         },
       })
       if (error) throw error
@@ -72,12 +72,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-8 animate-in fade-in duration-300">
       {/* Click outside to close */}
-      <div className="absolute inset-0" onClick={onClose}></div>
+      <button className="absolute inset-0" onClick={onClose}></button>
       
       {/* Modal Container */}
-      <div className="glass-panel w-full max-w-md rounded-3xl overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-300 pointer-events-auto">
+      <div className="glass-panel w-full max-w-md rounded-3xl shadow-2xl relative animate-in zoom-in-95 duration-300 pointer-events-auto max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
         
         {/* Decorative Top Section */}
         <div className="h-32 bg-gradient-to-br from-primary/30 to-purple-900/30 relative flex items-center justify-center">
@@ -147,7 +147,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
           {/* Email Form */}
           <form className="space-y-4" onSubmit={handleAuth}>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-text-muted uppercase ml-1 tracking-wider">Email Address</label>
+              <label htmlFor="email" className="text-[10px] font-black text-text-muted uppercase ml-1 tracking-wider">Email Address</label>
               <div className="relative group">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-text-muted text-lg group-focus-within:text-primary transition-colors">
                   mail
@@ -165,7 +165,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-[10px] font-black text-text-muted uppercase tracking-wider">Password</label>
+                <label htmlFor="password" className="text-[10px] font-black text-text-muted uppercase tracking-wider">Password</label>
                 {mode === 'login' && (
                   <button type="button" className="text-[10px] text-primary font-black hover:underline uppercase tracking-wider">Forgot?</button>
                 )}

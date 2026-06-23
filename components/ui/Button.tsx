@@ -1,11 +1,9 @@
-import React from "react";
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "social";
   isLoading?: boolean;
 }
 
-export default function Button({ variant = "primary", isLoading, className = "", children, ...props }: ButtonProps) {
+export default function Button({ variant = "primary", isLoading, className = "", children, ...props }: Readonly<ButtonProps>) {
   const baseStyles = "w-full py-3.5 rounded-xl text-sm font-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
   
   const variants = {

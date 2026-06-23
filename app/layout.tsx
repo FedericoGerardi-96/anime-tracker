@@ -35,7 +35,7 @@ export default async function RootLayout({
         <ToastProvider>
           <div className="flex h-screen overflow-hidden">
             <Sidebar />
-            <main className="flex-1 h-full overflow-y-auto flex flex-col relative">
+            <main className="flex-1 h-full overflow-y-auto flex flex-col relative pt-20 pb-12">
               <Suspense fallback={<div className="h-20 w-full bg-deep-navy/80 backdrop-blur-md border-b border-white/5 z-40" />}>
                 <Topbar />
               </Suspense>

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateShowHContent } from "@/lib/actions/profile";
 
-export default function HContentToggle({ enabled }: { enabled: boolean }) {
+export default function HContentToggle({ enabled }: Readonly<{ enabled: boolean }>) {
   const [checked, setChecked] = useState(enabled);
   const [isPending, startTransition] = useTransition();
 

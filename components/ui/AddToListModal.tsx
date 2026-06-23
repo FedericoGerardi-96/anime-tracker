@@ -19,6 +19,7 @@ interface AnimeData {
   season?: string;
   tags?: string[];
   episodes?: number;
+  score?: number;
 }
 
 interface AddToListModalProps {
@@ -37,7 +38,7 @@ export default function AddToListModal({
   mode = 'add-anime',
   animeData,
   initialListIds = []
-}: AddToListModalProps) {
+}: Readonly<AddToListModalProps>) {
   const [lists, setLists] = useState<List[]>([])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -160,10 +161,59 @@ export default function AddToListModal({
     setIsSaving(false)
   }
 
+  const renderListContent = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      )
+    }
+
+    if (filteredLists.length > 0) {
+      return filteredLists.map((list) => {
+        const isSelected = selectedLists.has(list.id)
+        return (
+          <label 
+            key={list.id}
+            className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors group ${
+              isSelected 
+                ? "bg-primary/20 border border-primary/30" 
+                : "hover:bg-primary/10"
+            }`}
+          >
+            <div className="flex flex-col">
+              <span className={`text-sm ${isSelected ? "text-text-primary font-medium" : "text-text-muted group-hover:text-text-primary"}`}>
+                {list.name}
+              </span>
+              {list.description && (
+                <span className="text-[10px] text-text-muted line-clamp-1">{list.description}</span>
+              )}
+            </div>
+            <input 
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => toggleList(list.id)}
+              className={`w-5 h-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary/40 focus:ring-offset-background-dark ${
+                isSelected ? "border-primary bg-primary" : ""
+              }`}
+            />
+          </label>
+        )
+      })
+    }
+
+    return (
+      <div className="text-center py-10">
+        <p className="text-text-muted text-sm">No lists found</p>
+      </div>
+    )
+  }
+
   if (!isOpen) return null
 
   return (
-    <div 
+    <button 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
@@ -212,46 +262,7 @@ export default function AddToListModal({
 
             {/* Scrollable Collection List */}
             <div className="px-6 py-2 overflow-y-auto custom-scrollbar flex-1 space-y-1 min-h-[200px]">
-              {loading ? (
-                <div className="flex justify-center items-center py-10">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : filteredLists.length > 0 ? (
-                filteredLists.map((list) => {
-                  const isSelected = selectedLists.has(list.id)
-                  return (
-                    <label 
-                      key={list.id}
-                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors group ${
-                        isSelected 
-                          ? "bg-primary/20 border border-primary/30" 
-                          : "hover:bg-primary/10"
-                      }`}
-                    >
-                      <div className="flex flex-col">
-                        <span className={`text-sm ${isSelected ? "text-text-primary font-medium" : "text-text-muted group-hover:text-text-primary"}`}>
-                          {list.name}
-                        </span>
-                        {list.description && (
-                          <span className="text-[10px] text-text-muted line-clamp-1">{list.description}</span>
-                        )}
-                      </div>
-                      <input 
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleList(list.id)}
-                        className={`w-5 h-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary/40 focus:ring-offset-background-dark ${
-                          isSelected ? "border-primary bg-primary" : ""
-                        }`}
-                      />
-                    </label>
-                  )
-                })
-              ) : (
-                <div className="text-center py-10">
-                  <p className="text-text-muted text-sm">No lists found</p>
-                </div>
-              )}
+              {renderListContent()}
             </div>
           </>
         )}
@@ -317,7 +328,7 @@ export default function AddToListModal({
             {/* Progress and Status Section */}
             <div className="px-6 py-4 border-t border-white/5 bg-slate-900/20 grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Progress</label>
+                <label htmlFor="episode" className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Progress</label>
                 <div className="relative flex items-center">
                   <input 
                     className="w-full bg-slate-950/50 border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-600 transition-all text-sm" 
@@ -333,7 +344,7 @@ export default function AddToListModal({
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Status</label>
+                <label htmlFor="status" className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Status</label>
                 <div className="relative">
                   <select 
                     className="w-full bg-slate-950/50 border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-sm"
@@ -374,6 +385,6 @@ export default function AddToListModal({
           </>
         )}
       </div>
-    </div>
+    </button>
   )
 }

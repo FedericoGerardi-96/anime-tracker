@@ -28,12 +28,12 @@ export default function Dropdown({
   className = '',
   buttonClassName = '',
   menuClassName = ''
-}: DropdownProps) {
+}: Readonly<DropdownProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalValue, setInternalValue] = useState(value || options[0]?.value || '');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const currentValue = value !== undefined ? value : internalValue;
+  const currentValue = value ?? internalValue;
   const selectedOption = options.find((opt) => opt.value === currentValue);
 
   useEffect(() => {

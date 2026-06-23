@@ -16,7 +16,7 @@ export default function CustomListsGrid({ lists, onOpenList, onCreateNew }: Cust
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
       {lists.map((list) => (
-        <div
+        <button
           onClick={() => onOpenList(list)}
           key={list.id}
           className='group relative bg-slate-900/40 p-5 rounded-3xl border border-white/5 hover:border-primary/50 transition-all cursor-pointer shadow-xl overflow-hidden block'
@@ -39,11 +39,11 @@ export default function CustomListsGrid({ lists, onOpenList, onCreateNew }: Cust
             <span className='text-slate-500'>Custom Collection</span>
             <span className='text-primary hover:underline'>View Items</span>
           </div>
-        </div>
+        </button>
       ))}
 
-      {/* Create New List CTA */}
-      <div
+      {/* Create New List CTA */} 
+      <button
         onClick={onCreateNew}
         className='group relative border-2 border-dashed border-white/10 rounded-3xl p-5 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer flex flex-col items-center justify-center py-12'
       >
@@ -51,7 +51,7 @@ export default function CustomListsGrid({ lists, onOpenList, onCreateNew }: Cust
           <span className='material-symbols-outlined text-text-muted group-hover:text-primary'>add</span>
         </div>
         <p className='text-text-muted group-hover:text-primary font-bold'>Create New List</p>
-      </div>
+      </button>
     </div>
   );
 }

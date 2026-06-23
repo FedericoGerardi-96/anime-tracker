@@ -23,7 +23,7 @@ interface MediaGridProps {
   selectedListName?: string;
 }
 
-export default function MediaGrid({ items, searchQuery, activeTabLabel, selectedListName }: MediaGridProps) {
+export default function MediaGrid({ items, searchQuery, activeTabLabel, selectedListName }: Readonly<MediaGridProps>) {
   if (items.length === 0) {
     return (
       <div className='col-span-full py-32 text-center rounded-3xl border border-dashed border-white/10 bg-white/5'>

@@ -1,12 +1,16 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import FavoritesSearch from "./_components/FavoritesSearch";
-import FavoritesPaginator from "./_components/FavoritesPaginator";
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
+
+import { getAuthenticatedUser } from "@/services/supabase";
+import { getFavorites, getAllFavoritesFull } from "@/services/favorites";
+import FavoritesSearch from "@/components/favorites/FavoritesSearch";
+import FavoritesPaginator from "@/components/favorites/FavoritesPaginator";
+import ExportFavoritesButton from "@/components/favorites/ExportFavoritesButton";
+import FavoritesFilters from "@/components/favorites/FavoritesFilters";
 import { IFavorites } from "@/types/favorites";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "My Favorites",
@@ -18,74 +22,52 @@ const PAGE_SIZE = 15;
 interface SearchParams {
   page?: string;
   q?: string;
+  tags?: string;
+  sort?: string;
 }
 
 export default async function FavoritesPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<SearchParams>;
-}) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+}>) {
+  const user = await getAuthenticatedUser();
 
   if (!user) redirect("/");
 
   const params = await searchParams;
-  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
+  const currentPage = Math.max(1, Number.parseInt(params.page ?? "1", 10));
   const query = (params.q ?? "").trim();
+  const tagsParam = (params.tags ?? "").trim();
+  const selectedTags = tagsParam ? tagsParam.split(",") : [];
+  const sort = (params.sort ?? "").trim();
   const from = (currentPage - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  // Build the Supabase query
-  let dbQuery = supabase
-    .from("favorites")
-    .select(
-      `
-      id,
-      media:media_id!inner (
-        id,
-        mal_id,
-        title,
-        type,
-        image,
-        description,
-        season,
-        tags
-      )
-    `,
-      { count: "exact" }
+  // Retrieve all favorites to extract unique tags for the filter UI
+  const allFavorites = await getAllFavoritesFull(user.id);
+  const uniqueTags = Array.from(
+    new Set(
+      allFavorites.flatMap((fav: any) => {
+        const media = Array.isArray(fav.media) ? fav.media[0] : fav.media;
+        return media?.tags || [];
+      })
     )
-    .eq("user_id", user.id);
+  ).sort();
 
-  // Search: filter on joined media columns (title, description, tags)
-  if (query) {
-    // Use referencedTable (supabase-js v2 API) to filter on the inner-joined media table.
-    // tags is a text[] column — cs("{tag}") checks if the array contains that element.
-    dbQuery = dbQuery.or(
-      `title.ilike.%${query}%,description.ilike.%${query}%,tags.cs.{${query}}`,
-      { referencedTable: "media" }
-    );
-  }
-
-  const { data: favoritesData, count, error } = await dbQuery
-    .order("id", { ascending: false })
-    .range(from, to);
-
-  if (error) {
-    console.error("Error fetching favorites:", error);
-  }
-
-  const favorites = favoritesData ?? [] as IFavorites[];
-  const totalCount = count ?? 0;
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const { favorites, totalCount, totalPages } = await getFavorites(user.id, {
+    query,
+    page: currentPage,
+    pageSize: PAGE_SIZE,
+    tags: selectedTags,
+    sortBy: sort,
+  });
 
   const hasResults = favorites.length > 0;
   const isSearching = query.length > 0;
 
   return (
-    <div className="flex-1 min-h-screen relative px-4 sm:px-8 lg:px-12 pb-20 pt-24 lg:pt-28">
+    <div className="flex-1 relative px-4 sm:px-8 lg:px-12 py-8">
       {/* Hero Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
@@ -111,103 +93,34 @@ export default async function FavoritesPage({
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 bg-primary hover:bg-primary/80 text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 active:scale-95">
-            <span
-              className="material-symbols-outlined"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              table_chart
-            </span>
-            <span className="uppercase text-xs tracking-widest">
-              Export to Excel
-            </span>
-          </button>
+          <ExportFavoritesButton />
         </div>
       </div>
 
       {/* Filter / Search Bar */}
-      <div className="glass-card rounded-2xl p-6 mb-12 flex flex-wrap items-end gap-6 border border-white/10 bg-white/5 backdrop-blur-md">
+      <div className="glass-card rounded-2xl p-6 mb-12 flex flex-wrap items-end gap-6 border border-white/10 bg-white/5 backdrop-blur-md relative z-30">
         {/* Search — client component wrapped in Suspense */}
         <div className="flex flex-col gap-2 flex-1 min-w-[220px]">
-          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">
             Search
-          </label>
+          </span>
           <Suspense fallback={null}>
             <FavoritesSearch defaultValue={query} />
           </Suspense>
         </div>
 
-        <div className="flex flex-col gap-2 min-w-[160px]">
-          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">
-            Genre
-          </label>
-          <div className="relative">
-            <select className="w-full bg-slate-900/50 border border-white/5 text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer">
-              <option>All Genres</option>
-              <option>Action</option>
-              <option>Sci-Fi</option>
-              <option>Fantasy</option>
-              <option>Psychological</option>
-            </select>
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 pointer-events-none">
-              expand_more
-            </span>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 min-w-[160px]">
-          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">
-            Sort By
-          </label>
-          <div className="relative">
-            <select className="w-full bg-slate-900/50 border border-white/5 text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer">
-              <option>Date Added</option>
-              <option>Title</option>
-              <option>Type</option>
-            </select>
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 pointer-events-none">
-              expand_more
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 self-end py-1">
-          <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/30 transition-all">
-            <span className="material-symbols-outlined">grid_view</span>
-          </button>
-          <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all">
-            <span className="material-symbols-outlined">view_list</span>
-          </button>
-        </div>
+        <Suspense fallback={
+          <>
+            <div className="h-10 w-40 bg-slate-200 dark:bg-slate-800/50 rounded-lg animate-pulse" />
+            <div className="h-10 w-40 bg-slate-200 dark:bg-slate-800/50 rounded-lg animate-pulse" />
+          </>
+        }>
+          <FavoritesFilters availableTags={uniqueTags} />
+        </Suspense>
       </div>
 
       {/* Content Grid */}
-      {!hasResults ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <span
-            className="material-symbols-outlined text-6xl text-slate-700 mb-4"
-            style={{ fontVariationSettings: "'FILL' 0" }}
-          >
-            {isSearching ? "search_off" : "heart_broken"}
-          </span>
-          <h2 className="text-2xl font-bold text-white mb-2">
-            {isSearching ? `No results for "${query}"` : "No favorites yet"}
-          </h2>
-          <p className="text-slate-400 max-w-sm">
-            {isSearching
-              ? "Try a different title, description keyword, or tag."
-              : "You haven't added any series to your favorites collection. Start exploring and bookmarking your top picks!"}
-          </p>
-          {!isSearching && (
-            <Link
-              href="/anime"
-              className="mt-6 bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-xl font-bold transition-all"
-            >
-              Explore Anime
-            </Link>
-          )}
-        </div>
-      ) : (
+      {hasResults ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
             {favorites.map((fav: IFavorites) => {
@@ -270,7 +183,7 @@ export default async function FavoritesPage({
                     </h3>
                     {media.tags && media.tags.length > 0 && (
                       <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1 truncate">
-                        {(media.tags as string[]).slice(0, 2).join(" · ")}
+                        {media.tags.slice(0, 2).join(" · ")}
                       </p>
                     )}
                   </div>
@@ -292,6 +205,32 @@ export default async function FavoritesPage({
             Showing {from + 1}–{Math.min(to + 1, totalCount)} of {totalCount}
           </p>
         </>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <span
+            className="material-symbols-outlined text-6xl text-slate-700 mb-4"
+            style={{ fontVariationSettings: "'FILL' 0" }}
+          >
+            {isSearching ? "search_off" : "heart_broken"}
+          </span>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            {isSearching ? `No results for "${query}"` : "No favorites yet"}
+          </h2>
+          <p className="text-slate-400 max-w-sm">
+            {isSearching
+              ? "Try a different title, description keyword, or tag."
+              : "You haven't added any series to your favorites collection. Start exploring and bookmarking your top picks!"}
+          </p>
+          {!isSearching && (
+            <Link
+              href="/anime"
+              className="mt-6 bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-xl font-bold transition-all"
+            >
+              Explore Anime
+            </Link>
+          )}
+        </div>
+
       )}
 
       {/* Decorative background elements */}

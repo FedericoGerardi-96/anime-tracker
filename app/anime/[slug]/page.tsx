@@ -1,10 +1,10 @@
 
-import React from 'react';
 import { getAnimeById, getAnimeCharacters, getAnimeEpisodes, getAnimeRecommendations } from '@/lib/jikan-service';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { slugify } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/server';
+import { getAuthenticatedUser } from '@/services/supabase';
+import { checkIsAnimeFavorite } from '@/services/favorites';
 import { getAnimeListAssociations, getAnimeProgress } from '@/lib/actions/lists';
 import AnimeActions from '@/components/anime/AnimeActions';
 import BackButton from '@/components/navigation/BackButton';
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const idMatch = slug.match(/^(\d+)/);
   if (!idMatch) return { title: "Anime Not Found" };
   
-  const animeId = parseInt(idMatch[1]);
+  const animeId = Number.parseInt(idMatch[1]);
   try {
     const anime = await getAnimeById(animeId);
     return {
@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function AnimeDetailPage({ params }: Props) {
+export default async function AnimeDetailPage({ params }: Readonly<Props>) {
   const { slug } = await params;
   
   const idMatch = slug.match(/^(\d+)/);
   if (!idMatch) return notFound();
   
-  const animeId = parseInt(idMatch[1]);
+  const animeId = Number.parseInt(idMatch[1]);
 
   let animeData;
   try {
@@ -61,39 +61,17 @@ export default async function AnimeDetailPage({ params }: Props) {
   const recentEpisodes = episodes.slice(0, 3);
   const topRecommendations = recommendations.slice(0, 5);
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  let isFavorite = false;
-  let initialListIds: string[] = [];
-  let progress = null;
-
-  if (user) {
-    // Check standard favorites
-    const { data: favSimple } = await supabase
-      .from('favorites')
-      .select('id, media!inner(mal_id)')
-      .eq('user_id', user.id)
-      .eq('media.mal_id', animeId)
-      .single();
-
-    if (favSimple) {
-      isFavorite = true;
-    } else {
-      // Check hentai vault
-      const { data: hentaiFav } = await supabase
-        .from('hentai')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('mal_id', animeId)
-        .single();
-      
-      isFavorite = !!hentaiFav;
-    }
-
-    initialListIds = await getAnimeListAssociations(animeId);
-    progress = await getAnimeProgress(animeId);
-  }
+  const user = await getAuthenticatedUser();
+ 
+   let isFavorite = false;
+   let initialListIds: string[] = [];
+   let progress = null;
+ 
+   if (user) {
+     isFavorite = await checkIsAnimeFavorite(user.id, animeId);
+     initialListIds = await getAnimeListAssociations(animeId);
+     progress = await getAnimeProgress(animeId);
+   }
 
   const animeCardData = {
     id: animeId,
@@ -108,7 +86,7 @@ export default async function AnimeDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="flex-1 min-h-screen relative px-4 sm:px-8 lg:px-12 pb-20">
+    <div className="flex-1 relative px-4 sm:px-8 lg:px-12 pb-8">
       <div className="absolute top-0 left-0 w-full h-[600px] z-0 opacity-20 pointer-events-none overflow-hidden">
         <div 
           className="w-full h-full bg-cover bg-center blur-3xl scale-110" 
@@ -117,7 +95,7 @@ export default async function AnimeDetailPage({ params }: Props) {
         <div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/80 to-transparent"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto mt-24 lg:mt-32">
+      <div className="relative z-10 max-w-7xl mx-auto mt-4 lg:mt-6">
         <div className="flex items-center gap-2 text-xs font-medium text-text-muted mb-8 px-4">
           <Link href="/" className="hover:text-primary transition-colors">Home</Link>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
