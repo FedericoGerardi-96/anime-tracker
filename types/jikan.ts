@@ -41,6 +41,12 @@ export interface JikanAnime {
     name: string;
     url: string;
   }>;
+  broadcast?: {
+    day: string | null;
+    time: string | null;
+    timezone: string | null;
+    string: string | null;
+  };
 }
 
 export interface JikanManga {

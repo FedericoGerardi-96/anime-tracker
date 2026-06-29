@@ -118,6 +118,60 @@ export async function getScheduleToday(): Promise<JikanAnime[]> {
   });
 }
 
+export async function getWeeklySchedules(): Promise<Record<string, JikanAnime[]>> {
+  const schedules: Record<string, JikanAnime[]> = {
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: [],
+  };
+
+  const pagesToFetch = [1, 2, 3]; // Fetch top 75 seasonal anime
+  
+  for (const page of pagesToFetch) {
+    try {
+      const response = await fetch(`${JIKAN_API_BASE}/seasons/now?sfw=true&page=${page}`, {
+        next: { revalidate: 3600 }
+      });
+      
+      if (response.ok) {
+        const { data } = await response.json();
+        if (data && Array.isArray(data)) {
+          data.forEach((anime: JikanAnime) => {
+            // Jikan's broadcast.day is usually like "Mondays"
+            const dayStr = anime.broadcast?.day?.toLowerCase() || "";
+            let matchedDay = "";
+            
+            if (dayStr.includes("monday")) matchedDay = "monday";
+            else if (dayStr.includes("tuesday")) matchedDay = "tuesday";
+            else if (dayStr.includes("wednesday")) matchedDay = "wednesday";
+            else if (dayStr.includes("thursday")) matchedDay = "thursday";
+            else if (dayStr.includes("friday")) matchedDay = "friday";
+            else if (dayStr.includes("saturday")) matchedDay = "saturday";
+            else if (dayStr.includes("sunday")) matchedDay = "sunday";
+
+            if (matchedDay) {
+              // Avoid duplicate mal_ids
+              if (!schedules[matchedDay].some((a) => a.mal_id === anime.mal_id)) {
+                schedules[matchedDay].push(anime);
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`Error fetching page ${page} of current season:`, e);
+    }
+    // Rate limit delay to avoid hitting Jikan API block
+    await new Promise(resolve => setTimeout(resolve, 350));
+  }
+  
+  return schedules;
+}
+
 export async function getSeasonNow(limit: number = 12): Promise<JikanAnime[]> {
   const response = await fetch(`${JIKAN_API_BASE}/seasons/now?sfw=true&limit=${limit}`, {
     next: { revalidate: 3600 }

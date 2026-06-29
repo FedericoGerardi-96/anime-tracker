@@ -47,14 +47,13 @@ export default function AiringToday({ todayAnime, favoriteMalIds }: Readonly<Air
               </p>
             )}
           </div>
-          <button
-            disabled
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold opacity-60 cursor-not-allowed"
-            title="Coming soon"
+          <Link
+            href="/anime/schedule"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold hover:bg-primary/20 transition-colors"
           >
             <span className="material-symbols-outlined text-base">event</span>{''}
             View Release Calendar
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">

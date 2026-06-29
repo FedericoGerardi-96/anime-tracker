@@ -9,6 +9,7 @@ import { IProfile } from "@/types/profile";
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/anime", label: "Anime Library", icon: "auto_stories" },
+  { href: "/anime/schedule", label: "Schedule", icon: "calendar_month" },
   { href: "/manga", label: "Manga Library", icon: "menu_book" },
   { href: "/lists", label: "My Lists", icon: "format_list_bulleted" },
   { href: "/favorites", label: "Favorites", icon: "favorite" },
