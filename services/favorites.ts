@@ -7,14 +7,16 @@ interface GetFavoritesOptions {
   pageSize?: number;
   tags?: string[];
   sortBy?: string;
+  status?: string;
 }
 
 /**
  * Fetches search-filtered, tags-filtered, sorted and paginated favorites for a specific user.
+ * Includes user-specific metadata (custom description, watch link, custom tags) when available.
  */
 export async function getFavorites(userId: string, options: GetFavoritesOptions = {}) {
   const supabase = await getSupabaseServer();
-  const { query = "", page = 1, pageSize = 15, tags = [], sortBy = "" } = options;
+  const { query = "", page = 1, pageSize = 15, tags = [], sortBy = "", status = "" } = options;
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -40,12 +42,52 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
     )
     .eq("user_id", userId);
 
+  // Search in both Jikan media table and user custom metadata table
   const cleanQuery = query.trim();
   if (cleanQuery) {
-    dbQuery = dbQuery.or(
-      `title.ilike.%${cleanQuery}%,description.ilike.%${cleanQuery}%,tags.cs.{${cleanQuery}}`,
-      { referencedTable: "media" }
-    );
+    // 1. Search Jikan details
+    const { data: mediaMatches } = await supabase
+      .from("media")
+      .select("id")
+      .or(`title.ilike.%${cleanQuery}%,description.ilike.%${cleanQuery}%,tags.cs.{${cleanQuery}}`);
+
+    const matchedMediaIdsByJikan = mediaMatches?.map((m: any) => m.id) || [];
+
+    // 2. Search custom descriptions and tags
+    const { data: metaMatches } = await supabase
+      .from("user_media_metadata")
+      .select("media_id")
+      .eq("user_id", userId)
+      .or(`custom_description.ilike.%${cleanQuery}%,custom_tags.cs.{${cleanQuery.toLowerCase()}}`);
+
+    const matchedMediaIdsByMeta = metaMatches?.map((m: any) => m.media_id) || [];
+
+    const allMatchedMediaIds = Array.from(new Set([...matchedMediaIdsByJikan, ...matchedMediaIdsByMeta]));
+
+    if (allMatchedMediaIds.length > 0) {
+      dbQuery = dbQuery.in("media_id", allMatchedMediaIds);
+    } else {
+      // Force empty result
+      dbQuery = dbQuery.eq("id", "00000000-0000-0000-0000-000000000000");
+    }
+  }
+
+  // Filter by progress status
+  if (status && status !== "All Statuses") {
+    const { data: progressMatches } = await supabase
+      .from("user_anime_progress")
+      .select("media_id")
+      .eq("user_id", userId)
+      .eq("status", status);
+
+    const matchedMediaIdsByStatus = progressMatches?.map((p: any) => p.media_id) || [];
+
+    if (matchedMediaIdsByStatus.length > 0) {
+      dbQuery = dbQuery.in("media_id", matchedMediaIdsByStatus);
+    } else {
+      // Force empty result
+      dbQuery = dbQuery.eq("id", "00000000-0000-0000-0000-000000000000");
+    }
   }
 
   if (tags && tags.length > 0) {
@@ -70,7 +112,56 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
     console.error("Error fetching favorites:", error);
   }
 
-  const favorites = (favoritesData ?? []) as IFavorites[];
+  const rawFavorites = (favoritesData ?? []) as any[];
+
+  // Batch-fetch user metadata for the returned media IDs
+  const mediaIds = rawFavorites.map((fav) => {
+    const media = Array.isArray(fav.media) ? fav.media[0] : fav.media;
+    return media?.id;
+  }).filter(Boolean);
+
+  let metadataMap: Record<string, any> = {};
+  let progressMap: Record<string, any> = {};
+
+  if (mediaIds.length > 0) {
+    // Fetch custom metadata
+    const { data: metadataRows } = await supabase
+      .from("user_media_metadata")
+      .select("id, media_id, custom_description, watch_link, custom_tags")
+      .eq("user_id", userId)
+      .in("media_id", mediaIds);
+
+    if (metadataRows) {
+      metadataMap = Object.fromEntries(
+        metadataRows.map((row: any) => [row.media_id, row])
+      );
+    }
+
+    // Fetch tracking progress/status
+    const { data: progressRows } = await supabase
+      .from("user_anime_progress")
+      .select("media_id, status, current_episode")
+      .eq("user_id", userId)
+      .in("media_id", mediaIds);
+
+    if (progressRows) {
+      progressMap = Object.fromEntries(
+        progressRows.map((row: any) => [row.media_id, row])
+      );
+    }
+  }
+
+  // Merge metadata and progress into favorites
+  const favorites = rawFavorites.map((fav) => {
+    const media = Array.isArray(fav.media) ? fav.media[0] : fav.media;
+    const mediaId = media?.id;
+    return {
+      ...fav,
+      user_metadata: mediaId ? metadataMap[mediaId] ?? null : null,
+      progress: mediaId ? progressMap[mediaId] ?? null : null,
+    };
+  }) as IFavorites[];
+
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -80,6 +171,8 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
     totalPages,
   };
 }
+
+
 
 /**
  * Fetches favorites with simple media detail (id, mal_id, title, image) for a specific user.

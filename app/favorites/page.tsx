@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { getAuthenticatedUser } from "@/services/supabase";
@@ -10,7 +9,7 @@ import FavoritesSearch from "@/components/favorites/FavoritesSearch";
 import FavoritesPaginator from "@/components/favorites/FavoritesPaginator";
 import ExportFavoritesButton from "@/components/favorites/ExportFavoritesButton";
 import FavoritesFilters from "@/components/favorites/FavoritesFilters";
-import { IFavorites } from "@/types/favorites";
+import FavoritesGrid from "@/components/favorites/FavoritesGrid";
 
 export const metadata: Metadata = {
   title: "My Favorites",
@@ -24,6 +23,7 @@ interface SearchParams {
   q?: string;
   tags?: string;
   sort?: string;
+  status?: string;
 }
 
 export default async function FavoritesPage({
@@ -41,6 +41,7 @@ export default async function FavoritesPage({
   const tagsParam = (params.tags ?? "").trim();
   const selectedTags = tagsParam ? tagsParam.split(",") : [];
   const sort = (params.sort ?? "").trim();
+  const status = (params.status ?? "").trim();
   const from = (currentPage - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
@@ -61,6 +62,7 @@ export default async function FavoritesPage({
     pageSize: PAGE_SIZE,
     tags: selectedTags,
     sortBy: sort,
+    status: status,
   });
 
   const hasResults = favorites.length > 0;
@@ -122,75 +124,7 @@ export default async function FavoritesPage({
       {/* Content Grid */}
       {hasResults ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-            {favorites.map((fav: IFavorites) => {
-              const media = Array.isArray(fav.media)
-                ? fav.media[0]
-                : fav.media;
-              if (!media) return null;
-              const mediaType = media.type ? media.type.toUpperCase() : "ANIME";
-
-              return (
-                <div key={fav.id} className="group relative flex flex-col gap-4">
-                  <div className="relative aspect-3/4 rounded-2xl overflow-hidden glass-card transition-all duration-500 hover:-translate-y-2 group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 bg-white/5">
-                    <Image
-                      alt={media.title || "Media Poster"}
-                      className="w-full! h-full! object-cover transition-transform duration-700 group-hover:scale-110"
-                      src={
-                        media.image ||
-                        "https://via.placeholder.com/300x400?text=No+Image"
-                      }
-                      width={300}
-                      height={400}
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-80" />
-
-                    {/* Type badge */}
-                    <div className="absolute top-4 left-4">
-                      <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 border border-white/10">
-                        <span className="text-white text-[10px] font-bold uppercase tracking-widest">
-                          {mediaType}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Favorite heart */}
-                    <div className="absolute top-4 right-4">
-                      <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg text-white">
-                        <span
-                          className="material-symbols-outlined text-xl"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          favorite
-                        </span>
-                      </button>
-                    </div>
-
-                    {/* Quick View overlay */}
-                    <div className="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                      <Link
-                        href={`/${media.type || "anime"}/${media.mal_id}`}
-                        className="block text-center w-full bg-white text-slate-900 font-bold py-3 rounded-xl uppercase text-[10px] tracking-widest shadow-xl hover:bg-slate-200 transition-colors"
-                      >
-                        Quick View
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="px-1">
-                    <h3 className="text-white font-bold text-lg leading-tight group-hover:text-primary transition-colors truncate">
-                      {media.title}
-                    </h3>
-                    {media.tags && media.tags.length > 0 && (
-                      <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1 truncate">
-                        {media.tags.slice(0, 2).join(" · ")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <FavoritesGrid favorites={favorites} />
 
           {/* Real Paginator */}
           <Suspense fallback={null}>

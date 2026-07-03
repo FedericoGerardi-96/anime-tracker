@@ -23,6 +23,7 @@ export default function FavoritesFilters({ availableTags }: Readonly<FavoritesFi
     : [];
 
   const currentSort = searchParams.get("sort") || "Date Added";
+  const currentStatus = searchParams.get("status") || "All Statuses";
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function FavoritesFilters({ availableTags }: Readonly<FavoritesFi
     (params: Record<string, string | null>) => {
       const current = new URLSearchParams(searchParams.toString());
       for (const [name, value] of Object.entries(params)) {
-        if (value === null || value === "" || value === "Date Added") {
+        if (value === null || value === "" || value === "Date Added" || value === "All Statuses") {
           current.delete(name);
         } else {
           current.set(name, value);
@@ -73,6 +74,12 @@ export default function FavoritesFilters({ availableTags }: Readonly<FavoritesFi
   const handleSortChange = (sort: string) => {
     startTransition(() => {
       router.push(`${pathname}?${createQueryString({ sort, page: "1" })}`);
+    });
+  };
+
+  const handleStatusChange = (status: string) => {
+    startTransition(() => {
+      router.push(`${pathname}?${createQueryString({ status, page: "1" })}`);
     });
   };
 
@@ -150,6 +157,31 @@ export default function FavoritesFilters({ availableTags }: Readonly<FavoritesFi
               )}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Filter by Status */}
+      <div className="flex flex-col gap-2 min-w-[160px]">
+        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">
+          Status
+        </span>
+        <div className="relative">
+          <select
+            value={currentStatus}
+            onChange={(e) => handleStatusChange(e.target.value)}
+            disabled={isPending}
+            className="w-full bg-slate-900/50 border border-white/5 text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer outline-none disabled:opacity-50"
+          >
+            <option value="All Statuses">All Statuses</option>
+            <option value="watching">Watching / Reading</option>
+            <option value="completed">Completed</option>
+            <option value="on_hold">On Hold</option>
+            <option value="dropped">Dropped</option>
+            <option value="plan_to_watch">Plan to Watch / Read</option>
+          </select>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 pointer-events-none">
+            expand_more
+          </span>
         </div>
       </div>
 
