@@ -1,0 +1,124 @@
+
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.985 0.004 75);
+  --foreground: oklch(0.19 0.014 285);
+  --card: oklch(0.995 0.002 75);
+  --card-foreground: oklch(0.19 0.014 285);
+  --popover: oklch(0.995 0.002 75);
+  --muted: oklch(0.955 0.006 75);
+  --muted-foreground: oklch(0.5 0.014 275);
+  --primary-color: oklch(0.5 0.19 288);
+  --primary-foreground: oklch(0.99 0.004 75);
+  --accent: oklch(0.93 0.035 290);
+  --accent-foreground: oklch(0.32 0.09 288);
+  --border: oklch(0.9 0.008 75);
+  --ring: oklch(0.5 0.19 288);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.16 0.014 282);
+  --foreground: oklch(0.96 0.006 75);
+  --card: oklch(0.205 0.016 282);
+  --card-foreground: oklch(0.96 0.006 75);
+  --popover: oklch(0.205 0.016 282);
+  --muted: oklch(0.27 0.018 282);
+  --muted-foreground: oklch(0.66 0.014 270);
+  --primary-color: oklch(0.72 0.17 288);
+  --primary-foreground: oklch(0.15 0.02 282);
+  --accent: oklch(0.3 0.05 290);
+  --accent-foreground: oklch(0.9 0.03 290);
+  --border: oklch(1 0 0 / 10%);
+  --ring: oklch(0.72 0.17 288);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-primary: var(--primary-color);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-deep-navy: var(--background);
+  --color-slate-dark: var(--card);
+  --color-text-primary: var(--foreground);
+  --color-text-muted: var(--muted-foreground);
+  --color-accent-gold: #eab308;
+  
+  --font-display: 'Inter', system-ui, sans-serif; /* SF Pro Display fallback to Inter if not available */
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+* {
+  border-color: var(--border);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary-color) 35%, transparent);
+}
+
+@layer utilities {
+  
+  .glass-panel {
+    background: rgba(2, 6, 23, 0.5);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(141, 49, 227, 0.05);
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(141, 49, 227, 0.4);
+    border-radius: 10px;
+  }
+
+  .cinematic-shadow {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Explicit class for icons just in case */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}
+html[data-catalog-loading='true'] .catalog-results {
+  visibility: hidden;
+  pointer-events: none;
+}
