@@ -10,7 +10,6 @@ export interface IFavorites {
 
 export interface Media {
     id:          string;
-    tags:        string[];
     type:        string;
     image:       string;
     title:       string;
@@ -21,7 +20,6 @@ export interface Media {
     format?:     string;
     status?:     string;
     total_units?: number;
-    description: string;
     score?:      number;
 }
 

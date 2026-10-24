@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   try {
     if (type === "character") {
       const result = await searchCharacters(query, 1);
-      return Response.json({ data: result.characters.slice(0, 5).map((character) => ({ mal_id: character.id, name: character.name, images: { webp: { small_image_url: character.image } } })) });
+      return Response.json({ data: result.characters.slice(0, 5).map((character) => ({ mal_id: character.id, provider: character.provider ?? 'anilist', name: character.name, images: { webp: { small_image_url: character.image } } })) });
     }
     if (type === "manga") {
       const result = await getMalMangaCatalog({ q: query, limit: 5 });
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const result = await getMalAnimeCatalog({ q: query, limit: 5 });
     return Response.json({ data: result.anime.map(mapMalAnimeToCatalog) });
   } catch (error) {
-    const provider = type === "character" ? "AniList" : "MyAnimeList";
+    const provider = type === "character" ? "AniList y MyAnimeList" : "MyAnimeList";
     console.error(`${provider} catalog search failed:`, error);
     return Response.json(
       { error: `La búsqueda de ${provider} no está disponible`, provider },

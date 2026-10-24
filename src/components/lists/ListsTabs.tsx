@@ -1,39 +1,24 @@
-'use client';
-
-const TABS = [
-  { id: 'watching', label: 'Viendo / Leyendo', icon: 'visibility' },
-  { id: 'completed', label: 'Completados', icon: 'done_all' },
-  { id: 'plan_to_watch', label: 'Pendientes', icon: 'schedule' },
-  { id: 'on_hold', label: 'En pausa', icon: 'pause_circle' },
-  { id: 'dropped', label: 'Abandonados', icon: 'cancel' },
-  { id: 'custom_lists', label: 'Listas personalizadas', icon: 'folder_special' },
-];
-
-interface ListsTabsProps {
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
-}
-
-export default function ListsTabs({ activeTab, onTabChange }: Readonly<ListsTabsProps>) {
+import Link from 'next/link';
+import { LIST_TABS } from '@/lib/lists-navigation';
+import type { ListsTabsProps } from '@/interfaces/lists';
+export default function ListsTabs({ activeTab }: Readonly<ListsTabsProps>) {
   return (
     <div className='flex items-center gap-2 border-b border-white/10 mb-4 overflow-x-auto no-scrollbar pb-1'>
-      {TABS.map((tab) => (
-        <button
-          type='button'
+      {LIST_TABS.map((tab) => (
+        <Link
           key={tab.id}
-          onClick={() => onTabChange(tab.id)}
+          href={`/lists?tab=${tab.id}`}
+          aria-current={tab.id === activeTab ? 'page' : undefined}
           className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
             tab.id === activeTab
               ? 'bg-primary text-white shadow-lg shadow-primary/20'
-              : 'text-slate-400 hover:bg-white/5 hover:text-white'
+              : 'text-slate-400 dark:hover:bg-white/5 hover:bg-muted  dark:hover:text-white hover:text-primary'
           }`}
         >
           <span className='material-symbols-outlined text-[18px]'>{tab.icon}</span>
           {tab.label}
-        </button>
+        </Link>
       ))}
     </div>
   );
 }
-
-export { TABS };

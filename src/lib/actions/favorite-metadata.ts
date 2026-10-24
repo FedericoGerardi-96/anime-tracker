@@ -14,7 +14,7 @@ export async function getUserMediaMetadata(mediaId: string): Promise<IUserMediaM
   if (!user) return null
 
   const { data, error } = await supabase
-    .from("user_media_metadata")
+    .from("user_media_progress")
     .select("id, user_id, media_id, custom_description, watch_link, custom_tags")
     .eq("user_id", user.id)
     .eq("media_id", mediaId)
@@ -44,19 +44,27 @@ export async function upsertUserMediaMetadata(metadata: {
     return { error: "Not authenticated" }
   }
 
-  const { error } = await supabase
-    .from("user_media_metadata")
-    .upsert(
-      {
-        user_id: user.id,
-        media_id: metadata.media_id,
-        custom_description: metadata.custom_description ?? null,
-        watch_link: metadata.watch_link ?? null,
-        custom_tags: metadata.custom_tags ?? [],
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,media_id" }
-    )
+  const values = {
+    custom_description: metadata.custom_description ?? null,
+    watch_link: metadata.watch_link ?? null,
+    custom_tags: metadata.custom_tags ?? [],
+    updated_at: new Date().toISOString(),
+  };
+  const { data: updated, error: updateError } = await supabase
+    .from("user_media_progress")
+    .update(values)
+    .eq('user_id', user.id)
+    .eq('media_id', metadata.media_id)
+    .select('id')
+    .maybeSingle();
+
+  const { error: insertError } = updated || updateError
+    ? { error: null }
+    : await supabase.from('user_media_progress').insert({
+        user_id: user.id, media_id: metadata.media_id,
+        status: 'plan_to_watch', current_episode: 0, ...values,
+      });
+  const error = updateError || insertError;
 
   if (error) {
     console.error("Error upserting user media metadata:", error)

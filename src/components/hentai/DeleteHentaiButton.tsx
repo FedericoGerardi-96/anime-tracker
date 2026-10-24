@@ -33,7 +33,7 @@ export default function DeleteHentaiButton({ id }: Readonly<DeleteHentaiButtonPr
   };
 
   return (
-    <button
+    <button type="button"
       onClick={handleDelete}
       disabled={isDeleting}
       className="absolute top-4 right-4 group/delete z-20 cursor-pointer disabled:cursor-not-allowed"

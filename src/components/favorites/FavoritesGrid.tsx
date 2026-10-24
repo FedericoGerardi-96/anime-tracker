@@ -26,7 +26,6 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
     title: string
     image: string
     type: string
-    description?: string
     total_units?: number
     metadata?: IFavorites['user_metadata']
     progress?: IFavorites['progress']
@@ -40,7 +39,6 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
       title: media.title,
       image: media.image,
       type: media.type,
-      description: media.description,
       total_units: media.total_units,
       metadata,
       progress,
@@ -78,7 +76,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
     <>
       {/* View Switcher Controls */}
       <div className="flex justify-end mb-8">
-        <div className="bg-slate-900/60 backdrop-blur-md p-1 rounded-xl border border-white/10 flex gap-1">
+        <div className="flex gap-1 rounded-xl border border-border bg-card p-1">
           <button
             type="button"
             onClick={() => setViewMode('grid')}
@@ -108,8 +106,8 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
 
       {viewMode === 'grid' ? (
         /* GRID VIEW */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-          {favorites.map((fav: IFavorites) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
+          {favorites.map((fav: IFavorites, index) => {
             const media = Array.isArray(fav.media) ? fav.media[0] : fav.media
             if (!media) return null
             const mediaType = media.type ? media.type.toUpperCase() : "ANIME"
@@ -129,6 +127,9 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                     }
                     width={300}
                     height={400}
+                    sizes="(max-width: 639px) 90vw, (max-width: 1023px) 45vw, (max-width: 1279px) 22vw, 18vw"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    fetchPriority={index < 2 ? 'high' : 'auto'}
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-80" />
 
@@ -139,11 +140,26 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                         {mediaType}
                       </span>
                     </div>
-                    <QuickStatusSelect compact mediaId={media.id} malId={media.mal_id} mediaType={media.type as 'anime' | 'manga'} initialStatus={progress?.status} currentEpisode={progress?.current_episode ?? 0} />
+                    <QuickStatusSelect compact onMedia mediaId={media.id} malId={media.mal_id} mediaType={media.type as 'anime' | 'manga'} initialStatus={progress?.status} currentEpisode={progress?.current_episode ?? 0} />
                   </div>
 
                   {/* Action buttons — top right */}
-                  <div className="absolute top-4 right-4 flex items-center gap-2">
+                  <div className="absolute top-4 right-4 flex flex-col items-center gap-2">
+                    {/* Favorite heart — always visible */}
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(media)}
+                      disabled={isRemoving}
+                      className="w-10 h-10 rounded-full bg-primary hover:bg-red-600 flex items-center justify-center shadow-lg text-white transition-colors cursor-pointer disabled:opacity-50"
+                      title="Quitar de favoritos"
+                    >
+                      <span
+                        className="material-symbols-outlined text-xl"
+                        style={{ fontVariationSettings: isRemoving ? "'FILL' 0" : "'FILL' 1" }}
+                      >
+                        {isRemoving ? 'sync' : 'favorite'}
+                      </span>
+                    </button>
                     <button type="button" onClick={() => setViewingFavorite(fav)} className="w-10 h-10 rounded-full bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-lg text-white hover:bg-primary/80 transition-all opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 cursor-pointer border border-white/10" title="Ver información" aria-label={`Ver información de ${media.title}`}>
                       <span className="material-symbols-outlined text-lg">visibility</span>
                     </button>
@@ -160,21 +176,6 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                         style={{ fontVariationSettings: "'FILL' 0" }}
                       >
                         edit
-                      </span>
-                    </button>
-                    {/* Favorite heart */}
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(media)}
-                      disabled={isRemoving}
-                      className="w-10 h-10 rounded-full bg-primary hover:bg-red-600 flex items-center justify-center shadow-lg text-white transition-colors cursor-pointer disabled:opacity-50"
-                      title="Quitar de favoritos"
-                    >
-                      <span
-                        className="material-symbols-outlined text-xl"
-                        style={{ fontVariationSettings: isRemoving ? "'FILL' 0" : "'FILL' 1" }}
-                      >
-                        {isRemoving ? 'sync' : 'favorite'}
                       </span>
                     </button>
                   </div>
@@ -204,17 +205,13 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                 </div>
 
                 <div className="px-1">
-                  <h3 className="text-white font-bold text-lg leading-tight group-hover:text-primary transition-colors truncate">
+                  <h3 className="text-foreground font-bold text-lg leading-tight group-hover:text-primary transition-colors truncate">
                     {media.title}
                   </h3>
                   {/* Show custom description if exists, otherwise show tags */}
                   {userMeta?.custom_description ? (
-                    <p className="text-slate-400 text-xs mt-1 line-clamp-2 font-medium">
+                    <p className="text-muted-foreground text-xs mt-1 line-clamp-2 font-medium">
                       {userMeta.custom_description}
-                    </p>
-                  ) : media.tags && media.tags.length > 0 ? (
-                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1 truncate">
-                      {media.tags.slice(0, 2).join(" · ")}
                     </p>
                   ) : null}
                   {/* Show custom tags if they exist */}
@@ -229,7 +226,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                         </span>
                       ))}
                       {userMeta.custom_tags.length > 3 && (
-                        <span className="text-slate-500 text-[9px] font-bold px-1 py-0.5">
+                        <span className="text-muted-foreground text-[9px] font-bold px-1 py-0.5">
                           +{userMeta.custom_tags.length - 3}
                         </span>
                       )}
@@ -243,7 +240,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
       ) : (
         /* LIST / TABLE VIEW */
         <div className="flex flex-col gap-4">
-          {favorites.map((fav: IFavorites) => {
+          {favorites.map((fav: IFavorites, index) => {
             const media = Array.isArray(fav.media) ? fav.media[0] : fav.media
             if (!media) return null
             const userMeta = fav.user_metadata
@@ -253,7 +250,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
             return (
               <div
                 key={fav.id}
-                className="glass-card hover:border-primary/30 transition-all duration-300 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-6 relative group border border-white/10 bg-white/5 backdrop-blur-md"
+                className="glass-card hover:border-primary/30 transition-all duration-300 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-6 relative group border border-border bg-card/70 backdrop-blur-md"
               >
                 {/* Poster & Title Info */}
                 <div className="flex items-center gap-4 flex-1 min-w-[240px]">
@@ -262,44 +259,40 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                       alt={media.title}
                       src={media.image || "https://via.placeholder.com/300x400?text=No+Image"}
                       fill
+                      sizes="64px"
+                      loading={index < 2 ? 'eager' : 'lazy'}
                       className="object-cover"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <span className="text-[9px] bg-slate-900 text-slate-300 font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-white/5">
+                      <span className="text-[9px] bg-muted text-muted-foreground font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-border">
                         {media.type?.toUpperCase()}
                       </span>
                       <QuickStatusSelect compact mediaId={media.id} malId={media.mal_id} mediaType={media.type as 'anime' | 'manga'} initialStatus={progress?.status} currentEpisode={progress?.current_episode ?? 0} />
                     </div>
                     <Link
                       href={`/${media.type || "anime"}/${media.mal_id}`}
-                      className="text-white font-bold text-base leading-tight hover:text-primary transition-colors block truncate"
+                      className="text-foreground font-bold text-base leading-tight hover:text-primary transition-colors block truncate"
                     >
                       {media.title}
                     </Link>
-                    {/* Original catalog tags */}
-                    {media.tags && media.tags.length > 0 && (
-                      <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider mt-1 truncate">
-                        {media.tags.slice(0, 3).join(" · ")}
-                      </p>
-                    )}
                   </div>
                 </div>
 
                 {/* Custom Description (Personal notes) */}
-                <div className="flex-[2] min-w-[280px] bg-slate-950/20 rounded-xl p-3 border border-white/5 md:max-w-md">
-                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                <div className="flex-[2] min-w-[280px] bg-muted/60 rounded-xl p-3 border border-border md:max-w-md">
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
                     Notas personales
                   </p>
-                  <p className="text-slate-300 text-xs line-clamp-3 italic">
+                  <p className="text-foreground/80 text-xs line-clamp-3 italic">
                     {userMeta?.custom_description || "Todavía no agregaste notas personales."}
                   </p>
                 </div>
 
                 {/* Custom Tags */}
                 <div className="flex-1 min-w-[120px]">
-                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
                     Mis etiquetas
                   </p>
                   {userMeta?.custom_tags && userMeta.custom_tags.length > 0 ? (
@@ -314,7 +307,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                       ))}
                     </div>
                   ) : (
-                    <span className="text-[10px] text-slate-600 italic">Ninguna</span>
+                    <span className="text-[10px] text-muted-foreground italic">Ninguna</span>
                   )}
                 </div>
 
@@ -332,18 +325,18 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                       {media.type === 'manga' ? 'Leer' : 'Ver'}
                     </a>
                   ) : (
-                    <span className="text-[10px] text-slate-600 italic px-2">Sin enlace</span>
+                    <span className="text-[10px] text-muted-foreground italic px-2">Sin enlace</span>
                   )}
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 border-l border-white/10 pl-4">
-                    <button type="button" onClick={() => setViewingFavorite(fav)} className="w-9 h-9 rounded-lg bg-slate-900/60 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary/80 transition-all cursor-pointer" title="Ver información">
+                  <div className="flex items-center gap-2 border-l border-border pl-4">
+                    <button type="button" onClick={() => setViewingFavorite(fav)} className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-primary-foreground hover:bg-primary transition-all cursor-pointer" title="Ver información">
                       <span className="material-symbols-outlined text-base">visibility</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleEdit(media, userMeta, progress)}
-                      className="w-9 h-9 rounded-lg bg-slate-900/60 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary/80 transition-all cursor-pointer"
+                      className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-primary-foreground hover:bg-primary transition-all cursor-pointer"
                       title="Editar datos personalizados"
                     >
                       <span className="material-symbols-outlined text-base">edit</span>

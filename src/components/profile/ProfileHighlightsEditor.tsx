@@ -1,9 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveProfileHighlights } from '@/lib/actions/profile-highlights';
+import { useClientSearch } from '@/hooks/useClientSearch';
 import Loader from '@/components/ui/Loader';
 import type { ProfileHighlight, ProfileHighlightCategory } from '@/types/profile-highlights';
 
@@ -15,32 +16,11 @@ export default function ProfileHighlightsEditor({ initialItems }: Readonly<{ ini
   const [active, setActive] = useState<ProfileHighlightCategory>('anime');
   const [items, setItems] = useState(initialItems);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ProfileHighlight[]>([]);
-  const [searching, setSearching] = useState(false);
+  const { data: results, loading: searching, error: searchError } = useClientSearch<ProfileHighlight>(query.trim().length >= 2 ? `/api/profile/highlights/search?type=${active}&q=${encodeURIComponent(query.trim())}` : null, 400);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const selected = useMemo(() => items.filter((item) => item.category === active).sort((a, b) => a.position - b.position), [items, active]);
 
-  useEffect(() => {
-    setResults([]);
-    setMessage(null);
-    if (query.trim().length < 2) return;
-    const controller = new AbortController();
-    const timer = setTimeout(async () => {
-      setSearching(true);
-      try {
-        const response = await fetch(`/api/profile/highlights/search?type=${active}&q=${encodeURIComponent(query.trim())}`, { signal: controller.signal });
-        const payload = await response.json() as { data?: ProfileHighlight[]; error?: string };
-        if (!response.ok) throw new Error(payload.error);
-        setResults(payload.data ?? []);
-      } catch (error) {
-        if ((error as Error).name !== 'AbortError') setMessage((error as Error).message || 'No se pudo completar la búsqueda.');
-      } finally {
-        setSearching(false);
-      }
-    }, 400);
-    return () => { clearTimeout(timer); controller.abort(); };
-  }, [query, active]);
 
   const add = (item: ProfileHighlight) => {
     if (selected.length >= 10 || selected.some((current) => current.external_id === item.external_id)) return;
@@ -72,18 +52,18 @@ export default function ProfileHighlightsEditor({ initialItems }: Readonly<{ ini
 
   return <div className="space-y-6">
     <div className="flex gap-2 overflow-x-auto border-b border-border pb-3">
-      {TYPES.map((type) => <button key={type} type="button" onClick={() => { setActive(type); setQuery(''); }} className={`shrink-0 rounded-xl px-5 py-3 text-sm font-bold transition ${active === type ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>{LABELS[type]} <span className="ml-1 opacity-70">{items.filter((item) => item.category === type).length}/10</span></button>)}
+      {TYPES.map((type) => <button key={type} type="button" onClick={() => { setActive(type); setQuery(''); setMessage(null); }} className={`shrink-0 rounded-xl px-5 py-3 text-sm font-bold transition ${active === type ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>{LABELS[type]} <span className="ml-1 opacity-70">{items.filter((item) => item.category === type).length}/10</span></button>)}
     </div>
 
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.8fr)]">
       <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
-        <label htmlFor="highlight-search" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Buscar {LABELS[active].toLowerCase()} en AniList</label>
+        <label htmlFor="highlight-search" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Buscar {LABELS[active].toLowerCase()} en AniList o MyAnimeList</label>
         <div className="relative mt-3">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">search</span>
-          <input id="highlight-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Escribí al menos dos letras…`} className="h-12 w-full rounded-xl border border-border bg-background pl-12 pr-4 outline-none focus:border-primary" />
+          <input id="highlight-search" value={query} onChange={(event) => { setQuery(event.target.value); setMessage(null); }} placeholder={`Escribí al menos dos letras…`} className="h-12 w-full rounded-xl border border-border bg-background pl-12 pr-4 outline-none focus:border-primary" />
         </div>
-        {searching && <div className="py-12"><Loader label="Buscando en AniList…" /></div>}
-        {!searching && query.length >= 2 && <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        {searching && <div className="py-12"><Loader label={`Buscando ${LABELS[active].toLowerCase()}…`} /></div>}
+        {!searching && query.trim().length >= 2 && <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {results.map((item) => {
             const added = selected.some((current) => current.external_id === item.external_id);
             return <button type="button" disabled={added || selected.length >= 10} onClick={() => add(item)} key={item.external_id} className="flex items-center gap-3 rounded-2xl border border-border p-3 text-left transition hover:border-primary/50 disabled:opacity-45">
@@ -93,6 +73,7 @@ export default function ProfileHighlightsEditor({ initialItems }: Readonly<{ ini
             </button>;
           })}
         </div>}
+        {!searching && query.trim().length >= 2 && results.length === 0 && !searchError && <p className="py-8 text-center text-sm text-muted-foreground">No encontramos resultados.</p>}
       </section>
 
       <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
@@ -106,8 +87,7 @@ export default function ProfileHighlightsEditor({ initialItems }: Readonly<{ ini
         </li>)}</ol>}
       </section>
     </div>
-    {message && <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-500">{message}</p>}
+    {(message || searchError) && <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-500">{message || searchError}</p>}
     <div className="sticky bottom-4 flex justify-end gap-3 rounded-2xl border border-border bg-background/90 p-4 shadow-2xl backdrop-blur-xl"><button type="button" onClick={() => router.push('/profile')} className="rounded-xl border border-border px-5 py-3 font-bold">Cancelar</button><button type="button" disabled={saving} onClick={save} className="rounded-xl bg-primary px-6 py-3 font-bold text-primary-foreground disabled:opacity-50">{saving ? 'Guardando…' : 'Guardar destacados'}</button></div>
   </div>;
 }
-

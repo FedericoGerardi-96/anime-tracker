@@ -6,4 +6,8 @@ export interface IProfile {
     roles:           string[];
     updated_at:      Date;
     show_h_content:  boolean;
+    username?:       string;
+    bio?:            string;
+    discoverable?:   boolean;
+    allow_friend_requests?: boolean;
 }

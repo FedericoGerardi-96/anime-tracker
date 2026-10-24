@@ -26,7 +26,7 @@ export default function HContentToggle({ enabled }: Readonly<{ enabled: boolean 
           </p>
         </div>
       </div>
-      <button
+      <button type="button"
         onClick={handleToggle}
         disabled={isPending}
         aria-checked={checked}

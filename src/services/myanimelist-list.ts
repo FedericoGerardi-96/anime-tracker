@@ -22,12 +22,12 @@ async function updateMalFavorite(
   const headers = { Authorization: `Bearer ${accessToken}`, Accept: "application/json" };
 
   if (!isFavorite) {
-    return fetch(url, { method: "DELETE", headers, cache: "no-store" });
+    return fetch(url, { method: "DELETE", headers, cache: "no-store", signal: AbortSignal.timeout(15000) });
   }
 
   const membershipResponse = await fetch(
     `${MAL_API_BASE}/${mediaType}/${mediaId}?fields=my_list_status`,
-    { headers, cache: "no-store" },
+    { headers, cache: "no-store", signal: AbortSignal.timeout(15000) },
   );
   if (!membershipResponse.ok) return membershipResponse;
 
@@ -41,6 +41,7 @@ async function updateMalFavorite(
     headers: { ...headers, "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ status: mediaType === "anime" ? "plan_to_watch" : "plan_to_read" }),
     cache: "no-store",
+    signal: AbortSignal.timeout(15000),
   });
 }
 

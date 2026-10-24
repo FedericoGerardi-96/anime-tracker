@@ -25,7 +25,7 @@ export default function ErrorPage({ error, unstable_retry }: Readonly<{ error: E
             : 'No pudimos completar esta solicitud. Podés intentar recargar la información.'}
         </p>
           <div className='mt-8 flex justify-center'>
-            <button
+            <button type="button"
               onClick={() => unstable_retry()}
               className='flex cursor-pointer items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground transition-all hover:brightness-110 active:scale-95'>
               <span className='material-symbols-outlined' style={{ fontVariationSettings: "'FILL' 1" }}>

@@ -9,5 +9,8 @@ export interface ProfileHighlight {
   subtitle?: string | null;
   image_url?: string | null;
   position: number;
+  provider?: 'anilist' | 'myanimelist';
+  anilist_id?: number | null;
+  mal_id?: number | null;
 }
 

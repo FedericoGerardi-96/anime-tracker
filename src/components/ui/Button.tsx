@@ -15,7 +15,7 @@ export default function Button({ variant = "primary", isLoading, className = "",
   };
 
   return (
-    <button 
+    <button type="button"
       className={`${baseStyles} ${variants[variant]} ${className}`}
       disabled={isLoading}
       {...props}

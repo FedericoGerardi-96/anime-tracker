@@ -1,23 +1,9 @@
+import { filterValues, catalogStatuses, scoreRanges } from '@/lib/library-filters';
+import type { GetFavoritesOptions } from "@/interfaces/favorites-service";
 import { getSupabaseServer } from "@/services/supabase";
 import { IFavorites } from "@/types/favorites";
 import { matchesLibrarySearch } from "@/lib/library-search";
 
-interface GetFavoritesOptions {
-  query?: string;
-  page?: number;
-  pageSize?: number;
-  tags?: string[];
-  sortBy?: string;
-  sortDirection?: "asc" | "desc";
-  status?: string;
-  mediaType?: "anime" | "manga";
-  genre?: string;
-  catalogStatus?: string;
-  year?: number;
-  season?: string;
-  format?: string;
-  minScore?: number;
-}
 
 /**
  * Fetches search-filtered, tags-filtered, sorted and paginated favorites for a specific user.
@@ -42,11 +28,9 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
         title,
         type,
         image,
-        description,
         season,
         year,
         genres,
-        tags,
         format,
         status,
         total_units,
@@ -57,21 +41,25 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
     )
     .eq("user_id", userId);
 
-  if (mediaType) dbQuery = dbQuery.eq("media.type", mediaType);
-  if (genre) dbQuery = dbQuery.contains("media.genres", [genre]);
-  if (year) dbQuery = dbQuery.eq("media.year", year);
-  if (season) dbQuery = dbQuery.eq("media.season", season);
-  if (format) dbQuery = dbQuery.eq("media.format", format);
-  if (minScore) dbQuery = dbQuery.gte("media.score", minScore);
-  if (catalogStatus) {
-    const equivalents: Record<string, string[]> = {
-      RELEASING: ['RELEASING', 'currently_airing', 'currently_publishing'],
-      FINISHED: ['FINISHED', 'finished_airing', 'finished'],
-      NOT_YET_RELEASED: ['NOT_YET_RELEASED', 'not_yet_aired', 'not_yet_published'],
-      HIATUS: ['HIATUS', 'on_hiatus'], CANCELLED: ['CANCELLED', 'discontinued'],
-    };
-    dbQuery = dbQuery.in("media.status", equivalents[catalogStatus] ?? [catalogStatus]);
+  if (filterValues(mediaType).length) dbQuery = dbQuery.in('media.type', filterValues(mediaType));
+  if (filterValues(genre).length) dbQuery = dbQuery.contains('media.genres', filterValues(genre));
+  const mediaConditions: string[] = [];
+  if (filterValues(options.excludeGenre).length) {
+    const literal = '{' + filterValues(options.excludeGenre).map((value) => '"' + value.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"').join(',') + '}';
+    mediaConditions.push(`or(genres.is.null,genres.not.ov.${literal})`);
   }
+  if (year) dbQuery = dbQuery.eq('media.year', year);
+  const lower = options.yearFrom && options.yearTo ? Math.min(options.yearFrom, options.yearTo) : options.yearFrom;
+  const upper = options.yearFrom && options.yearTo ? Math.max(options.yearFrom, options.yearTo) : options.yearTo;
+  if (lower) dbQuery = dbQuery.gte('media.year', lower);
+  if (upper) dbQuery = dbQuery.lte('media.year', upper);
+  if (filterValues(season).length) dbQuery = dbQuery.in('media.season', filterValues(season));
+  if (filterValues(format).length) dbQuery = dbQuery.in('media.format', filterValues(format));
+  if (minScore) dbQuery = dbQuery.gte('media.score', minScore);
+  const ranges = scoreRanges(options.scoreBands);
+  if (ranges.length) mediaConditions.push(`or(${ranges.map(([lower, upper]) => `and(score.gte.${lower},score.lt.${upper})`).join(',')})`);
+  if (mediaConditions.length) dbQuery = dbQuery.or(`and(${mediaConditions.join(',')})`, { referencedTable: 'media' });
+  if (catalogStatuses(catalogStatus).length) dbQuery = dbQuery.in('media.status', catalogStatuses(catalogStatus));
 
   // Search in both catalog media and user custom metadata.
   const cleanQuery = query.trim();
@@ -79,17 +67,17 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
     const [{ data: favoriteCandidates }, { data: metadataCandidates }] = await Promise.all([
       supabase
         .from("favorites")
-        .select("media:media_id!inner(id, title, description, tags)")
+        .select("media:media_id!inner(id, title)")
         .eq("user_id", userId),
       supabase
-        .from("user_media_metadata")
+        .from("user_media_progress")
         .select("media_id, custom_description, custom_tags")
         .eq("user_id", userId),
     ]);
 
     const matchedMediaIdsByCatalog = (favoriteCandidates ?? []).flatMap((row: any) => {
       const media = Array.isArray(row.media) ? row.media[0] : row.media;
-      return media && matchesLibrarySearch(cleanQuery, [media.title, media.description, media.tags]) ? [media.id] : [];
+      return media && matchesLibrarySearch(cleanQuery, [media.title]) ? [media.id] : [];
     });
 
     const matchedMediaIdsByMeta = (metadataCandidates ?? [])
@@ -109,10 +97,10 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
   // Filter by progress status
   if (status && status !== "All Statuses") {
     const { data: progressMatches } = await supabase
-      .from("user_anime_progress")
+      .from("user_media_progress")
       .select("media_id")
       .eq("user_id", userId)
-      .eq("status", status);
+      .in("status", filterValues(status));
 
     const matchedMediaIdsByStatus = progressMatches?.map((p: any) => p.media_id) || [];
 
@@ -125,22 +113,24 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
   }
 
   if (tags && tags.length > 0) {
-    const formattedTags = tags.map((t) => `"${t.replace(/"/g, '\\"')}"`).join(",");
-    dbQuery = dbQuery.filter("media.tags", "ov", `{${formattedTags}}`);
+    const { data: tagMatches } = await supabase.from('user_media_progress').select('media_id').eq('user_id', userId).overlaps('custom_tags', tags);
+    const ids = (tagMatches ?? []).map((row) => row.media_id);
+    dbQuery = ids.length ? dbQuery.in('media_id', ids) : dbQuery.eq('id', '00000000-0000-0000-0000-000000000000');
   }
 
   // Handle sorting
   if (sortBy === "Title") {
-    dbQuery = dbQuery.order("title", { referencedTable: "media", ascending: sortDirection === "asc" });
+    dbQuery = dbQuery.order("media(title)", { ascending: sortDirection === "asc" });
   } else if (sortBy === "Score") {
-    dbQuery = dbQuery.order("score", { referencedTable: "media", ascending: sortDirection === "asc", nullsFirst: false });
+    dbQuery = dbQuery.order("media(score)", { ascending: sortDirection === "asc", nullsFirst: false });
   } else if (sortBy === "Year") {
-    dbQuery = dbQuery.order("year", { referencedTable: "media", ascending: sortDirection === "asc", nullsFirst: false });
+    dbQuery = dbQuery.order("media(year)", { ascending: sortDirection === "asc", nullsFirst: false });
   } else {
     dbQuery = dbQuery.order("created_at", { ascending: sortDirection === "asc" });
   }
 
   const { data: favoritesData, count, error } = await dbQuery
+    .order("id", { ascending: true })
     .range(from, to);
 
   if (error) {
@@ -159,29 +149,18 @@ export async function getFavorites(userId: string, options: GetFavoritesOptions 
   let progressMap: Record<string, any> = {};
 
   if (mediaIds.length > 0) {
-    // Fetch custom metadata
-    const { data: metadataRows } = await supabase
-      .from("user_media_metadata")
-      .select("id, media_id, custom_description, watch_link, custom_tags")
+    const { data: personalRows } = await supabase
+      .from("user_media_progress")
+      .select("id, media_id, custom_description, watch_link, custom_tags, status, current_episode")
       .eq("user_id", userId)
       .in("media_id", mediaIds);
 
-    if (metadataRows) {
+    if (personalRows) {
       metadataMap = Object.fromEntries(
-        metadataRows.map((row: any) => [row.media_id, row])
+        personalRows.map((row: any) => [row.media_id, row])
       );
-    }
-
-    // Fetch tracking progress/status
-    const { data: progressRows } = await supabase
-      .from("user_anime_progress")
-      .select("media_id, status, current_episode")
-      .eq("user_id", userId)
-      .in("media_id", mediaIds);
-
-    if (progressRows) {
       progressMap = Object.fromEntries(
-        progressRows.map((row: any) => [row.media_id, row])
+        personalRows.map((row: any) => [row.media_id, row])
       );
     }
   }
@@ -237,8 +216,9 @@ export async function getFavoriteMalIds(userId: string): Promise<number[]> {
   const supabase = await getSupabaseServer();
   const { data, error } = await supabase
     .from("favorites")
-    .select("media!inner(mal_id)")
-    .eq("user_id", userId);
+    .select("media!inner(mal_id, type)")
+    .eq("user_id", userId)
+    .eq("media.type", "anime");
 
   if (error || !data) return [];
 
@@ -268,6 +248,7 @@ export async function checkIsMangaFavorite(userId: string, malId: number): Promi
     .select('id')
     .eq('user_id', userId)
     .eq('mal_id', malId)
+    .eq('type', 'doujin')
     .maybeSingle();
 
   return !!hentaiFav;
@@ -282,9 +263,10 @@ export async function checkIsAnimeFavorite(userId: string, malId: number): Promi
   // Check standard favorites
   const { data: favSimple } = await supabase
     .from('favorites')
-    .select('id, media!inner(mal_id)')
+    .select('id, media!inner(mal_id, type)')
     .eq('user_id', userId)
     .eq('media.mal_id', malId)
+    .eq('media.type', 'anime')
     .maybeSingle();
 
   if (favSimple) return true;
@@ -295,6 +277,7 @@ export async function checkIsAnimeFavorite(userId: string, malId: number): Promi
     .select('id')
     .eq('user_id', userId)
     .eq('mal_id', malId)
+    .eq('type', 'anime')
     .maybeSingle();
 
   return !!hentaiFav;
@@ -315,11 +298,9 @@ export async function getAllFavoritesFull(userId: string) {
         title,
         type,
         image,
-        description,
         season,
         year,
         genres,
-        tags,
         format,
         status,
         total_units,
@@ -330,5 +311,18 @@ export async function getAllFavoritesFull(userId: string) {
     .order("id", { ascending: false });
 
   if (error || !data) return [];
-  return data;
+  const mediaIds = data.flatMap((favorite) => {
+    const media = Array.isArray(favorite.media) ? favorite.media[0] : favorite.media;
+    return media?.id ? [media.id] : [];
+  });
+  if (!mediaIds.length) return data;
+  const { data: personalRows } = await supabase.from('user_media_progress')
+    .select('media_id, custom_tags')
+    .eq('user_id', userId)
+    .in('media_id', mediaIds);
+  const personalByMedia = new Map((personalRows ?? []).map((row) => [row.media_id, row]));
+  return data.map((favorite) => {
+    const media = Array.isArray(favorite.media) ? favorite.media[0] : favorite.media;
+    return { ...favorite, user_metadata: media?.id ? personalByMedia.get(media.id) ?? null : null };
+  });
 }

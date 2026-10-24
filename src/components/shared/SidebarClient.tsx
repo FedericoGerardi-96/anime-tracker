@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 import type { User } from "@supabase/supabase-js";
 import { IProfile } from "@/types/profile";
+import { DEFAULT_PROFILE_AVATAR, getProfileAvatar, profileAvatarBackground } from "@/lib/profile-avatar";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: "home" },
@@ -27,7 +28,9 @@ export default function SidebarClient({ user, profile }: Readonly<{ user?: User 
   return (
     <>
       {/* Mobile Hamburger Button */}
-      <button 
+      <button type="button"
+        aria-label={isOpen ? 'Cerrar menú lateral' : 'Abrir menú lateral'}
+        aria-expanded={isOpen}
         className="md:hidden fixed z-50 bottom-6 right-6 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-primary p-4 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95"
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -38,7 +41,7 @@ export default function SidebarClient({ user, profile }: Readonly<{ user?: User 
 
       {/* Overlay for mobile */}
       {isOpen && (
-        <button 
+        <button type="button" aria-label="Cerrar menú lateral"
           className="md:hidden fixed inset-0 bg-black/60 z-40 transition-opacity"
           onClick={() => setIsOpen(false)}
         />
@@ -56,7 +59,7 @@ export default function SidebarClient({ user, profile }: Readonly<{ user?: User 
             <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>movie_filter</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-primary">AniTrack</h1>
+            <span className="block text-xl font-bold tracking-tight text-primary">AniTrack</span>
             <p className="text-xs text-slate-500 dark:text-slate-400">Track your journey</p>
           </div>
         </div>
@@ -112,7 +115,7 @@ export default function SidebarClient({ user, profile }: Readonly<{ user?: User 
             >
               <div 
                 className="w-10 h-10 rounded-full bg-cover bg-center shrink-0 shadow-lg" 
-                style={{ backgroundImage: `url('${profile?.avatar || user?.user_metadata?.avatar_url || 'https://res.cloudinary.com/do3n04ysn/image/upload/v1692600735/anime-app/gw87wdnbncrslkemdxe4.png'}')` }}
+                style={{ backgroundImage: profileAvatarBackground(getProfileAvatar(profile?.avatar, user?.user_metadata?.avatar_url) ?? DEFAULT_PROFILE_AVATAR) }}
               />
               <div className="flex-1 overflow-hidden">
                 <p className="text-xs font-bold truncate text-text-primary">{profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0]}</p>

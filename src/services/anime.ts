@@ -41,13 +41,14 @@ export async function getAnimeListWithFavorites(options: MalAnimeCatalogOptions 
     const [{ data: favorites }, { data: hentaiFavorites }] = await Promise.all([
       supabase
         .from("favorites")
-        .select("media!inner(mal_id)")
-        .eq("user_id", userId),
+        .select("media!inner(mal_id, type)")
+        .eq("user_id", userId)
+        .eq("media.type", "anime"),
       supabase
         .from("hentai")
         .select("mal_id")
         .eq("user_id", userId)
-        .not("mal_id", "is", null),
+        .eq("type", "anime").not("mal_id", "is", null),
     ]);
 
     for (const favorite of (favorites ?? []) as FavoriteMediaRow[]) {

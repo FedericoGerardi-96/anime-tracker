@@ -10,7 +10,10 @@ export interface AniListCatalogOptions {
   sort?: string;
   season?: string;
   year?: number;
+  yearFrom?: number;
+  yearTo?: number;
   minScore?: number;
+  scoreBands?: string;
   page?: number;
   perPage?: number;
 }

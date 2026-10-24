@@ -6,11 +6,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export default function Input({ label, icon, error, forgotLink, ...props }: Readonly<InputProps>) {
+  const generatedId = useId();
+  const inputId = props.id ?? generatedId;
   return (
     <div className="space-y-1.5 w-full">
       <div className="flex justify-between items-center ml-1">
         {label && (
-          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <label htmlFor={inputId} className="text-xs font-bold text-slate-400 uppercase tracking-wider">
             {label}
           </label>
         )}
@@ -27,11 +29,13 @@ export default function Input({ label, icon, error, forgotLink, ...props }: Read
           </span>
         )}
         <input 
+          id={inputId}
+          aria-label={!label ? props['aria-label'] ?? props.placeholder : undefined}
           className={`
             w-full bg-slate-dark/50 border-white/5 border rounded-xl py-3 
             ${icon ? "pl-12" : "pl-4"} pr-4 text-sm 
             focus:ring-1 focus:ring-primary focus:bg-slate-dark/80 
-            transition-all outline-none text-white placeholder:text-slate-600
+            transition-all outline-none text-white placeholder:text-slate-400
             ${error ? "border-red-500" : "border-white/5"}
           `}
           {...props}
@@ -41,3 +45,4 @@ export default function Input({ label, icon, error, forgotLink, ...props }: Read
     </div>
   );
 }
+import { useId } from 'react';

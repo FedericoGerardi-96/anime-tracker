@@ -42,11 +42,12 @@ export default function FavoritesSearch({ defaultValue }: Readonly<{ defaultValu
         {isPending ? "sync" : "search"}
       </span>
       <input
+        aria-label="Buscar favoritos"
         type="text"
         defaultValue={defaultValue}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="Buscar por título, descripción o etiquetas..."
-        className="w-full bg-slate-900/50 border border-white/5 rounded-xl py-3 pl-12 pr-6 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+        className="w-full rounded-xl border border-border bg-background py-3 pl-12 pr-6 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:outline-none focus:ring-1 focus:ring-primary"
       />
     </div>
   );

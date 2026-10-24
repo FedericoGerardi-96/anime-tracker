@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ConnectionNotice from "@/components/profile/ConnectionNotice";
+import MalSyncButton from "@/components/favorites/MalSyncButton";
 import type { MalConnectionStatus } from "@/interfaces/myanimelist-auth";
 
 interface MalConnectionCardProps {
@@ -26,13 +28,13 @@ export default function MalConnectionCard({ connection, result, missingConfigura
 
   return (
     <div className="glass-card max-w-2xl overflow-hidden rounded-2xl border border-border">
-      {message && (
-        <div className={`border-b px-5 py-3 text-sm ${message.error ? "border-red-500/20 bg-red-500/10 text-red-400" : "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"}`}>
+      {message && result && (
+        <ConnectionNotice key={result} provider="mal" result={result} error={!!message.error}>
           {message.text}
           {result === "configuration_error" && missingConfiguration && (
             <span className="mt-1 block font-mono text-xs">Falta: {missingConfiguration}</span>
           )}
-        </div>
+        </ConnectionNotice>
       )}
 
       <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center">
@@ -51,7 +53,7 @@ export default function MalConnectionCard({ connection, result, missingConfigura
                 {needsReconnect ? "Es necesario volver a autorizar la cuenta" : `Conectado como ${connection.username}`}
               </p>
               <p className="mt-1 text-xs text-text-muted/75">
-                El acceso se renovará automáticamente; no tendrás que iniciar sesión todos los días.
+                {needsReconnect ? "Volvé a conectar tu cuenta para habilitar la sincronización." : "El acceso se renovará automáticamente; no tendrás que iniciar sesión todos los días."}
               </p>
             </>
           ) : (
@@ -71,13 +73,11 @@ export default function MalConnectionCard({ connection, result, missingConfigura
             </Link>
           )}
           {connection.connected && !needsReconnect && (
-            <button disabled className="cursor-not-allowed rounded-xl bg-primary/10 px-4 py-2.5 text-sm font-bold text-primary opacity-60" title="Disponible en la próxima etapa">
-              Sincronizar próximamente
-            </button>
+            <MalSyncButton />
           )}
           {connection.connected && (
             <form action="/api/mal/disconnect" method="post">
-              <button type="submit" className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-text-muted transition hover:border-red-500/40 hover:text-red-400">
+              <button type="submit" className="cursor-pointer rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-400 transition hover:border-red-500/60 hover:bg-red-500/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
                 Desconectar
               </button>
             </form>

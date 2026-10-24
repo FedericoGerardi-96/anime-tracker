@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getHentaiEntries } from "@/lib/actions/hentai";
 import HentaiSearch from "@/components/hentai/HentaiSearch";
-import HentaiPaginator from "@/components/hentai/HentaiPaginator";
+import Pagination from "@/components/ui/Pagination";
 import HentaiActions from "@/components/hentai/HentaiActions";
 import DeleteHentaiButton from "@/components/hentai/DeleteHentaiButton";
 
@@ -145,7 +145,7 @@ export default async function HentaiPage({
             </div>
 
             <Suspense fallback={null}>
-              <HentaiPaginator currentPage={currentPage} totalPages={totalPages} />
+              <Pagination currentPage={currentPage} totalPages={totalPages} />
             </Suspense>
             
             <p className="text-center text-xs text-slate-600 mt-8 font-medium">

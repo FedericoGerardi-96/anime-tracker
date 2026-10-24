@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter, useSearchParams } from 'next/navigation';
+import { SCHEDULE_SEASONS } from '@/lib/schedule-filters';
 import AnimeCard, { type AnimeCardProps } from "@/components/cards/AnimeCard";
 import AddToListModal from "@/components/ui/AddToListModal";
 import AuthModal from "@/components/auth/AuthModal";
-import { getAnimeListAssociations } from "@/lib/actions/lists";
+import { requestListDialog } from '@/lib/list-dialog-request';
+import type { ListDialogResult } from '@/interfaces/list-dialog';
 import type { CatalogAnime } from "@/interfaces/media-catalog";
 
 interface ScheduleCalendarProps {
   weeklySchedules: Record<string, CatalogAnime[]>;
   favoriteMalIds: number[] | null;
   userId?: string;
+  seasonAnime: CatalogAnime[];
+  year: number;
+  season: string;
+  years: number[];
+  filterMode: 'all' | 'followed';
+  hasWeeklySchedule: boolean;
 }
 
 const DAYS_OF_WEEK = [
@@ -26,34 +35,41 @@ const DAYS_OF_WEEK = [
 export default function ScheduleCalendar({
   weeklySchedules,
   favoriteMalIds,
-  userId,
+  userId, seasonAnime, year, season, years, filterMode, hasWeeklySchedule,
 }: Readonly<ScheduleCalendarProps>) {
   // Get active day of the week by default (0 is Sunday, 1 is Monday...)
   const currentDayIndex = new Date().getDay();
   const defaultDay = DAYS_OF_WEEK[currentDayIndex === 0 ? 6 : currentDayIndex - 1].id;
 
-  const [activeDay, setActiveDay] = useState<string>(defaultDay);
-  const [filterMode, setFilterMode] = useState<"all" | "followed">("all");
+  const [activeDay, setActiveDay] = useState<string>(hasWeeklySchedule ? defaultDay : 'season');
+  const [isNavigating, startNavigation] = useTransition();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const updateFilters = (updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('year', String(year));
+    params.set('season', season);
+    for (const [name, value] of Object.entries(updates)) params.set(name, value);
+    startNavigation(() => router.replace(`/anime/schedule?${params.toString()}`, { scroll: false }));
+  };
 
   // State for AddToListModal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<AnimeCardProps | null>(null);
-  const [initialListIds, setInitialListIds] = useState<string[]>([]);
+  const [dataPromise, setDataPromise] = useState<Promise<ListDialogResult> | null>(null);
 
-  const handleAddClick = async (anime: AnimeCardProps) => {
+  const handleAddClick = (anime: AnimeCardProps) => {
     if (!userId) {
       setIsAuthModalOpen(true);
       return;
     }
     setSelectedAnime(anime);
+    setDataPromise(requestListDialog(Number(anime.id), 'anime'));
     setIsModalOpen(true);
-    
-    const associations = await getAnimeListAssociations(Number(anime.id));
-    setInitialListIds(associations);
   };
 
-  const dayAnime = weeklySchedules[activeDay] || [];
+  const dayAnime = activeDay === 'season' ? seasonAnime : weeklySchedules[activeDay] || [];
   const isLoggedIn = !!userId;
 
   // Filter based on selected mode
@@ -67,34 +83,34 @@ export default function ScheduleCalendar({
   return (
     <div className="w-full space-y-8">
       {/* Upper Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900/40 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl shadow-black/10">
+      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
             <span className="material-symbols-outlined text-primary text-2xl">calendar_month</span>
-            Calendario semanal
+            Calendario de anime
           </h2>
-          <p className="text-sm text-slate-400 mt-1">Consultá qué anime se emite cada día</p>
+          <p className="mt-1 text-sm text-muted-foreground">{hasWeeklySchedule ? 'Explorá la temporada o consultá las emisiones de cada día.' : 'Explorá los animes estrenados en esta temporada.'}</p>
         </div>
         
         {/* Toggle Mode */}
         {isLoggedIn ? (
-          <div className="flex p-1 bg-slate-950/80 rounded-xl border border-white/5 max-w-fit self-start sm:self-auto">
-            <button
-              onClick={() => setFilterMode("all")}
+          <div className="flex max-w-fit self-start rounded-xl border border-border bg-background p-1 sm:self-auto">
+            <button type="button"
+              disabled={isNavigating} aria-pressed={filterMode === "all"} onClick={() => updateFilters({ mode: "all" })}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer ${
                 filterMode === "all"
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "text-slate-400 hover:text-slate-200"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               Todos
             </button>
-            <button
-              onClick={() => setFilterMode("followed")}
+            <button type="button"
+              disabled={isNavigating} aria-pressed={filterMode === "followed"} onClick={() => updateFilters({ mode: "followed" })}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                 filterMode === "followed"
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "text-slate-400 hover:text-slate-200"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -104,35 +120,61 @@ export default function ScheduleCalendar({
             </button>
           </div>
         ) : (
-          <div className="text-xs bg-slate-800/30 px-3 py-2 rounded-xl text-slate-400 border border-white/5 max-w-fit">
+          <div className="max-w-fit rounded-xl border border-border bg-background px-3 py-2 text-xs text-muted-foreground">
             Iniciá sesión para filtrar por favoritos
           </div>
         )}
       </div>
 
+      <div className="space-y-3" aria-busy={isNavigating}>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-3 text-sm font-semibold text-muted-foreground">
+            Año
+            <select aria-label="Año de estreno" value={years.length ? year : ''} disabled={isNavigating || !years.length}
+              onChange={event => updateFilters({ year: event.target.value })}
+              className="rounded-xl border border-border bg-card px-4 py-3 text-sm font-bold text-foreground outline-none focus:border-primary disabled:opacity-50 cursor-pointer">
+              {!years.length && <option value="">Sin años disponibles</option>}
+              {years.map(value => <option key={value} value={value}>{value}</option>)}
+            </select>
+          </label>
+          <div aria-label="Temporada" className="flex max-w-full gap-1 overflow-x-auto rounded-xl border border-border bg-card p-1">
+            {SCHEDULE_SEASONS.map(item => <button type="button" key={item.value} disabled={isNavigating || !years.length}
+              aria-pressed={season === item.value} onClick={() => updateFilters({ season: item.value })}
+              className={`rounded-lg px-4 py-2.5 text-xs font-bold transition cursor-pointer disabled:opacity-50 ${season === item.value ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
+              {item.label}
+            </button>)}
+          </div>
+          {isNavigating && <span role="status" className="text-xs text-muted-foreground">Cargando temporada…</span>}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {filterMode === 'followed' ? 'Los años disponibles corresponden a tus favoritos con año de estreno conocido.' : 'Seleccioná un año y una temporada para explorar sus estrenos.'}
+          {!hasWeeklySchedule && years.length > 0 && ' Esta vista muestra títulos de la temporada, sin atribuirles horarios históricos de emisión.'}
+        </p>
+      </div>
+
       {/* Days of the Week Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent border-b border-white/5">
-        {DAYS_OF_WEEK.map((day) => {
+      <div className="flex gap-2 overflow-x-auto border-b border-border pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+        {[{ id: 'season', label: 'Temporada completa' }, ...(hasWeeklySchedule ? DAYS_OF_WEEK : [])].map((day) => {
           const isSelected = activeDay === day.id;
-          const dayAnimeList = weeklySchedules[day.id] || [];
+          const dayAnimeList = day.id === 'season' ? seasonAnime : weeklySchedules[day.id] || [];
           const count = filterMode === "followed"
             ? dayAnimeList.filter((anime) => favoriteMalIds?.includes(anime.mal_id)).length
             : dayAnimeList.length;
           
           return (
-            <button
+            <button type="button"
               key={day.id}
               onClick={() => setActiveDay(day.id)}
               className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 shrink-0 cursor-pointer flex items-center gap-2 border ${
                 isSelected
                   ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105"
-                  : "bg-slate-900/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-850"
+                  : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               {day.label}
               {count > 0 && (
                 <span className={`text-xs px-2 py-0.5 rounded-md font-bold ${
-                  isSelected ? "bg-white/20 text-white" : "bg-slate-800 text-slate-500"
+                  isSelected ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
                 }`}>
                   {count}
                 </span>
@@ -144,13 +186,13 @@ export default function ScheduleCalendar({
 
       {/* Anime Grid */}
       {filteredAnime.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-slate-900/20 border border-dashed border-white/5 rounded-2xl text-center">
-          <span className="material-symbols-outlined text-5xl text-slate-600 mb-4 animate-pulse">calendar_today</span>
-          <h3 className="text-lg font-bold text-slate-300">No hay emisiones</h3>
-          <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto">
-            {filterMode === "followed" 
-              ? "No tenés animes favoritos que se emitan este día."
-              : "No hay emisiones programadas para este día."}
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-20 text-center">
+          <span className="material-symbols-outlined mb-4 animate-pulse text-5xl text-muted-foreground">calendar_today</span>
+          <h3 className="text-lg font-bold text-foreground">{activeDay === 'season' ? 'No hay animes para estos filtros' : 'No hay emisiones'}</h3>
+          <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
+            {!years.length ? 'Tus favoritos todavía no tienen un año de estreno conocido.' : activeDay === 'season'
+              ? filterMode === 'followed' ? 'No tenés favoritos en esta temporada. Probá otra temporada o año.' : 'No hay estrenos disponibles para esta temporada.'
+              : filterMode === 'followed' ? 'No tenés animes favoritos que se emitan este día.' : 'No hay emisiones programadas para este día.'}
           </p>
         </div>
       ) : (
@@ -166,7 +208,11 @@ export default function ScheduleCalendar({
               isAiring: anime.airing,
               synopsis: anime.synopsis ?? undefined,
               season: anime.season ?? undefined,
-              tags: anime.genres.map((genre) => genre.name),
+              genres: anime.genres.map((genre) => genre.name),
+              tags: anime.tags ?? [],
+              format: anime.type,
+              status: anime.status,
+              totalUnits: anime.episodes ?? undefined,
               episodes: anime.episodes ?? undefined,
               type: "anime" as const,
             };
@@ -194,7 +240,7 @@ export default function ScheduleCalendar({
         onClose={() => {
           setIsModalOpen(false);
           setSelectedAnime(null);
-          setInitialListIds([]);
+          setDataPromise(null);
         }}
         mode="add-anime"
         animeData={selectedAnime ? {
@@ -208,7 +254,7 @@ export default function ScheduleCalendar({
           episodes: selectedAnime.episodes,
           score: selectedAnime.score
         } : undefined}
-        initialListIds={initialListIds}
+        dataPromise={dataPromise}
       />
     </div>
   );

@@ -5,7 +5,8 @@ import { useState } from 'react';
 import AnimeCard from '@/components/cards/AnimeCard';
 import AddToListModal from '@/components/ui/AddToListModal';
 import AuthModal from '@/components/auth/AuthModal';
-import { getAnimeListAssociations } from '@/lib/actions/lists';
+import { requestListDialog } from '@/lib/list-dialog-request';
+import type { ListDialogResult } from '@/interfaces/list-dialog';
 
 interface AnimeListContentProps {
   animeList: any[];
@@ -16,27 +17,27 @@ export default function AnimeListContent({ animeList, userId }: Readonly<AnimeLi
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<any>(null);
-  const [initialListIds, setInitialListIds] = useState<string[]>([]);
+  const [dataPromise, setDataPromise] = useState<Promise<ListDialogResult> | null>(null);
 
-  const handleAddClick = async (anime: any) => {
+  const handleAddClick = (anime: any) => {
     if (!userId) {
       setIsAuthModalOpen(true);
       return;
     }
     setSelectedAnime(anime);
+    setDataPromise(requestListDialog(Number(anime.id), anime.type === 'manga' ? 'manga' : 'anime'));
     setIsModalOpen(true);
-    
-    const associations = await getAnimeListAssociations(Number(anime.id));
-    setInitialListIds(associations);
   };
 
   return (
     <>
+      <h2 className="sr-only">Resultados del catálogo</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-        {animeList.map((anime) => (
+        {animeList.map((anime, index) => (
           <AnimeCard 
             key={anime.id} 
             {...anime} 
+            priorityImage={index < 2}
             userId={userId}
             onAddClick={handleAddClick}
           />
@@ -53,7 +54,7 @@ export default function AnimeListContent({ animeList, userId }: Readonly<AnimeLi
         onClose={() => {
           setIsModalOpen(false);
           setSelectedAnime(null);
-          setInitialListIds([]);
+          setDataPromise(null);
         }}
         mode="add-anime"
         animeData={selectedAnime ? {
@@ -72,7 +73,7 @@ export default function AnimeListContent({ animeList, userId }: Readonly<AnimeLi
           episodes: selectedAnime.episodes,
           score: selectedAnime.score
         } : undefined}
-        initialListIds={initialListIds}
+        dataPromise={dataPromise}
       />
     </>
   );

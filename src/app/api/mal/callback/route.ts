@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { exchangeMalAuthorizationCode, getMalCurrentUser } from "@/lib/myanimelist-oauth";
 import { saveMalConnection } from "@/services/myanimelist-connection";
 import { getAuthenticatedUser } from "@/services/supabase";
+import { oauthReturnPath } from "@/lib/oauth-return-path";
 
 type CallbackFailure = "token_error" | "identity_error" | "storage_error";
 
@@ -21,12 +22,14 @@ async function completeMalConnection(userId: string, code: string, verifier: str
     .catch((error: unknown) => { throw new MalCallbackError("storage_error", error); });
 }
 
-function profileRedirect(request: NextRequest, result: string) {
-  const url = new URL("/profile", request.url);
+async function profileRedirect(request: NextRequest, result: string) {
+  const store = await cookies();
+  const url = new URL(oauthReturnPath(store.get("mal_oauth_return")?.value), request.url);
   url.searchParams.set("mal", result);
   const response = NextResponse.redirect(url);
   response.cookies.delete("mal_oauth_state");
   response.cookies.delete("mal_code_verifier");
+  response.cookies.set("mal_oauth_return", "", { maxAge: 0, path: "/api/mal" });
   return response;
 }
 

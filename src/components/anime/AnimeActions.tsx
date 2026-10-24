@@ -1,17 +1,24 @@
 
 'use client'
 
-import React, { useState, useTransition, useEffect } from 'react';
+import React, { useState, useTransition, useEffect, useRef, useId } from 'react';
 import { toggleFavorite } from '@/lib/actions/media';
 import { addMediaToLists } from '@/lib/actions/lists';
 import AddToListModal from '@/components/ui/AddToListModal';
 import AuthModal from '@/components/auth/AuthModal';
+import { requestListDialog } from '@/lib/list-dialog-request';
+import type { ListDialogResult } from '@/interfaces/list-dialog';
 
 interface AnimeActionsProps {
-  animeData: any;
+  animeData: Omit<Parameters<typeof toggleFavorite>[0], 'mal_id' | 'synopsis'> & {
+    id: number;
+    synopsis?: string | null;
+    catalogStatus?: string;
+    studio?: string;
+  };
   isFavorite: boolean;
   initialListIds: string[];
-  initialProgress: any;
+  initialProgress: { status: string; current_episode: number | null } | null;
   maxEpisodes?: number;
   userId?: string;
 }
@@ -29,6 +36,7 @@ export default function AnimeActions({
   const [isPending, startTransition] = useTransition();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dataPromise, setDataPromise] = useState<Promise<ListDialogResult> | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const { error, warning } = useToast();
@@ -38,6 +46,38 @@ export default function AnimeActions({
   const [isSavingProgress, setIsSavingProgress] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuId = useId();
+  const busy = isPending || isSavingProgress;
+  const options = [
+    { value: 'watching', label: animeData.type === 'manga' ? 'Leyendo' : 'Viendo', icon: 'play_arrow', color: 'text-emerald-400' },
+    { value: 'completed', label: 'Completado', icon: 'check', color: 'text-primary' },
+    { value: 'plan_to_watch', label: 'Pendiente', icon: 'schedule', color: 'text-muted-foreground' },
+    { value: 'on_hold', label: 'En pausa', icon: 'pause', color: 'text-amber-400' },
+    { value: 'dropped', label: 'Abandonado', icon: 'close', color: 'text-red-500' },
+  ];
+  const selected = options.find(option => option.value === status) ?? options[2];
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setIsMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMenuOpen(false);
+        menuRef.current?.querySelector<HTMLButtonElement>('[aria-expanded]')?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', closeOutside);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [isMenuOpen]);
+
   const isManga = animeData.type === 'manga';
 
   useEffect(() => {
@@ -45,6 +85,7 @@ export default function AnimeActions({
   }, [initialFavorite]);
 
   const handleFavoriteClick = async () => {
+    if (busy) return;
     if (!userId) {
       error('Please login to favorite this title');
       setAuthMode('login');
@@ -55,25 +96,32 @@ export default function AnimeActions({
     setIsFavorite(nextState);
 
     startTransition(async () => {
-      const result = await toggleFavorite({
-        mal_id: animeData.id,
-        title: animeData.title,
-        image: animeData.image,
-        type: animeData.type || 'anime',
-        synopsis: animeData.synopsis,
-        season: animeData.season,
-        year: animeData.year,
-        genres: animeData.genres,
-        tags: animeData.tags,
-        format: animeData.format,
-        status: animeData.catalogStatus,
-        score: animeData.score
-      });
-      if (result?.error) {
+      try {
+        const result = await toggleFavorite({
+          mal_id: animeData.id,
+          title: animeData.title,
+          image: animeData.image,
+          type: animeData.type || 'anime',
+          synopsis: animeData.synopsis ?? undefined,
+          season: animeData.season,
+          year: animeData.year,
+          genres: animeData.genres,
+          tags: animeData.tags,
+          format: animeData.format,
+          status: animeData.catalogStatus,
+          score: animeData.score
+        });
+        if (result?.error) {
+          setIsFavorite(!nextState);
+          error(result.error);
+        } else {
+          setIsFavorite(result.isFavorite ?? nextState);
+          if (nextState && !status) { setStatus('plan_to_watch'); setEpisode(episode || 0); }
+          if (result?.warning) warning(result.warning);
+        }
+      } catch {
         setIsFavorite(!nextState);
-        error(result.error);
-      } else if (result?.warning) {
-        warning(result.warning);
+        error('No se pudo actualizar el favorito');
       }
     });
   };
@@ -89,46 +137,109 @@ export default function AnimeActions({
     const s = newStatus ?? status;
     const e = newEpisode ?? episode;
 
-    const result = await addMediaToLists(
-      {
-        mal_id: animeData.id,
-        title: animeData.title,
-        image: animeData.image,
-        type: animeData.type || 'anime',
-        synopsis: animeData.synopsis,
-        season: animeData.season,
-        year: animeData.year,
-        genres: animeData.genres,
-        tags: animeData.tags,
-        format: animeData.format,
-        status: animeData.catalogStatus,
-        score: animeData.score
-      },
-      initialListIds,
-      {
-        status: s || undefined,
-        current_episode: e === '' ? 0 : Number(e)
-      }
-    );
+    try {
+      const result = await addMediaToLists(
+        {
+          mal_id: animeData.id,
+          title: animeData.title,
+          image: animeData.image,
+          type: animeData.type || 'anime',
+          synopsis: animeData.synopsis ?? undefined,
+          season: animeData.season,
+          year: animeData.year,
+          genres: animeData.genres,
+          tags: animeData.tags,
+          format: animeData.format,
+          status: animeData.catalogStatus,
+          score: animeData.score
+        },
+        initialListIds,
+        {
+          status: s || undefined,
+          current_episode: e === '' ? 0 : Number(e)
+        }
+      );
     
-    if (result.success) {
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2000);
+      if (result.error) { error(result.error); return false; }
+      if (result.warning) warning(result.warning);
+      if (result.success) {
+        setStatus(s || 'plan_to_watch');
+        setEpisode(e);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+      }
+      return !!result.success;
+    } catch {
+      error('No se pudo guardar el progreso');
+      return false;
+    } finally {
+      setIsSavingProgress(false);
     }
-    setIsSavingProgress(false);
   };
 
-  const buttonIconClass = (): string => {
-    const savingProgress = isSavingProgress ? 'sync' : 'save';
-    return showSuccess ? 'check_circle' : savingProgress;
-  }
+  const selectStatus = (newStatus: string) => {
+    if (busy) return;
+    setIsMenuOpen(false);
+    if (!userId) { void handleSaveProgress(newStatus); return; }
+    startTransition(async () => {
+      if (!isFavorite) {
+        try {
+          const result = await toggleFavorite({ ...animeData, mal_id: animeData.id, type: animeData.type || 'anime', synopsis: animeData.synopsis ?? undefined, status: animeData.catalogStatus });
+          if (result.error) { error(result.error); return; }
+          setIsFavorite(result.isFavorite ?? true);
+          if (result.warning) warning(result.warning);
+        } catch { error('No se pudo agregar el favorito'); return; }
+      }
+      await handleSaveProgress(newStatus, newStatus === 'completed' && maxEpisodes > 0 ? maxEpisodes : episode);
+    });
+  };
 
   return (
-    <div className="w-full">
-      <div className="flex flex-wrap items-center gap-3 glass-panel p-3 rounded-2xl">
-        <button 
+    <div className="relative z-20 w-full">
+      <div className="flex flex-wrap items-center gap-3 detail-panel p-3 rounded-2xl">
+        <div ref={menuRef} className="relative w-full sm:w-auto sm:min-w-[240px]">
+          <div className={`flex overflow-hidden rounded-xl border ${isFavorite ? 'border-border bg-muted/60 dark:bg-white/5' : 'border-primary bg-primary text-white'}`}>
+            <button type="button"
+              onClick={() => isFavorite ? setIsMenuOpen(!isMenuOpen) : handleFavoriteClick()}
+              disabled={busy}
+              aria-expanded={isFavorite ? isMenuOpen : undefined}
+              aria-controls={isFavorite ? menuId : undefined}
+              className="flex min-h-12 flex-1 items-center justify-center gap-2 px-5 py-3 text-sm font-bold transition hover:bg-black/10 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2 disabled:opacity-50 cursor-pointer"
+            >
+              <span aria-hidden="true" className={`material-symbols-outlined text-lg ${isFavorite ? selected.color : ''}`}>{isFavorite ? selected.icon : 'add'}</span>
+              {isFavorite ? selected.label : 'Añadir a favoritos'}
+            </button>
+            <button type="button" aria-label="Seleccionar estado" aria-expanded={isMenuOpen} aria-controls={menuId}
+              disabled={busy} onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex w-11 shrink-0 items-center justify-center border-l border-current/20 transition hover:bg-black/10 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2 disabled:opacity-50 cursor-pointer"
+            >
+              <span aria-hidden="true" className={`material-symbols-outlined text-lg transition-transform ${isMenuOpen ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+          </div>
+          {isMenuOpen && (
+            <div id={menuId} aria-label="Estado de seguimiento" className="absolute left-0 top-full z-50 mt-2 w-full min-w-[240px] rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-xl">
+              {options.map(option => (
+                <button type="button" key={option.value} disabled={busy} aria-pressed={isFavorite && status === option.value}
+                  onClick={() => selectStatus(option.value)}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition hover:bg-muted focus-visible:bg-muted focus-visible:outline-none disabled:opacity-50 cursor-pointer"
+                >
+                  <span aria-hidden="true" className={`material-symbols-outlined text-lg ${option.color}`}>{option.icon}</span>
+                  <span className={`flex-1 ${isFavorite && status === option.value ? 'font-bold' : ''}`}>{option.label}</span>
+                  {isFavorite && status === option.value && <span aria-hidden="true" className="material-symbols-outlined text-lg text-muted-foreground">check</span>}
+                </button>
+              ))}
+              {isFavorite && <div className="mt-1 border-t border-border pt-1">
+                <button type="button" disabled={busy} onClick={() => { setIsMenuOpen(false); void handleFavoriteClick(); }}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-red-500 transition hover:bg-red-500/10 focus-visible:bg-red-500/10 focus-visible:outline-none disabled:opacity-50 cursor-pointer"
+                ><span aria-hidden="true" className="material-symbols-outlined text-lg">delete</span>Quitar de mi lista</button>
+              </div>}
+            </div>
+          )}
+        </div>
+        <button type="button"
           onClick={() => {
             if (userId) {
+              setDataPromise(requestListDialog(Number(animeData.id), isManga ? 'manga' : 'anime'));
               setIsModalOpen(true);
             } else {
               error('Please login to manage your lists');
@@ -136,108 +247,54 @@ export default function AnimeActions({
               setIsAuthModalOpen(true);
             }
           }}
-          className="px-6 py-3.5 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90 transition-all text-sm shrink-0 cursor-pointer"
+          className="px-4 py-3 border border-border font-semibold rounded-xl flex items-center gap-2 hover:bg-muted transition-all text-sm shrink-0 cursor-pointer"
         >
           <span className="material-symbols-outlined text-lg">add</span>{''}
-          Add to List
+          Listas personalizadas
         </button>
 
-        <div className="h-10 w-px bg-white/10 mx-1 hidden sm:block"></div>
-
-        {/* Status Dropdown */}
-        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-xl border border-white/10 flex-1 min-w-[140px]">
-          <span className="text-[10px] font-bold text-slate-500 uppercase shrink-0">Status</span>
-          <select 
-            value={status}
-            onChange={(e) => {
-              const newStatus = e.target.value;
-              setStatus(newStatus);
-              
-              let newEpisode = episode;
-              if (newStatus === 'completed' && maxEpisodes > 0) {
-                newEpisode = maxEpisodes;
-                setEpisode(maxEpisodes);
-              }
-              
-              handleSaveProgress(newStatus, newEpisode);
-            }}
-            className="bg-transparent border-none text-sm font-semibold text-text-primary focus:ring-0 p-1 w-full cursor-pointer appearance-none outline-none"
-          >
-            <option value="" className="bg-slate-900">Seleccionar…</option>
-            <option value="watching" className="bg-slate-900">{isManga ? 'Leyendo' : 'Viendo'}</option>
-            <option value="completed" className="bg-slate-900">Completado</option>
-            <option value="on_hold" className="bg-slate-900">En pausa</option>
-            <option value="dropped" className="bg-slate-900">Abandonado</option>
-            <option value="plan_to_watch" className="bg-slate-900">Pendiente</option>
-          </select>
-        </div>
+        <div className="h-10 w-px bg-muted dark:bg-white/10 mx-1 hidden sm:block"></div>
 
         {/* Episode/Chapter Input */}
-        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-xl border border-white/10 flex-1 min-w-[120px]">
-          <span className="text-[10px] font-bold text-slate-500 uppercase shrink-0">{isManga ? 'CH' : 'EP'}</span>
+        <div className="flex items-center gap-2 px-3 py-1 bg-muted/60 dark:bg-white/5 rounded-xl border border-border flex-1 min-w-[120px]">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0" aria-hidden="true">{isManga ? 'CH' : 'EP'}</span>
           <input 
+            aria-label={isManga ? 'Capítulos leídos' : 'Episodios vistos'}
             type="number"
             value={episode}
             onChange={(e) => setEpisode(e.target.value === '' ? '' : Number(e.target.value))}
             onBlur={() => handleSaveProgress(undefined, episode)}
-            max={maxEpisodes}
+            disabled={busy}
+            max={maxEpisodes > 0 ? maxEpisodes : undefined}
             min={0}
             className="bg-transparent border-none text-sm font-bold text-text-primary focus:ring-0 p-1 w-full text-center outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
           {maxEpisodes > 0 && (
-            <span className="text-[10px] font-bold text-slate-600 shrink-0">/ {maxEpisodes}</span>
+            <span className="text-[10px] font-bold text-muted-foreground shrink-0">/ {maxEpisodes}</span>
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 ml-auto lg:ml-0">
-          <button 
-            onClick={handleFavoriteClick}
-            disabled={isPending}
-            className={`p-3.5 rounded-xl transition-all border border-white/10 cursor-pointer ${isFavorite ? 'text-red-500 bg-red-500/10 border-red-500/20' : 'text-white hover:bg-white/10'}`}
-          >
-            <span 
-              className="material-symbols-outlined text-lg"
-              style={isFavorite ? { fontVariationSettings: "'FILL' 1" } : {}}
-            >
-              favorite
-            </span>
-          </button>
-          
-          <button 
-            onClick={() => {
-              if (isSavingProgress) return;
-              handleSaveProgress();
-            }}
-            className={`p-3.5 rounded-xl transition-all border border-white/10 cursor-pointer ${showSuccess ? 'text-green-500 bg-green-500/10 border-green-500/20' : 'text-white hover:bg-white/10'}`}
-          >
-            <span className="material-symbols-outlined text-lg">
-              {buttonIconClass()}
-            </span>
-          </button>
-
-          <button className="p-3.5 rounded-xl text-white hover:bg-white/10 transition-all border border-white/10 cursor-pointer hidden sm:block">
-            <span className="material-symbols-outlined text-lg">share</span>
-          </button>
-        </div>
+        <span role="status" className="text-xs text-muted-foreground">
+          {busy ? 'Guardando…' : showSuccess ? 'Guardado' : ''}
+        </span>
       </div>
 
       <AddToListModal 
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => { setIsModalOpen(false); setDataPromise(null); }}
         mode="add-anime"
         animeData={{
           mal_id: animeData.id,
           title: animeData.title,
           image: animeData.image,
           type: animeData.type || 'anime',
-          synopsis: animeData.synopsis,
+          synopsis: animeData.synopsis ?? undefined,
           season: animeData.season,
           tags: animeData.tags,
           episodes: maxEpisodes,
           score: animeData.score
         }}
-        initialListIds={initialListIds}
+        dataPromise={dataPromise}
       />
 
       <AuthModal 

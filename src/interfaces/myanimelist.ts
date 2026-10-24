@@ -12,8 +12,10 @@ export interface MalAnimeNode {
   status?: string;
   num_episodes?: number;
   start_date?: string;
+  end_date?: string;
   synopsis?: string;
   source?: string;
+  average_episode_duration?: number;
   genres?: Array<{ id: number; name: string }>;
   studios?: Array<{ id: number; name: string }>;
   start_season?: { year: number; season: MalSeason };
@@ -35,6 +37,7 @@ export interface MalMangaNode {
   num_volumes?: number;
   num_chapters?: number;
   start_date?: string;
+  end_date?: string;
   synopsis?: string;
   genres?: Array<{ id: number; name: string }>;
   authors?: Array<{ node: { id: number; first_name: string; last_name: string }; role: string }>;

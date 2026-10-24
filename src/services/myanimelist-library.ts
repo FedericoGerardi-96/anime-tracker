@@ -18,6 +18,9 @@ const BASE_LIST_FIELDS = [
 ];
 const ANIME_LIST_FIELDS = [...BASE_LIST_FIELDS, "start_season", "broadcast", "num_episodes"].join(",");
 const MANGA_LIST_FIELDS = [...BASE_LIST_FIELDS, "num_chapters", "num_volumes"].join(",");
+export class MalLibraryError extends Error {
+  constructor(readonly status: number, readonly retryAfterMs: number) { super(`MyAnimeList respondió ${status}`); }
+}
 
 async function malAuthorizedFetch(url: string, accessToken: string, init?: RequestInit) {
   const response = await fetch(url, {
@@ -28,9 +31,28 @@ async function malAuthorizedFetch(url: string, accessToken: string, init?: Reque
       ...init?.headers,
     },
     cache: "no-store",
+    signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw new Error(`MyAnimeList respondió ${response.status}`);
+  if (!response.ok) throw new MalLibraryError(response.status, Number(response.headers.get("Retry-After")) * 1000 || 60000);
   return response;
+}
+
+export async function getMalSyncPage(token: string, type: "anime" | "manga", page: number) {
+  const fields = type === "anime" ? ANIME_LIST_FIELDS : MANGA_LIST_FIELDS;
+  const response = await malAuthorizedFetch(`${MAL_API_BASE}/users/@me/${type === "anime" ? "animelist" : "mangalist"}?limit=100&offset=${(page - 1) * 100}&nsfw=true&fields=${fields}`, token);
+  return response.json() as Promise<MalListResponse<MalAnimeListEntry | MalMangaListEntry>>;
+}
+
+export async function getMalSyncEntry(token: string, type: "anime" | "manga", id: number) {
+  const response = await malAuthorizedFetch(`${MAL_API_BASE}/${type}/${id}?fields=my_list_status,${type === "anime" ? "num_episodes" : "num_chapters"}`, token);
+  const entry = await response.json() as { id: number; num_episodes?: number; num_chapters?: number; my_list_status?: {
+    status: string; num_episodes_watched?: number; num_chapters_read?: number; updated_at: string;
+  } };
+  if (entry.id !== id) throw new Error("MAL devolvió una identidad incompatible");
+  if (!entry.my_list_status) return null;
+  const status = entry.my_list_status.status;
+  const total = type === "anime" ? entry.num_episodes : entry.num_chapters;
+  return { status, progress: status === "completed" && total ? total : (type === "anime" ? entry.my_list_status.num_episodes_watched : entry.my_list_status.num_chapters_read) ?? 0, updatedAt: Date.parse(entry.my_list_status.updated_at) / 1000 };
 }
 
 export async function getAllMalAnimeList(
@@ -64,9 +86,10 @@ export async function setMalAnimeProgress(
   animeId: number,
   status: MalAnimeListStatus["status"],
   watchedEpisodes: number,
+  includeZero = false,
 ): Promise<void> {
   const body = new URLSearchParams({ status });
-  if (watchedEpisodes > 0) body.set("num_watched_episodes", String(watchedEpisodes));
+  if (watchedEpisodes > 0 || includeZero) body.set("num_watched_episodes", String(watchedEpisodes));
 
   await malAuthorizedFetch(`${MAL_API_BASE}/anime/${animeId}/my_list_status`, accessToken, {
     method: "PUT",
@@ -102,9 +125,10 @@ export async function setMalMangaProgress(
   mangaId: number,
   status: MalMangaListStatus["status"],
   chaptersRead: number,
+  includeZero = false,
 ): Promise<void> {
   const body = new URLSearchParams({ status });
-  if (chaptersRead > 0) body.set("num_chapters_read", String(chaptersRead));
+  if (chaptersRead > 0 || includeZero) body.set("num_chapters_read", String(chaptersRead));
   await malAuthorizedFetch(`${MAL_API_BASE}/manga/${mangaId}/my_list_status`, accessToken, {
     method: "PUT",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
