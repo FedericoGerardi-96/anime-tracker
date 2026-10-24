@@ -43,7 +43,7 @@ export async function getMangaListWithFavorites(options: MalMangaCatalogOptions 
     const supabase = await getSupabaseServer();
     const [{ data: favorites }, { data: hentaiFavorites }] = await Promise.all([
       supabase.from("favorites").select("media!inner(mal_id)").eq("user_id", userId).eq("media.type", "manga"),
-      supabase.from("hentai").select("mal_id").eq("user_id", userId).not("mal_id", "is", null),
+      supabase.from("hentai").select("mal_id").eq("user_id", userId).eq("type", "doujin").not("mal_id", "is", null),
     ]);
     for (const favorite of (favorites ?? []) as FavoriteMediaRow[]) {
       const media = Array.isArray(favorite.media) ? favorite.media[0] : favorite.media;

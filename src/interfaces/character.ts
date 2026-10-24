@@ -9,6 +9,8 @@ export interface CharacterVoiceActor {
 
 export interface AnimeCharacter {
   id: number;
+  provider?: "anilist" | "myanimelist";
+  malId?: number;
   name: string;
   nativeName?: string | null;
   alternativeNames: string[];
@@ -38,4 +40,7 @@ export interface CharacterAppearance {
 export interface CharacterDetail extends Omit<AnimeCharacter, "role" | "voiceActors"> {
   appearances: CharacterAppearance[];
   voiceActors: CharacterVoiceActor[];
+  pictures?: string[];
+  details?: Array<{ label: string; value: string }>;
+  birthday?: string | null;
 }

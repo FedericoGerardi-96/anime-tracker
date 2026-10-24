@@ -1,0 +1,2 @@
+import { Skeleton } from './PageSkeleton';
+export default function ListsSkeleton() { return <div role="status" aria-label="Cargando tus listas…" className="space-y-6"><span className="sr-only">Cargando tus listas…</span><Skeleton className="h-24" /><div aria-hidden="true" className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">{Array.from({ length: 12 }, (_, i) => <Skeleton key={i} className="aspect-2/3" />)}</div></div>; }

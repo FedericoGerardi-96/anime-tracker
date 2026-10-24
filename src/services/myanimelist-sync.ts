@@ -5,6 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getValidMalAccessToken } from "@/services/myanimelist-connection";
 import { getAllMalAnimeList, getAllMalMangaList, setMalAnimeProgress, setMalMangaProgress } from "@/services/myanimelist-library";
 import type { MalAnimeNode, MalMangaNode } from '@/interfaces/myanimelist';
+import { refreshStoredRelatedReading } from '@/services/related-reading';
 
 type Reporter = (event: LibrarySyncProgress) => void;
 type LocalStatus = "watching" | "completed" | "on_hold" | "dropped" | "plan_to_watch";
@@ -37,8 +38,8 @@ function unwrap(row: LocalFavoriteForSync) { return Array.isArray(row.media) ? r
 
 async function getLocal(client: SupabaseClient, userId: string, type: LibraryMediaType) {
   const [{ data: favorites, error: favoriteError }, { data: progress, error: progressError }] = await Promise.all([
-    client.from("favorites").select("id, media:media_id!inner(id, mal_id, title, type, image, description, season, year, genres, tags, format, status, day, total_units, score)").eq("user_id", userId),
-    client.from("user_anime_progress").select("media_id, status, current_episode, updated_at").eq("user_id", userId),
+    client.from("favorites").select("id, media:media_id!inner(id, mal_id, title, type, image, season, year, genres, format, status, day, total_units, score)").eq("user_id", userId),
+    client.from("user_media_progress").select("media_id, status, current_episode, updated_at").eq("user_id", userId),
   ]);
   if (favoriteError) throw favoriteError;
   if (progressError) throw progressError;
@@ -66,7 +67,7 @@ function mediaRow(entry: Remote, type: LibraryMediaType) {
   const node = entry.source.node;
   const anime = type === "anime" ? (entry.source as MalAnimeListEntry).node : undefined;
   const totalUnits = type === 'anime' ? (node as MalAnimeNode).num_episodes : (node as MalMangaNode).num_chapters;
-  return { mal_id: node.id, title: node.alternative_titles?.en?.trim() || node.title, type, image: node.main_picture?.large || node.main_picture?.medium || "", description: node.synopsis ?? null, season: anime?.start_season?.season ?? null, year: anime?.start_season?.year ?? (Number(node.start_date?.slice(0, 4)) || null), genres: node.genres?.map((genre) => genre.name) ?? [], format: node.media_type ?? null, status: node.status ?? null, day: anime?.broadcast?.day_of_the_week ?? null, total_units: totalUnits ?? null, score: node.mean ?? 0 };
+  return { mal_id: node.id, title: node.alternative_titles?.en?.trim() || node.title, type, image: node.main_picture?.large || node.main_picture?.medium || "", season: anime?.start_season?.season ?? null, year: anime?.start_season?.year ?? (Number(node.start_date?.slice(0, 4)) || null), genres: node.genres?.map((genre) => genre.name) ?? [], format: node.media_type ?? null, status: node.status ?? null, day: anime?.broadcast?.day_of_the_week ?? null, total_units: totalUnits ?? null, score: node.mean ?? 0 };
 }
 async function ensureMedia(client: SupabaseClient, entries: Remote[], type: LibraryMediaType) {
   const result = new Map<number, string>();
@@ -82,8 +83,29 @@ async function ensureMedia(client: SupabaseClient, entries: Remote[], type: Libr
 }
 async function saveProgress(client: SupabaseClient, rows: Array<Record<string, string | number>>) {
   for (let i = 0; i < rows.length; i += 100) {
-    const { error } = await client.from("user_anime_progress").upsert(rows.slice(i, i + 100), { onConflict: "user_id,media_id" });
+    const { error } = await client.from("user_media_progress").upsert(rows.slice(i, i + 100), { onConflict: "user_id,media_id" });
     if (error) throw error;
+  }
+}
+
+async function enrichCompletedAnime(client: SupabaseClient, userId: string, reporter: Reporter, state: State) {
+  const { data, error } = await client.from('media')
+    .select('id, mal_id, user_media_progress!inner(user_id, status)')
+    .eq('type', 'anime')
+    .is('related_reading_checked_at', null)
+    .eq('user_media_progress.user_id', userId)
+    .eq('user_media_progress.status', 'completed')
+    .order('score', { ascending: false })
+    .limit(24);
+  if (error) {
+    console.warn('No se pudieron buscar animes para completar sus relaciones:', error);
+    return;
+  }
+  const items = data ?? [];
+  for (let offset = 0; offset < items.length; offset += 4) {
+    report(reporter, { type: 'progress', phase: 'reconciling', message: `Buscando manga y novelas relacionados… ${Math.min(offset + 4, items.length)} de ${items.length}` }, state);
+    const results = await Promise.allSettled(items.slice(offset, offset + 4).map((item) => refreshStoredRelatedReading(client, item.id, item.mal_id)));
+    for (const result of results) if (result.status === 'rejected') console.warn('No se pudo guardar una relación de lectura:', result.reason);
   }
 }
 
@@ -145,7 +167,9 @@ export async function synchronizeLibraries(client: SupabaseClient, userId: strin
   const token = await getValidMalAccessToken(userId);
   if (selection.anime) await syncType(client, userId, token, "anime", reporter, state);
   if (selection.manga) await syncType(client, userId, token, "manga", reporter, state);
-  await createSupabaseAdminClient().from("mal_connections").update({ last_synced_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("user_id", userId);
+  const admin = createSupabaseAdminClient();
+  if (selection.anime) await enrichCompletedAnime(admin, userId, reporter, state);
+  await admin.from("mal_connections").update({ last_synced_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("user_id", userId);
   report(reporter, { type: "complete", phase: "complete", message: "Sincronización completada" }, state);
 }
 

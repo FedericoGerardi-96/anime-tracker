@@ -17,6 +17,8 @@ export interface DropdownProps {
   className?: string; // Additional classes for the wrapper
   buttonClassName?: string; // Additional classes for the button itself
   menuClassName?: string; // Additional classes for the dropdown menu
+  ariaLabel?: string;
+  disabled?: boolean;
 }
 
 export default function Dropdown({
@@ -27,11 +29,14 @@ export default function Dropdown({
   placeholder = 'Select an option',
   className = '',
   buttonClassName = '',
-  menuClassName = ''
+  menuClassName = '',
+  ariaLabel,
+  disabled = false
 }: Readonly<DropdownProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalValue, setInternalValue] = useState(value || options[0]?.value || '');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const currentValue = value ?? internalValue;
   const selectedOption = options.find((opt) => opt.value === currentValue);
@@ -51,18 +56,36 @@ export default function Dropdown({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
   const handleSelect = (val: string) => {
     setInternalValue(val);
     if (onChange) onChange(val);
     setIsOpen(false);
+    triggerRef.current?.focus();
   };
 
   return (
     <div className={`relative group w-full sm:w-auto ${className}`} ref={dropdownRef}>
       <button 
         type="button"
-        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); setIsOpen(!isOpen); }}
-        className={`flex items-center justify-between gap-4 w-full sm:w-auto px-4 py-2 bg-primary/5 rounded-lg text-sm hover:bg-primary/10 transition-all border border-primary/10 text-slate-900 dark:text-slate-100 ${buttonClassName}`}
+        ref={triggerRef}
+        aria-label={ariaLabel}
+        aria-expanded={isOpen}
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground transition-all hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${buttonClassName}`}
       >
         <span className="flex items-center gap-2">
           {selectedOption?.icon && (
@@ -71,7 +94,7 @@ export default function Dropdown({
             </span>
           )}
           <span className="truncate">
-            {label && <span className="text-slate-500 font-medium">{label}: </span>}
+            {label && <span className="font-medium text-muted-foreground">{label}: </span>}
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </span>
@@ -83,19 +106,20 @@ export default function Dropdown({
       </button>
 
       {/* Menú flotante estilo select - Usa absolute y z-index para no alterar el contenedor */}
-      <div 
-        className={`absolute top-full left-0 mt-2 w-min min-w-full sm:min-w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden transition-all duration-200 ${menuClassName} ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'}`}
+      {isOpen && <div
+        className={`absolute left-0 top-full z-[100] mt-2 w-min min-w-full overflow-hidden rounded-xl border border-border bg-popover text-foreground shadow-2xl transition-all duration-200 sm:min-w-48 ${menuClassName} ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'pointer-events-none -translate-y-2 scale-95 opacity-0'}`}
       >
         <ul className="max-h-60 overflow-y-auto p-1">
           {options.map((opt) => (
             <li key={opt.value}>
               <button
                 type="button"
-                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleSelect(opt.value); }}
-                className={`flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                disabled={disabled}
+                onClick={() => handleSelect(opt.value)}
+                className={`flex cursor-pointer items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-lg transition-colors disabled:cursor-not-allowed ${
                   currentValue === opt.value
                     ? 'bg-primary/10 text-primary font-semibold'
-                    : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300'
+                    : 'text-foreground hover:bg-muted'
                 }`}
               >
                 {opt.icon && (
@@ -108,7 +132,7 @@ export default function Dropdown({
             </li>
           ))}
         </ul>
-      </div>
+      </div>}
     </div>
   );
 }

@@ -1,24 +1,12 @@
-'use client';
-
-interface CustomList {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-interface CustomListsGridProps {
-  lists: CustomList[];
-  onOpenList: (list: CustomList) => void;
-  onCreateNew: () => void;
-}
-
-export default function CustomListsGrid({ lists, onOpenList, onCreateNew }: CustomListsGridProps) {
+import Link from 'next/link';
+import type { CustomListsGridProps } from '@/interfaces/lists';
+import CreateListButton from './CreateListButton';
+export default function CustomListsGrid({ lists }: CustomListsGridProps) {
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
       {lists.map((list) => (
-        <button
-          type='button'
-          onClick={() => onOpenList(list)}
+        <Link
+          href={`/lists?tab=custom_lists&list=${encodeURIComponent(list.id)}`}
           key={list.id}
           className='group relative bg-slate-900/40 p-5 rounded-3xl border border-white/5 hover:border-primary/50 transition-all cursor-pointer shadow-xl overflow-hidden block'
         >
@@ -37,23 +25,13 @@ export default function CustomListsGrid({ lists, onOpenList, onCreateNew }: Cust
           )}
 
           <div className='pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold relative z-10'>
-            <span className='text-slate-500'>Colección personalizada</span>
+            <span className='text-slate-300'>Colección personalizada</span>
             <span className='text-primary hover:underline'>Ver elementos</span>
           </div>
-        </button>
+        </Link>
       ))}
 
-      {/* Create New List CTA */} 
-      <button
-        type='button'
-        onClick={onCreateNew}
-        className='group relative border-2 border-dashed border-white/10 rounded-3xl p-5 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer flex flex-col items-center justify-center py-12'
-      >
-        <div className='w-14 h-14 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors flex items-center justify-center mb-4'>
-          <span className='material-symbols-outlined text-text-muted group-hover:text-primary'>add</span>
-        </div>
-        <p className='text-text-muted group-hover:text-primary font-bold'>Crear nueva lista</p>
-      </button>
+      <div className="flex items-center justify-center rounded-3xl border-2 border-dashed border-white/10 p-5"><CreateListButton /></div>
     </div>
   );
 }

@@ -43,7 +43,7 @@ export default function ExportFavoritesButton() {
   };
 
   return (
-    <button
+    <button type="button"
       onClick={handleExport}
       disabled={isPending}
       className="flex items-center gap-2 bg-primary hover:bg-primary/80 text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"

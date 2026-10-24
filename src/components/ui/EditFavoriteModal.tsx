@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, KeyboardEvent } from 'react'
 import Image from 'next/image'
 import { upsertUserMediaMetadata } from '@/lib/actions/favorite-metadata'
 import { updatePersonalProgress } from '@/lib/actions/lists'
+import { useToast } from '@/components/ui/Toast'
 import { IUserMediaMetadata } from '@/types/favorites'
 
 interface EditFavoriteModalProps {
@@ -16,7 +17,6 @@ interface EditFavoriteModalProps {
     title: string
     image: string
     type: string
-    description?: string
     total_units?: number
   }
   initialMetadata?: IUserMediaMetadata | null
@@ -31,6 +31,7 @@ export default function EditFavoriteModal({
   initialMetadata,
   initialProgress,
 }: Readonly<EditFavoriteModalProps>) {
+  const { warning } = useToast()
   const [saving, setSaving] = useState(false)
   const [customDescription, setCustomDescription] = useState(initialMetadata?.custom_description ?? '')
   const [watchLink, setWatchLink] = useState(initialMetadata?.watch_link ?? '')
@@ -83,6 +84,7 @@ export default function EditFavoriteModal({
       ])
 
       if (result.success && progressResult.success) {
+        if (progressResult.warning) warning(progressResult.warning)
         onSaved?.()
         onClose()
       } else {
@@ -146,7 +148,8 @@ export default function EditFavoriteModal({
             </div>
 
             {/* Close button */}
-            <button
+            <button type="button"
+              aria-label="Cerrar edición de favorito"
               onClick={onClose}
               className="text-text-muted hover:text-text-primary transition-colors cursor-pointer shrink-0"
             >
@@ -167,7 +170,7 @@ export default function EditFavoriteModal({
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Estado</label>
-                  <select value={status} onChange={(event) => {
+                  <select aria-label="Estado de seguimiento" value={status} onChange={(event) => {
                     const nextStatus = event.target.value
                     setStatus(nextStatus)
                     if (nextStatus === 'completed' && mediaData.total_units) setCurrentEpisode(mediaData.total_units)
@@ -181,7 +184,7 @@ export default function EditFavoriteModal({
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-text-muted">{mediaData.type === 'manga' ? 'Capítulo / página actual' : 'Episodios vistos'}{mediaData.total_units ? ` · Total ${mediaData.total_units}` : ''}</label>
-                  <input type="number" min={0} max={mediaData.total_units || undefined} value={currentEpisode} onChange={(event) => setCurrentEpisode(Math.max(0, Number(event.target.value)))} className="w-full rounded-xl border border-primary/20 bg-slate-950/50 px-4 py-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-primary/50" />
+                  <input aria-label={mediaData.type === 'manga' ? 'Capítulo o página actual' : 'Episodios vistos'} type="number" min={0} max={mediaData.total_units || undefined} value={currentEpisode} onChange={(event) => setCurrentEpisode(Math.max(0, Number(event.target.value)))} className="w-full rounded-xl border border-primary/20 bg-slate-950/50 px-4 py-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
               </div>
 
@@ -191,8 +194,9 @@ export default function EditFavoriteModal({
                   <span className="material-symbols-outlined text-sm text-primary">description</span>
                   Notas personales
                 </label>
-                <textarea
-                  className="w-full bg-slate-950/50 border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-600 text-sm resize-none custom-scrollbar"
+                  <textarea
+                    aria-label="Notas personales"
+                    className="w-full bg-slate-950/50 border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 text-sm resize-none custom-scrollbar"
                   placeholder="Escribí tus notas o recordatorios sobre esta obra..."
                   rows={3}
                   value={customDescription}
@@ -208,7 +212,8 @@ export default function EditFavoriteModal({
                 </label>
                 <div className="relative group">
                   <input
-                    className="w-full bg-slate-950/50 border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-600 text-sm"
+                    aria-label="Enlace personal"
+                    className="w-full bg-slate-950/50 border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 text-sm"
                     placeholder="https://crunchyroll.com/..."
                     type="url"
                     value={watchLink}
@@ -244,7 +249,7 @@ export default function EditFavoriteModal({
                         className="inline-flex items-center gap-1 bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/30"
                       >
                         {tag}
-                        <button
+                        <button type="button"
                           onClick={() => handleRemoveTag(tag)}
                           className="hover:text-red-400 transition-colors cursor-pointer"
                         >
@@ -258,7 +263,8 @@ export default function EditFavoriteModal({
                 {/* Tag input */}
                 <div className="flex gap-2">
                   <input
-                    className="flex-1 bg-slate-950/50 border border-primary/20 rounded-xl py-2.5 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-600 text-sm"
+                    aria-label="Nueva etiqueta"
+                    className="flex-1 bg-slate-950/50 border border-primary/20 rounded-xl py-2.5 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 text-sm"
                     placeholder="Agregá una etiqueta y presioná Enter..."
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
@@ -278,7 +284,7 @@ export default function EditFavoriteModal({
 
             {/* Save button */}
             <div className="px-6 pb-6 pt-2">
-              <button
+              <button type="button"
                 onClick={handleSave}
                 disabled={saving}
                 className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"

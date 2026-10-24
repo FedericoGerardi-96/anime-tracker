@@ -74,7 +74,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-8 animate-in fade-in duration-300">
       {/* Click outside to close */}
-      <button className="absolute inset-0" onClick={onClose}></button>
+      <button type="button" aria-label="Cerrar ventana de inicio de sesión" className="absolute inset-0" onClick={onClose}></button>
       
       {/* Modal Container */}
       <div className="glass-panel w-full max-w-md rounded-3xl shadow-2xl relative animate-in zoom-in-95 duration-300 pointer-events-auto max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
@@ -90,7 +90,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
             </div>
             <h2 className="text-2xl font-black tracking-tighter text-white">AniTrack</h2>
           </div>
-          <button 
+          <button type="button"
+            aria-label="Cerrar ventana de inicio de sesión"
             onClick={onClose}
             className="absolute top-4 right-4 text-white/50 hover:text-white transition-all hover:rotate-90 cursor-pointer"
           >
@@ -110,7 +111,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
           </div>
 
           {/* Social Login */}
-          <button 
+          <button type="button"
             onClick={handleGoogleLogin}
             className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all active:scale-95 mb-6 cursor-pointer shadow-md"
           >
@@ -153,11 +154,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
                   mail
                 </span>
                 <input 
+                  id="email"
                   required
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
+                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
                   placeholder="name@example.com" 
                 />
               </div>
@@ -175,17 +177,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
                   lock
                 </span>
                 <input 
+                  id="password"
                   required
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none" 
+                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
                   placeholder="••••••••"
                 />
               </div>
             </div>
 
-            <button 
+            <button type="submit"
               disabled={loading}
               className="w-full bg-primary hover:bg-primary/90 text-white py-3.5 rounded-xl font-black text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -206,7 +209,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
           <div className="mt-8 text-center">
             <p className="text-sm text-text-muted font-medium">
               {mode === 'login' ? "Don't have an account?" : "Already have an account?"}
-              <button 
+              <button type="button"
                 onClick={() => {
                   setMode(mode === 'login' ? 'signup' : 'login')
                   setError(null)
@@ -223,7 +226,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
         {/* Bottom Note */}
         <div className="bg-white/5 px-8 py-4 text-center border-t border-white/5">
           <p className="text-[10px] text-text-muted uppercase font-bold tracking-tight leading-relaxed">
-            By continuing, you agree to AniTrack's <button className="underline hover:text-white transition-colors cursor-pointer">Terms</button> and <button className="underline hover:text-white transition-colors cursor-pointer">Privacy</button>.
+            By continuing, you agree to AniTrack's <button type="button" className="underline hover:text-white transition-colors cursor-pointer">Terms</button> and <button type="button" className="underline hover:text-white transition-colors cursor-pointer">Privacy</button>.
           </p>
         </div>
       </div>

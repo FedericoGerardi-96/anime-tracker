@@ -1,58 +1,60 @@
 
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { getLists, createList, addAnimeToLists, getAnimeProgress } from '@/lib/actions/lists'
+import { Suspense, use, useState, useMemo } from 'react'
+import { createList, addAnimeToLists } from '@/lib/actions/lists'
+import { requestListDialog } from '@/lib/list-dialog-request'
+import { Skeleton } from '@/components/fallbacks/PageSkeleton'
+import { useToast } from '@/components/ui/Toast'
+import type { AddToListModalProps, ListDialogFormProps, ListDialogData, ListDialogResult, ResolvedListDialogProps } from '@/interfaces/list-dialog'
 
-interface List {
-  id: string
-  name: string
-  description?: string
+const EMPTY_DATA: ListDialogData = { lists: [], listIds: [], progress: null }
+
+export default function AddToListModal(props: Readonly<AddToListModalProps>) {
+  if (!props.isOpen) return null
+  if (props.mode === 'create') return <ListDialogForm {...props} initialData={EMPTY_DATA} />
+  return <ListDialogSession key={`${props.animeData?.type}-${props.animeData?.mal_id}`} {...props} />
 }
 
-interface AnimeData {
-  mal_id: number;
-  title: string;
-  image: string;
-  type: 'anime' | 'manga';
-  synopsis?: string;
-  season?: string;
-  year?: number;
-  genres?: string[];
-  tags?: string[];
-  format?: string;
-  status?: string;
-  totalUnits?: number;
-  episodes?: number;
-  score?: number;
+function ListDialogSession(props: Readonly<AddToListModalProps>) {
+  const [retryPromise, setRetryPromise] = useState<Promise<ListDialogResult> | null>(null)
+  const promise = retryPromise ?? props.dataPromise
+  const retry = () => {
+    if (props.animeData) setRetryPromise(requestListDialog(props.animeData.mal_id, props.animeData.type))
+  }
+  const placeholder = (message?: string) => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={props.onClose}>
+    <div role="dialog" aria-modal="true" aria-label="Agregar a lista" className="glass-card w-full max-w-md space-y-5 rounded-xl p-6" onClick={event => event.stopPropagation()}>
+      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Agregar a lista</h2><button type="button" onClick={props.onClose} aria-label="Cerrar">✕</button></div>
+      {message ? <><p role="alert">{message}</p><button type="button" onClick={retry} className="rounded-xl bg-primary px-4 py-2 text-white">Reintentar</button></> : <div role="status" aria-label="Cargando listas y progreso…" className="space-y-4"><span className="sr-only">Cargando listas y progreso…</span><Skeleton className="h-12" /><Skeleton className="h-28" /><Skeleton className="h-12" /></div>}
+    </div>
+  </div>
+  if (!promise) return placeholder('No pudimos iniciar la carga.')
+  return <Suspense fallback={placeholder()}><ResolvedListDialog {...props} dataPromise={promise} renderError={placeholder} /></Suspense>
 }
 
-interface AddToListModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onListCreated?: () => void
-  mode?: 'create' | 'add-anime'
-  animeData?: AnimeData
-  initialListIds?: string[]
+function ResolvedListDialog({ dataPromise, renderError, ...props }: Readonly<ResolvedListDialogProps>) {
+  const result = use(dataPromise)
+  if (!result.data) return renderError(result.error)
+  return <ListDialogForm {...props} initialData={result.data} />
 }
 
-export default function AddToListModal({ 
+function ListDialogForm({
   isOpen, 
   onClose, 
   onListCreated,
   mode = 'add-anime',
   animeData,
-  initialListIds = []
-}: Readonly<AddToListModalProps>) {
-  const [lists, setLists] = useState<List[]>([])
-  const [loading, setLoading] = useState(false)
+  initialData
+}: Readonly<ListDialogFormProps>) {
+  const { warning } = useToast()
+  const [lists, setLists] = useState(initialData.lists)
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedLists, setSelectedLists] = useState<Set<string>>(new Set(initialListIds))
+  const [selectedLists, setSelectedLists] = useState<Set<string>>(new Set(initialData.listIds))
   const [isSaving, setIsSaving] = useState(false)
   
   // Progress & Status states
-  const [status, setStatus] = useState<string>('')
-  const [episode, setEpisode] = useState<number | ''>('')
+  const [status, setStatus] = useState(initialData.progress?.status ?? '')
+  const [episode, setEpisode] = useState<number | ''>(initialData.progress?.current_episode ?? '')
 
   const [error, setError] = useState<string | null>(null)
   
@@ -60,39 +62,6 @@ export default function AddToListModal({
   const [newName, setNewName] = useState('')
   const [newDescription, setNewDescription] = useState('')
   const [isCreating, setIsCreating] = useState(false)
-
-  useEffect(() => {
-    if (isOpen) {
-      if (mode === 'add-anime') {
-        fetchLists()
-        if (animeData) {
-          fetchProgress(animeData.mal_id)
-        }
-      }
-      setSelectedLists(new Set(initialListIds))
-      setError(null)
-    }
-  }, [isOpen, mode, initialListIds, animeData])
-
-  async function fetchLists() {
-    setLoading(true)
-    const { data, error } = await getLists()
-    if (!error && data) {
-      setLists(data)
-    }
-    setLoading(false)
-  }
-
-  async function fetchProgress(malId: number) {
-    const data = await getAnimeProgress(malId)
-    if (data) {
-      setStatus(data.status || '')
-      setEpisode(data.current_episode || '')
-    } else {
-      setStatus('')
-      setEpisode('')
-    }
-  }
 
   const filteredLists = useMemo(() => {
     return lists.filter(list => 
@@ -158,6 +127,7 @@ export default function AddToListModal({
     )
     
     if (result.success) {
+      if (result.warning) warning(result.warning)
       onClose()
       if (onListCreated) onListCreated() // Trigger refresh if needed
     } else {
@@ -167,14 +137,6 @@ export default function AddToListModal({
   }
 
   const renderListContent = () => {
-    if (loading) {
-      return (
-        <div className="flex justify-center items-center py-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      )
-    }
-
     if (filteredLists.length > 0) {
       return filteredLists.map((list) => {
         const isSelected = selectedLists.has(list.id)
@@ -239,7 +201,8 @@ export default function AddToListModal({
               </p>
             )}
           </div>
-          <button 
+          <button type="button"
+            aria-label="Cerrar ventana de listas"
             onClick={onClose}
             className="text-text-muted hover:text-text-primary transition-colors cursor-pointer"
           >
@@ -256,7 +219,8 @@ export default function AddToListModal({
                   search
                 </span>
                 <input 
-                  className="w-full bg-slate-900/50 border border-primary/20 rounded-lg py-2.5 pl-10 pr-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted/50"
+                  aria-label="Buscar listas existentes"
+                  className="w-full bg-slate-900/50 border border-primary/20 rounded-lg py-2.5 pl-10 pr-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted"
                   placeholder="Search existing lists"
                   type="text"
                   value={searchQuery}
@@ -287,7 +251,8 @@ export default function AddToListModal({
           <form onSubmit={handleCreateList} className="flex flex-col gap-3">
             <div className="flex gap-2">
               <input 
-                className="flex-1 bg-slate-900/50 border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-600 text-sm"
+                aria-label="Nombre de la lista"
+                className="flex-1 bg-slate-900/50 border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-400 text-sm"
                 placeholder="Enter list name..."
                 type="text"
                 value={newName}
@@ -306,7 +271,8 @@ export default function AddToListModal({
             </div>
             {mode === 'create' && (
               <input 
-                className="w-full bg-slate-900/50 border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-600 text-sm"
+                aria-label="Descripción de la lista"
+                className="w-full bg-slate-900/50 border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-400 text-sm"
                 placeholder="Enter list description..."
                 type="text"
                 value={newDescription}
@@ -336,7 +302,8 @@ export default function AddToListModal({
                 <label htmlFor="episode" className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Progress</label>
                 <div className="relative flex items-center">
                   <input 
-                    className="w-full bg-slate-950/50 border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-600 transition-all text-sm" 
+                    id="episode"
+                    className="w-full bg-slate-950/50 border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-400 transition-all text-sm"
                     min="0" 
                     placeholder="Ep #" 
                     type="number" 
@@ -352,6 +319,7 @@ export default function AddToListModal({
                 <label htmlFor="status" className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Status</label>
                 <div className="relative">
                   <select 
+                    id="status"
                     className="w-full bg-slate-950/50 border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-sm"
                     value={status}
                     onChange={(e) => {
@@ -376,7 +344,7 @@ export default function AddToListModal({
 
             {/* Action Button */}
             <div className="px-6 pb-8 pt-2">
-              <button 
+              <button type="button"
                 onClick={handleSave}
                 disabled={isSaving}
                 className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"

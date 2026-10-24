@@ -3,14 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "worker:anilist": "node scripts/anilist-sync-worker.mjs",
+    "worker:sync": "node scripts/anilist-sync-worker.mjs",
+    "test:anilist-sync": "node --test tests/anilist-sync-policy.test.mjs",
+    "test:provider-sync": "node --test tests/media-provider-sync.test.mjs",
+    "test:oauth-return": "node --test tests/oauth-return-path.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.3",
+    "cheerio": "^1.2.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",

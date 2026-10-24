@@ -4,7 +4,7 @@ import { getAuthenticatedUser } from "@/services/supabase"
 import { getFavoritesWithMedia as fetchFavoritesWithMedia, getFavoriteMalIds as fetchFavoriteMalIds, getAllFavoritesFull } from "@/services/favorites"
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { syncMediaFavoriteWithMal } from "@/services/myanimelist-list"
+import { syncMediaFavoriteWithProviders } from "@/services/media-provider-sync"
 import { getCanonicalMediaInput } from '@/services/canonical-media'
 
 async function syncFavoriteIfApplicable(
@@ -12,8 +12,8 @@ async function syncFavoriteIfApplicable(
   mediaData: { mal_id: number; type?: 'anime' | 'manga' },
   isFavorite: boolean,
 ) {
-  const result = await syncMediaFavoriteWithMal(userId, mediaData.mal_id, mediaData.type ?? 'anime', isFavorite);
-  return result.status === 'failed' ? result.message : undefined;
+  const result = await syncMediaFavoriteWithProviders(userId, mediaData.mal_id, mediaData.type ?? 'anime', isFavorite);
+  return result.warning;
 }
 
 export async function getFavoritesWithMedia() {
@@ -54,6 +54,7 @@ export async function toggleFavorite(mediaData: {
   if (!user) {
     return { error: 'Not authenticated' }
   }
+  if (!Number.isInteger(mediaData.mal_id) || mediaData.mal_id <= 0 || (mediaData.type && mediaData.type !== 'anime' && mediaData.type !== 'manga')) return { error: 'Serie inválida' }
 
   // 0. Check if media is Hentai
   const isHentai = mediaData.tags?.some(tag => tag.toLowerCase() === 'hentai');
@@ -68,12 +69,13 @@ export async function toggleFavorite(mediaData: {
       .single();
 
     if (existingHentai) {
-      await supabase.from('hentai').delete().eq('id', existingHentai.id);
+      const { error } = await supabase.from('hentai').delete().eq('id', existingHentai.id);
+      if (error) return { error: 'No se pudo quitar el favorito' };
       const warning = await syncFavoriteIfApplicable(user.id, mediaData, false);
       revalidatePath('/hentai');
       return { success: true, isFavorite: false, warning };
     } else {
-      await supabase.from('hentai').insert({
+      const { error } = await supabase.from('hentai').insert({
         user_id: user.id,
         mal_id: mediaData.mal_id,
         title: mediaData.title,
@@ -81,6 +83,7 @@ export async function toggleFavorite(mediaData: {
         description: mediaData.synopsis,
         type: mediaData.type === 'manga' ? 'doujin' : 'anime'
       });
+      if (error) return { error: 'No se pudo agregar el favorito' };
       const warning = await syncFavoriteIfApplicable(user.id, mediaData, true);
       revalidatePath('/hentai');
       return { success: true, isFavorite: true, warning };
@@ -105,8 +108,8 @@ export async function toggleFavorite(mediaData: {
       .from('media')
       .insert({
         mal_id: canonical.mal_id, title: canonical.title, type: canonical.type || 'anime', image: canonical.image,
-        description: canonical.synopsis, season: canonical.season, year: canonical.year || null,
-        genres: canonical.genres || [], tags: [], format: canonical.format || null,
+        season: canonical.season, year: canonical.year || null,
+        genres: canonical.genres || [], format: canonical.format || null,
         status: canonical.status || null, day: canonical.day || null,
         total_units: canonical.totalUnits || null, score: canonical.score || 0,
       })
@@ -145,6 +148,18 @@ export async function toggleFavorite(mediaData: {
       console.error('Error adding favorite:', insertError)
       return { error: 'Failed to add favorite' }
     }
+    const { error: progressError } = await supabase.from('user_media_progress').upsert({
+      user_id: user.id,
+      media_id: mediaId,
+      status: 'plan_to_watch',
+      current_episode: 0,
+      custom_tags: [],
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,media_id', ignoreDuplicates: true })
+    if (progressError) {
+      console.error('Error creating personal media state:', progressError)
+      return { error: 'Favorite added, but its personal state could not be created' }
+    }
   }
 
   revalidatePath('/anime')
@@ -162,7 +177,7 @@ export async function exportFavoritesAction() {
   if (!user) throw new Error("Not authenticated");
   
   const data = await getAllFavoritesFull(user.id);
-  return data.map((fav: any) => {
+  return data.map((fav) => {
     const media = Array.isArray(fav.media) ? fav.media[0] : fav.media;
     return {
       "ID": fav.id,
@@ -175,8 +190,6 @@ export async function exportFavoritesAction() {
       "Format": media?.format || "",
       "Status": media?.status || "",
       "Genres": Array.isArray(media?.genres) ? media.genres.join(", ") : "",
-      "Tags": Array.isArray(media?.tags) ? media.tags.join(", ") : "",
-      "Description": media?.description || "",
     };
   });
 }

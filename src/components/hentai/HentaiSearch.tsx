@@ -41,11 +41,12 @@ export default function HentaiSearch({ defaultValue }: Readonly<{ defaultValue?:
         {isPending ? "sync" : "search"}
       </span>
       <input
+        aria-label="Buscar en la colección privada"
         type="text"
         defaultValue={defaultValue}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="Quick search by title or description..."
-        className="w-full bg-slate-900/50 border border-white/5 rounded-xl py-4 pl-12 pr-6 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all backdrop-blur-md"
+        className="w-full rounded-xl border border-border bg-card py-4 pl-12 pr-6 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:outline-none focus:ring-1 focus:ring-primary/50"
       />
     </div>
   );

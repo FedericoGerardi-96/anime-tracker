@@ -31,7 +31,7 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
   }
 
   return (
-    <button 
+    <button type="button"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onClick={onClose}
     >
@@ -50,7 +50,8 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
               Add private content to your collection
             </p>
           </div>
-          <button 
+          <button type="button"
+            aria-label="Cerrar formulario"
             onClick={onClose}
             className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
           >
@@ -69,7 +70,7 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
                   name="title"
                   id="title"
                   required
-                  className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                  className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   placeholder="Enter title..."
                   type="text"
                 />
@@ -102,7 +103,7 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
                 <input
                   name="image"
                   id="image"
-                  className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 pl-12 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                  className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 pl-12 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   placeholder="https://image-host.com/cover.jpg"
                   type="text"
                 />
@@ -115,7 +116,7 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
               <textarea
                 name="description"
                 id="description"
-                className="custom-scrollbar w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-600 resize-none focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                className="custom-scrollbar w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-400 resize-none focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                 placeholder="Add a brief description..."
                 rows={4}
               ></textarea>

@@ -1,3 +1,11 @@
+export interface CatalogDetailMetadata {
+  title_japanese?: string | null;
+  title_synonyms?: string[];
+  start_date?: string | null;
+  end_date?: string | null;
+  duration_minutes?: number | null;
+}
+
 export interface CatalogImageSet {
   jpg: { image_url: string; small_image_url: string; large_image_url: string };
   webp: { image_url: string; small_image_url: string; large_image_url: string };
@@ -8,7 +16,7 @@ export interface CatalogGenre {
   name: string;
 }
 
-export interface CatalogAnime {
+export interface CatalogAnime extends CatalogDetailMetadata {
   mal_id: number;
   images: CatalogImageSet;
   title: string;
@@ -31,7 +39,7 @@ export interface CatalogAnime {
   broadcast?: { day: string | null; time: string | null };
 }
 
-export interface CatalogManga {
+export interface CatalogManga extends CatalogDetailMetadata {
   mal_id: number;
   images: CatalogImageSet;
   title: string;

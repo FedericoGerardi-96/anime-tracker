@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from 'next/image';
 
 import type { CatalogAnime } from "@/interfaces/media-catalog";
 import { slugify } from "@/lib/utils";
@@ -32,7 +33,7 @@ export default function AiringToday({ todayAnime, favoriteMalIds }: Readonly<Air
           )}
           {!isLoggedIn && <p className="mt-1 text-sm text-muted-foreground">Estrenos y nuevos episodios programados para hoy.</p>}
         </div>
-        <Link href="/anime?status=airing" className="text-primary text-sm font-semibold hover:underline">
+        <Link href="/anime?status=airing" aria-label="Ver todos los animes en emisión" className="text-primary text-sm font-semibold hover:underline">
           Ver todo
         </Link>
       </div>
@@ -47,7 +48,7 @@ export default function AiringToday({ todayAnime, favoriteMalIds }: Readonly<Air
                 : "No hay anime programado para hoy"}
             </p>
             {isLoggedIn && (
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Volvé mañana o consultá el calendario completo
               </p>
             )}
@@ -62,16 +63,21 @@ export default function AiringToday({ todayAnime, favoriteMalIds }: Readonly<Air
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-          {displayed.map((anime) => (
+          {displayed.map((anime, index) => (
             <Link
               key={anime.mal_id}
               href={`/anime/${anime.mal_id}-${slugify(anime.title_english || anime.title)}`}
               className="group cursor-pointer"
             >
               <div className="relative aspect-3/4 rounded-xl overflow-hidden mb-3">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                  style={{ backgroundImage: `url('${anime.images.webp.large_image_url || anime.images.jpg.large_image_url}')` }}
+                <Image
+                  src={anime.images.webp.large_image_url || anime.images.jpg.large_image_url}
+                  alt=""
+                  fill
+                  sizes="(max-width: 767px) calc((100vw - 3rem) / 2), (max-width: 1279px) calc((100vw - 5rem) / 3), 210px"
+                  loading={index < 2 ? "eager" : "lazy"}
+                  fetchPriority={index < 2 ? "high" : "auto"}
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 {anime.score && (
                   <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-yellow-400 text-[10px] px-2 py-1 rounded font-bold">
@@ -82,10 +88,10 @@ export default function AiringToday({ todayAnime, favoriteMalIds }: Readonly<Air
                   <span className="material-symbols-outlined text-white text-4xl">play_circle</span>
                 </div>
               </div>
-              <h4 className="font-bold text-sm truncate group-hover:text-primary transition-colors">
+              <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors">
                 {anime.title_english || anime.title}
-              </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              </h3>
+              <p className="text-xs text-muted-foreground">
                 {anime.episodes ? `${anime.episodes} episodios` : "En emisión"}
               </p>
             </Link>

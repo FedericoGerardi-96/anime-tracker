@@ -1,8 +1,7 @@
+import { Suspense } from 'react';
+import ScheduleContent from '@/components/anime/ScheduleContent';
+import ScheduleSkeleton from '@/components/fallbacks/ScheduleSkeleton';
 import { Metadata } from "next";
-import { getMalWeeklySchedule } from "@/lib/myanimelist-service";
-import { getFavoriteMalIds } from "@/lib/actions/media";
-import { getAuthenticatedUser } from "@/services/supabase";
-import ScheduleCalendar from "@/components/anime/ScheduleCalendar";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -10,14 +9,8 @@ export const metadata: Metadata = {
   description: "Calendario semanal de emisiones y estrenos de anime.",
 };
 
-export default async function SchedulePage() {
-  const user = await getAuthenticatedUser();
-  
-  const [weeklySchedules, favoriteMalIds] = await Promise.all([
-    getMalWeeklySchedule(),
-    getFavoriteMalIds(),
-  ]);
-
+export default async function SchedulePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams;
   return (
     <div className="flex-1 p-4 sm:p-8 lg:p-12 space-y-6">
       {/* Breadcrumb / Back button */}
@@ -33,11 +26,7 @@ export default async function SchedulePage() {
         <span className="text-slate-300 font-medium">Calendario</span>
       </div>
 
-      <ScheduleCalendar
-        weeklySchedules={weeklySchedules}
-        favoriteMalIds={favoriteMalIds ?? []}
-        userId={user?.id}
-      />
+      <Suspense key={JSON.stringify(params)} fallback={<ScheduleSkeleton />}><ScheduleContent params={params} /></Suspense>
     </div>
   );
 }

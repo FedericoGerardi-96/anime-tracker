@@ -1,101 +1,101 @@
-
 'use client';
-import { useTransition } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
-interface PaginationProps {
-  currentPage: number;
-  totalPages?: number;
-  hasNextPage: boolean;
-}
+import { Fragment, useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import type { PaginationProps } from '@/interfaces/pagination';
 
-export default function Pagination({ currentPage, totalPages, hasNextPage }: Readonly<PaginationProps>) {
+const buttonClass = 'flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-sm font-bold text-foreground transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-35 cursor-pointer';
+
+export default function Pagination({
+  currentPage,
+  totalPages,
+  hasNextPage,
+  showBoundaryPages = true,
+}: Readonly<PaginationProps>) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const handlePageChange = (page: number) => {
+  const hasKnownTotal = typeof totalPages === 'number' && Number.isFinite(totalPages);
+  const lastPage = hasKnownTotal
+    ? Math.min(Math.max(0, Math.floor(totalPages)), hasNextPage === false ? currentPage : Infinity)
+    : undefined;
+  const canGoBack = currentPage > 1;
+  const canGoForward = lastPage === undefined ? Boolean(hasNextPage) : currentPage < lastPage;
+
+  if (currentPage < 1 || (lastPage !== undefined && (lastPage <= 1 || currentPage > lastPage))) return null;
+  if (!canGoBack && !canGoForward) return null;
+
+  const pages: number[] = [];
+  if (lastPage !== undefined && showBoundaryPages && lastPage <= 7) {
+    for (let page = 1; page <= lastPage; page++) pages.push(page);
+  } else if (lastPage !== undefined && showBoundaryPages) {
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(lastPage - 1, currentPage + 1);
+    pages.push(1);
+    for (let page = start; page <= end; page++) pages.push(page);
+    pages.push(lastPage);
+  } else {
+    const start = Math.max(1, currentPage - 2);
+    const end = lastPage === undefined
+      ? currentPage + (canGoForward ? 1 : 0)
+      : Math.min(lastPage, currentPage + 2);
+    for (let page = start; page <= end; page++) pages.push(page);
+  }
+
+  const goToPage = (page: number) => {
+    if (page < 1 || (lastPage !== undefined && page > lastPage) || page === currentPage || isPending) return;
     startTransition(() => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set('page', page.toString());
-      router.push(`${pathname}?${params.toString()}`);
+      if (page === 1) params.delete('page');
+      else params.set('page', String(page));
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname);
     });
   };
 
-  const pages = [];
-  const maxVisiblePages = 5;
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  const endPage = totalPages
-    ? Math.min(totalPages, startPage + maxVisiblePages - 1)
-    : currentPage + (hasNextPage ? 1 : 0);
-
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
-
   return (
-    <div className={`flex justify-center items-center gap-2 py-12 ${isPending ? 'opacity-60 pointer-events-none' : ''} transition-opacity duration-200`}>
-      <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={isPending || currentPage <= 1}
-        className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-      >
-        <span className="material-symbols-outlined text-sm">chevron_left</span>
-      </button>
-
-      {startPage > 1 && (
-        <>
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={isPending}
-            className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 font-bold text-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <span className="material-symbols-outlined text-sm">keyboard_double_arrow_left</span>
-          </button>
-          {startPage > 2 && <span className="text-text-muted px-1 text-xs">...</span>}
-        </>
-      )}
-
-      {pages.map((page) => (
+    <nav aria-label="Paginación" className={`mt-10 flex justify-center transition-opacity ${isPending ? 'pointer-events-none opacity-60' : ''}`}>
+      <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-border bg-card/90 p-2 shadow-sm backdrop-blur-sm">
         <button
-          key={page}
-          onClick={() => handlePageChange(page)}
-          disabled={isPending}
-          className={`size-10 flex items-center justify-center rounded-xl transition-all border font-bold text-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-            currentPage === page
-              ? "bg-primary border-primary text-white shadow-lg shadow-primary/30"
-              : "glass border-white/5 text-text-muted hover:bg-primary/20 hover:text-text-primary"
-          }`}
+          type="button"
+          aria-label="Página anterior"
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={!canGoBack || isPending}
+          className={buttonClass}
         >
-          {page}
+          <span aria-hidden="true" className="material-symbols-outlined">chevron_left</span>
         </button>
-      ))}
 
-      {totalPages && endPage < totalPages && (
-        <>
-          {endPage < totalPages - 1 && <span className="text-text-muted px-1 text-xs">...</span>}
-          <button
-            onClick={() => handlePageChange(totalPages)}
-            disabled={isPending}
-            className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 font-bold text-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <span className="material-symbols-outlined text-sm">keyboard_double_arrow_right</span>
-          </button>
-        </>
-      )}
+        {pages.map((page, index) => (
+          <Fragment key={page}>
+            {index > 0 && page - pages[index - 1] > 1 && (
+              <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center text-muted-foreground">…</span>
+            )}
+            <button
+              type="button"
+              aria-label={`Ir a la página ${page}`}
+              aria-current={page === currentPage ? 'page' : undefined}
+              onClick={() => goToPage(page)}
+              disabled={isPending}
+              className={`${buttonClass} ${page === currentPage ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground' : ''}`}
+            >
+              {page}
+            </button>
+          </Fragment>
+        ))}
 
-      <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={isPending || !hasNextPage}
-        className="size-10 flex items-center justify-center rounded-xl glass hover:bg-primary/20 transition-all border border-white/5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-      >
-        <span className="material-symbols-outlined text-sm">chevron_right</span>
-      </button>
-    </div>
+        <button
+          type="button"
+          aria-label="Página siguiente"
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={!canGoForward || isPending}
+          className={buttonClass}
+        >
+          <span aria-hidden="true" className="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </nav>
   );
 }

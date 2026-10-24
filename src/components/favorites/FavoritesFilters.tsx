@@ -131,6 +131,7 @@ export default function FavoritesFilters({ availableTags, showStatus = true }: R
           {isOpen && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-slate-950 border border-white/10 rounded-xl shadow-2xl z-50 p-3 max-h-[300px] overflow-hidden flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-150">
               <input
+                aria-label="Buscar etiquetas"
                 type="text"
                 value={tagSearch}
                 onChange={(e) => setTagSearch(e.target.value)}
@@ -179,7 +180,7 @@ export default function FavoritesFilters({ availableTags, showStatus = true }: R
       <div className="flex flex-col gap-2 min-w-[150px]">
         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Tipo</span>
         <div className="relative">
-          <select value={currentType} onChange={(e) => handleTypeChange(e.target.value)} disabled={isPending} className="w-full bg-slate-900/50 border border-white/5 text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer outline-none disabled:opacity-50">
+          <select aria-label="Filtrar por tipo" value={currentType} onChange={(e) => handleTypeChange(e.target.value)} disabled={isPending} className="w-full bg-slate-900/50 border border-white/5 text-white text-sm rounded-lg focus:ring-1 focus:ring-primary py-3 px-4 appearance-none cursor-pointer outline-none disabled:opacity-50">
             <option value="all">Anime y manga</option>
             <option value="anime">Anime</option>
             <option value="manga">Manga</option>
@@ -195,6 +196,7 @@ export default function FavoritesFilters({ availableTags, showStatus = true }: R
         </span>
         <div className="relative">
           <select
+            aria-label="Filtrar por estado"
             value={currentStatus}
             onChange={(e) => handleStatusChange(e.target.value)}
             disabled={isPending}
@@ -222,6 +224,7 @@ export default function FavoritesFilters({ availableTags, showStatus = true }: R
         <div className="flex gap-2">
           <div className="relative flex-1">
           <select
+            aria-label="Ordenar favoritos"
             value={currentSort}
             onChange={(e) => handleSortChange(e.target.value)}
             disabled={isPending}

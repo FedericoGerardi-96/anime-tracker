@@ -126,7 +126,7 @@ function fetchSearchCatalog(query: string, limit: number, offset: number) {
 
 function validateSeason(year: number, season: string): void {
   const validSeason = ["winter", "spring", "summer", "fall"].includes(season);
-  const validYear = Number.isInteger(year) && year >= 1970 && year <= new Date().getFullYear();
+  const validYear = Number.isInteger(year) && year >= 1900 && year <= new Date().getFullYear() + 1;
   if (!validSeason || !validYear) {
     throw new MyAnimeListApiError(400, "Temporada o año inválidos");
   }
@@ -231,6 +231,11 @@ export function mapMalAnimeToCatalog(anime: MalAnimeNode): CatalogAnime {
     images: imageSet(anime.main_picture),
     title: anime.title,
     title_english: anime.alternative_titles?.en?.trim() || null,
+    title_japanese: anime.alternative_titles?.ja?.trim() || null,
+    title_synonyms: anime.alternative_titles?.synonyms ?? [],
+    start_date: anime.start_date ?? null,
+    end_date: anime.end_date ?? null,
+    duration_minutes: anime.average_episode_duration ? anime.average_episode_duration / 60 : null,
     type: anime.media_type || "TV",
     source: anime.source || "",
     episodes: anime.num_episodes || null,
@@ -255,6 +260,10 @@ export function mapMalMangaToCatalog(manga: MalMangaNode): CatalogManga {
     images: imageSet(manga.main_picture),
     title: manga.title,
     title_english: manga.alternative_titles?.en?.trim() || null,
+    title_japanese: manga.alternative_titles?.ja?.trim() || null,
+    title_synonyms: manga.alternative_titles?.synonyms ?? [],
+    start_date: manga.start_date ?? null,
+    end_date: manga.end_date ?? null,
     type: manga.media_type || "Manga",
     year: Number(manga.start_date?.slice(0, 4)) || null,
     chapters: manga.num_chapters || null,
@@ -272,7 +281,7 @@ export function mapMalMangaToCatalog(manga: MalMangaNode): CatalogManga {
 }
 
 export async function getMalAnimeById(id: number): Promise<CatalogAnime> {
-  const anime = await malFetch<MalAnimeNode>(`/anime/${id}`, { fields: `${ANIME_LIST_FIELDS},num_scoring_users,recommendations` });
+  const anime = await malFetch<MalAnimeNode>(`/anime/${id}`, { fields: `${ANIME_LIST_FIELDS},num_scoring_users,recommendations,end_date,average_episode_duration` });
   return mapMalAnimeToCatalog(anime);
 }
 
@@ -315,7 +324,7 @@ export async function getMalMangaCatalog(options: MalMangaCatalogOptions = {}): 
 }
 
 export async function getMalMangaById(id: number): Promise<CatalogManga> {
-  const manga = await malFetch<MalMangaNode>(`/manga/${id}`, { fields: `${MANGA_LIST_FIELDS},recommendations` });
+  const manga = await malFetch<MalMangaNode>(`/manga/${id}`, { fields: `${MANGA_LIST_FIELDS},recommendations,end_date` });
   return mapMalMangaToCatalog(manga);
 }
 
@@ -333,13 +342,18 @@ function currentSeason(): { year: number; season: "winter" | "spring" | "summer"
   return { year: date.getUTCFullYear(), season: seasons[date.getUTCMonth()] };
 }
 
-export async function getMalWeeklySchedule(): Promise<Record<string, CatalogAnime[]>> {
-  const { year, season } = currentSeason();
-  const response = await malFetch<MalListResponse<{ node: MalAnimeNode }>>(`/anime/season/${year}/${season}`, {
-    limit: 100, sort: "anime_num_list_users", fields: ANIME_LIST_FIELDS,
-  });
+export async function getMalWeeklySchedule(period = currentSeason()): Promise<Record<string, CatalogAnime[]>> {
+  const { year, season } = period;
+  const nodes: MalAnimeNode[] = [];
+  let page = 1;
+  let hasNextPage = true;
+  while (hasNextPage) {
+    const batch = await getMalAnimeCatalog({ year, season, page: page++, limit: 100 });
+    nodes.push(...batch.anime);
+    hasNextPage = batch.hasNextPage;
+  }
   const result: Record<string, CatalogAnime[]> = { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] };
-  for (const { node } of response.data) {
+  for (const node of nodes) {
     const day = node.broadcast?.day_of_the_week?.toLowerCase();
     if (day && result[day]) result[day].push(mapMalAnimeToCatalog(node));
   }

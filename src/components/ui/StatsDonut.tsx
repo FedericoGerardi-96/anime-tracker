@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 const STATUSES = [
-  { key: "watching",      label: "Viendo / Leyendo", color: "#6366f1" },
+  { key: "watching",      label: "Viendo",          color: "#6366f1" },
   { key: "completed",     label: "Completados",      color: "#22c55e" },
   { key: "on_hold",       label: "En pausa",         color: "#eab308" },
   { key: "dropped",       label: "Abandonados",      color: "#ef4444" },
@@ -9,10 +11,10 @@ const STATUSES = [
 const R = 36;
 const C = 2 * Math.PI * R;
 
-export default function StatsDonut({ stats }: Readonly<{ stats: Record<string, number> | null }>) {
+export default function StatsDonut({ stats, mediaType }: Readonly<{ stats: Record<string, number> | null; mediaType: "anime" | "manga" }>) {
   if (!stats) {
     return (
-      <p className="text-sm text-slate-500 text-center py-2">Iniciá sesión para ver tus estadísticas</p>
+      <p className="py-2 text-center text-sm text-muted-foreground">Iniciá sesión para ver tus estadísticas</p>
     );
   }
 
@@ -20,24 +22,29 @@ export default function StatsDonut({ stats }: Readonly<{ stats: Record<string, n
 
   if (total === 0) {
     return (
-      <p className="text-sm text-slate-500 text-center py-2">Todavía no registraste contenido</p>
+      <p className="py-2 text-center text-sm text-muted-foreground">Todavía no registraste {mediaType}</p>
     );
   }
 
-  let runningLen = 0;
-  const segments = STATUSES.map(s => {
+  const { segments } = STATUSES.reduce<{ runningLen: number; segments: Array<(typeof STATUSES)[number] & { count: number; segLen: number; dashoffset: number }> }>((acc, s) => {
     const count = stats[s.key] || 0;
     const segLen = (count / total) * C;
-    const dashoffset = C - runningLen;
-    runningLen += segLen;
-    return { ...s, count, segLen, dashoffset };
-  }).filter(s => s.count > 0);
+    const dashoffset = C - acc.runningLen;
+    return { runningLen: acc.runningLen + segLen, segments: count > 0 ? [...acc.segments, { ...s, count, segLen, dashoffset }] : acc.segments };
+  }, { runningLen: 0, segments: [] });
+
+  const statusLabel = (status: (typeof STATUSES)[number]) => {
+    if (mediaType !== "manga") return status.label;
+    if (status.key === "watching") return "Leyendo";
+    if (status.key === "plan_to_watch") return "Por leer";
+    return status.label;
+  };
 
   return (
     <div>
       {/* Donut chart */}
       <div className="relative flex justify-center mb-5">
-        <svg width="120" height="120" viewBox="0 0 80 80" className="-rotate-90">
+        <svg width="120" height="120" viewBox="0 0 80 80" className="-rotate-90" aria-hidden="true" focusable="false">
           <circle
             cx="40" cy="40" r={R}
             fill="none"
@@ -61,7 +68,7 @@ export default function StatsDonut({ stats }: Readonly<{ stats: Record<string, n
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
             <p className="text-2xl font-black leading-none">{total}</p>
-            <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider mt-0.5">Total</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Total</p>
           </div>
         </div>
       </div>
@@ -69,13 +76,18 @@ export default function StatsDonut({ stats }: Readonly<{ stats: Record<string, n
       {/* Legend */}
       <div className="space-y-2">
         {STATUSES.filter(s => (stats[s.key] || 0) > 0).map(s => (
-          <div key={s.key} className="flex items-center justify-between">
+          <Link
+            key={s.key}
+            href={`/lists?tab=${s.key}&type=${mediaType}`}
+            aria-label={`Ver ${mediaType} en estado ${statusLabel(s)} en Mis listas`}
+            className="flex items-center justify-between rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-              <span className="text-xs text-slate-500">{s.label}</span>
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} aria-hidden="true" />
+              <span className="text-xs text-muted-foreground">{statusLabel(s)}</span>
             </div>
             <span className="text-xs font-bold">{stats[s.key]}</span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

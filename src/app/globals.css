@@ -1,6 +1,8 @@
 
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   color-scheme: light;
   --background: oklch(0.985 0.004 75);
@@ -69,6 +71,11 @@ body {
   font-family: var(--font-sans);
 }
 
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
 * {
   border-color: var(--border);
 }
@@ -78,6 +85,35 @@ body {
 }
 
 @layer utilities {
+
+  .detail-panel {
+    background: color-mix(in oklab, var(--card) 92%, transparent);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+  }
+
+  .detail-shadow {
+    box-shadow: 0 16px 40px -16px rgba(30, 20, 50, 0.18);
+  }
+
+  .detail-hero {
+    opacity: 0.08;
+    mask-image: linear-gradient(to bottom, black 30%, transparent);
+  }
+
+  .dark .detail-panel {
+    background: rgba(2, 6, 23, 0.5);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .detail-shadow {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .dark .detail-hero {
+    opacity: 0.2;
+    mask-image: none;
+  }
   
   .glass-panel {
     background: rgba(2, 6, 23, 0.5);

@@ -2,6 +2,7 @@
 
 import React, { useTransition, useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { slugify } from '@/lib/utils';
 import { toggleFavorite } from '@/lib/actions/media';
 import { useToast } from '@/components/ui/Toast';
@@ -27,6 +28,7 @@ export interface AnimeCardProps {
   type?: 'anime' | 'manga';
   userId?: string;
   onAddClick?: (anime: any) => void;
+  priorityImage?: boolean;
 }
 
 export default function AnimeCard({
@@ -48,7 +50,8 @@ export default function AnimeCard({
   totalUnits,
   type = 'anime',
   userId,
-  onAddClick
+  onAddClick,
+  priorityImage = false
 }: Readonly<AnimeCardProps>) {
   const [isPending, startTransition] = useTransition();
   const [optimisticFavorite, setOptimisticFavorite] = useState(isFavorite);
@@ -99,11 +102,16 @@ export default function AnimeCard({
   return (
     <div className="group relative flex flex-col gap-3">
       <div className="relative aspect-2/3 rounded-xl overflow-hidden shadow-xl shadow-black/20">
-        <Link href={`/${type}/${slug}`}>
-          <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" 
-            style={{ backgroundImage: `url('${image}')` }}
-          />
+        <Link href={`/${type}/${slug}`} aria-label={`Ver ficha de ${title}`} className="absolute inset-0">
+          {image ? <Image
+            src={image}
+            alt=""
+            fill
+            sizes="(max-width: 767px) 45vw, (max-width: 1023px) 30vw, (max-width: 1279px) 22vw, (max-width: 1535px) 18vw, 15vw"
+            loading={priorityImage ? 'eager' : 'lazy'}
+            fetchPriority={priorityImage ? 'high' : 'auto'}
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+          /> : <span className="absolute inset-0 bg-muted" aria-hidden="true" />}
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         </Link>
         
@@ -114,7 +122,8 @@ export default function AnimeCard({
         )}
         
         <div className="absolute top-2 right-2 flex flex-col gap-2 transition-transform duration-300 z-10">
-          <button 
+          <button type="button"
+            aria-label={`Agregar ${title} a una lista`}
             onClick={(e) => {
               e.preventDefault();
               onAddClick?.({ id, title, image, score, studio, year, isAiring, synopsis, season, genres, tags, format, status, episodes, totalUnits: totalUnits ?? episodes, type });
@@ -123,7 +132,9 @@ export default function AnimeCard({
           >
             <span className="material-symbols-outlined text-lg">add</span>
           </button>
-          <button 
+          <button type="button"
+            aria-label={optimisticFavorite ? `Quitar ${title} de favoritos` : `Agregar ${title} a favoritos`}
+            aria-pressed={optimisticFavorite}
             onClick={handleFavoriteClick}
             disabled={isPending}
             className={`w-8 h-8 rounded-full flex items-center justify-center hover:scale-110 transition-all group/fav cursor-pointer ${
@@ -153,11 +164,11 @@ export default function AnimeCard({
       </div>
       
       <Link href={`/${type}/${slug}`}>
-        <h3 className="font-bold text-sm leading-tight line-clamp-1 text-slate-900 dark:text-slate-100 hover:text-primary transition-colors">
+        <h3 className="font-bold text-sm leading-tight line-clamp-1 text-foreground hover:text-primary transition-colors">
           {title}
         </h3>
-        <p className="text-xs text-slate-500 mt-1">
-          {studio} • {year}
+        <p className="mt-1 text-xs text-muted-foreground">
+          {studio}{year > 0 ? ` • ${year}` : ''}
         </p>
       </Link>
 

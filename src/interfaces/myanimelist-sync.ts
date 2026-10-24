@@ -52,7 +52,6 @@ export interface LocalMediaForSync {
     title: string;
     type: string;
     image: string;
-    description?: string | null;
     season?: string | null;
     year?: number | null;
     genres?: string[] | null;

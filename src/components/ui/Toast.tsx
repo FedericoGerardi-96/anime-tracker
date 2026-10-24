@@ -102,7 +102,8 @@ export function ToastProvider({ children }: Readonly<{ children: ReactNode }>) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white line-clamp-2">{t.message}</p>
             </div>
-            <button 
+            <button type="button"
+              aria-label="Cerrar notificación"
               onClick={() => removeToast(t.id)}
               className="text-white/40 hover:text-white transition-colors p-1"
             >

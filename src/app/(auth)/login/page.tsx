@@ -7,7 +7,7 @@ import { login, signInWithGoogle } from "@/lib/actions/auth";
 
 export const metadata: Metadata = {
   title: "Login",
-  description: "Sign in to your AniTrack account to sync your progress and lists.",
+  description: "Inicia sesión en tu cuenta para continuar con tu viaje en el mundo del anime.",
 };
 
 export default async function LoginPage({

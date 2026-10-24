@@ -14,6 +14,7 @@ export default function LibrarySearch({ value, onChange }: Readonly<LibrarySearc
         search
       </span>
       <input
+        aria-label="Buscar en la biblioteca"
         type='text'
         value={value}
         onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}

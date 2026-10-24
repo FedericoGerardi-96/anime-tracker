@@ -23,7 +23,7 @@ export default function BackButton({ label, fallback, className }: Readonly<Back
   };
 
   return (
-    <button 
+    <button type="button"
       onClick={handleBack}
       className={className || "hover:text-primary transition-colors cursor-pointer"}
     >
