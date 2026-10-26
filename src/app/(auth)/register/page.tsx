@@ -19,7 +19,7 @@ export default async function RegisterPage({
   const error = resolvedParams.error as string;
 
   return (
-    <div className="flex-1 flex items-center justify-center p-6 relative">
+    <div className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative background elements matching code.html blurs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[120px] -z-10 animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -z-10 animate-transition delay-1000"></div>
@@ -30,8 +30,8 @@ export default async function RegisterPage({
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary to-transparent opacity-50"></div>
         
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-black text-white tracking-tight">Create Account</h1>
-          <p className="text-slate-400 mt-2 text-sm font-medium">Join the community of anime lovers.</p>
+          <h1 className="text-3xl font-black text-foreground tracking-tight">Create Account</h1>
+          <p className="text-muted-foreground mt-2 text-sm font-medium">Join the community of anime lovers.</p>
           {error && <p className="text-red-400 text-sm mt-4 p-2 bg-red-400/10 rounded-lg">{error}</p>}
         </div>
 
@@ -53,7 +53,7 @@ export default async function RegisterPage({
 
         <div className="relative flex items-center mb-6">
           <div className="grow border-t border-white/10"></div>
-          <span className="shrink mx-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Or email</span>
+          <span className="shrink mx-4 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Or email</span>
           <div className="grow border-t border-white/10"></div>
         </div>
 
@@ -85,13 +85,13 @@ export default async function RegisterPage({
           />
 
           <div className="pt-2">
-            <Button variant="primary">
+            <Button variant="primary" type="submit">
               CREATE ACCOUNT
             </Button>
           </div>
         </form>
 
-        <p className="text-center mt-8 text-xs text-slate-400 font-medium">
+        <p className="text-center mt-8 text-xs text-muted-foreground font-medium">
           Already have an account?{''}
           <a className="text-primary font-bold hover:underline ml-1" href="/login">Log in here</a>
         </p>

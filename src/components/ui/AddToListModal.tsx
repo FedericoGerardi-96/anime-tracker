@@ -1,6 +1,7 @@
 
 'use client'
 
+import Modal from '@/components/ui/Modal'
 import { Suspense, use, useState, useMemo } from 'react'
 import { createList, addAnimeToLists } from '@/lib/actions/lists'
 import { requestListDialog } from '@/lib/list-dialog-request'
@@ -12,8 +13,9 @@ const EMPTY_DATA: ListDialogData = { lists: [], listIds: [], progress: null }
 
 export default function AddToListModal(props: Readonly<AddToListModalProps>) {
   if (!props.isOpen) return null
-  if (props.mode === 'create') return <ListDialogForm {...props} initialData={EMPTY_DATA} />
-  return <ListDialogSession key={`${props.animeData?.type}-${props.animeData?.mal_id}`} {...props} />
+  return <Modal onClose={props.onClose} label={props.mode === 'create' ? 'Crear lista' : 'Agregar a lista'}>
+    {props.mode === 'create' ? <ListDialogForm {...props} initialData={EMPTY_DATA} /> : <ListDialogSession key={`${props.animeData?.type}-${props.animeData?.mal_id}`} {...props} />}
+  </Modal>
 }
 
 function ListDialogSession(props: Readonly<AddToListModalProps>) {
@@ -22,8 +24,8 @@ function ListDialogSession(props: Readonly<AddToListModalProps>) {
   const retry = () => {
     if (props.animeData) setRetryPromise(requestListDialog(props.animeData.mal_id, props.animeData.type))
   }
-  const placeholder = (message?: string) => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={props.onClose}>
-    <div role="dialog" aria-modal="true" aria-label="Agregar a lista" className="glass-card w-full max-w-md space-y-5 rounded-xl p-6" onClick={event => event.stopPropagation()}>
+  const placeholder = (message?: string) => <div className="w-full max-w-md">
+    <div className="border border-border bg-card w-full max-w-md space-y-5 rounded-xl p-6" onClick={event => event.stopPropagation()}>
       <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Agregar a lista</h2><button type="button" onClick={props.onClose} aria-label="Cerrar">✕</button></div>
       {message ? <><p role="alert">{message}</p><button type="button" onClick={retry} className="rounded-xl bg-primary px-4 py-2 text-white">Reintentar</button></> : <div role="status" aria-label="Cargando listas y progreso…" className="space-y-4"><span className="sr-only">Cargando listas y progreso…</span><Skeleton className="h-12" /><Skeleton className="h-28" /><Skeleton className="h-12" /></div>}
     </div>
@@ -85,25 +87,30 @@ function ListDialogForm({
 
     setIsCreating(true)
     setError(null)
-    const { data, error } = await createList(newName.trim(), newDescription.trim())
-    if (!error && data) {
-      if (mode === 'add-anime') {
-        setLists([data, ...lists])
-        const newSelected = new Set(selectedLists)
-        newSelected.add(data.id)
-        setSelectedLists(newSelected)
+    try {
+      const { data, error } = await createList(newName.trim(), newDescription.trim())
+      if (!error && data) {
+        if (mode === 'add-anime') {
+          setLists([data, ...lists])
+          const newSelected = new Set(selectedLists)
+          newSelected.add(data.id)
+          setSelectedLists(newSelected)
+        }
+        setNewName('')
+        setNewDescription('')
+        if (onListCreated) onListCreated()
+
+        if (mode === 'create') {
+          setTimeout(onClose, 500)
+        }
+      } else {
+        setError(error || 'Failed to create list')
       }
-      setNewName('')
-      setNewDescription('')
-      if (onListCreated) onListCreated()
-      
-      if (mode === 'create') {
-        setTimeout(onClose, 500)
-      }
-    } else {
-      setError(error || 'Failed to create list')
+    } catch {
+      setError("No se pudo crear la lista. Revisá tu conexión e intentá nuevamente.")
+    } finally {
+      setIsCreating(false)
     }
-    setIsCreating(false)
   }
 
   const handleSave = async () => {
@@ -120,20 +127,25 @@ function ListDialogForm({
       current_episode: episode === '' ? 0 : Number(episode)
     } : undefined
 
-    const result = await addAnimeToLists(
-      animeData, 
-      Array.from(selectedLists),
-      progressData
-    )
-    
-    if (result.success) {
-      if (result.warning) warning(result.warning)
-      onClose()
-      if (onListCreated) onListCreated() // Trigger refresh if needed
-    } else {
-      setError(result.error || 'Failed to save selection')
+    try {
+      const result = await addAnimeToLists(
+        animeData,
+        Array.from(selectedLists),
+        progressData
+      )
+
+      if (result.success) {
+        if (result.warning) warning(result.warning)
+        onClose()
+        if (onListCreated) onListCreated() // Trigger refresh if needed
+      } else {
+        setError(result.error || 'Failed to save selection')
+      }
+    } catch {
+      setError("No se pudieron guardar los cambios. Revisá tu conexión e intentá nuevamente.")
+    } finally {
+      setIsSaving(false)
     }
-    setIsSaving(false)
   }
 
   const renderListContent = () => {
@@ -181,8 +193,7 @@ function ListDialogForm({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
+      className="w-full max-w-md"
     >
       {/* Modal Content */}
       <div 
@@ -202,6 +213,7 @@ function ListDialogForm({
             )}
           </div>
           <button type="button"
+            autoFocus
             aria-label="Cerrar ventana de listas"
             onClick={onClose}
             className="text-text-muted hover:text-text-primary transition-colors cursor-pointer"

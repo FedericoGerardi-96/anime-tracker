@@ -2,24 +2,24 @@
 'use client'
 import { useState } from 'react';
 
-import AnimeCard from '@/components/cards/AnimeCard';
+import AnimeCard, { type AnimeCardProps } from '@/components/cards/AnimeCard';
 import AddToListModal from '@/components/ui/AddToListModal';
 import AuthModal from '@/components/auth/AuthModal';
 import { requestListDialog } from '@/lib/list-dialog-request';
 import type { ListDialogResult } from '@/interfaces/list-dialog';
 
 interface AnimeListContentProps {
-  animeList: any[];
+  animeList: AnimeCardProps[];
   userId?: string;
 }
 
 export default function AnimeListContent({ animeList, userId }: Readonly<AnimeListContentProps>) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [selectedAnime, setSelectedAnime] = useState<any>(null);
+  const [selectedAnime, setSelectedAnime] = useState<AnimeCardProps | null>(null);
   const [dataPromise, setDataPromise] = useState<Promise<ListDialogResult> | null>(null);
 
-  const handleAddClick = (anime: any) => {
+  const handleAddClick = (anime: AnimeCardProps) => {
     if (!userId) {
       setIsAuthModalOpen(true);
       return;

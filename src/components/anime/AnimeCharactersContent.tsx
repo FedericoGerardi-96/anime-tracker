@@ -1,23 +1,17 @@
 import Link from "next/link";
-import { getMalAnimeById } from "@/lib/myanimelist-service";
 import {
   CharacterProviderUnavailableError,
-  getAnimeCharacters,
+  getAnimeCharactersPage,
 } from "@/services/anilist-characters";
-import { getAuthenticatedUser } from "@/services/supabase";
-import type { DetailContentProps } from "@/interfaces/page";
+import Pagination from "@/components/ui/Pagination";
 import CharactersClient from "./CharactersClient";
 export default async function AnimeCharactersContent({
-  slug,
-}: Readonly<DetailContentProps>) {
+  slug, page = 1,
+}: Readonly<{ slug: string; page?: number }>) {
   const animeId = Number.parseInt(slug.split("-")[0]);
   let data;
   try {
-    data = await Promise.all([
-      getMalAnimeById(animeId),
-      getAuthenticatedUser(),
-      getAnimeCharacters(animeId),
-    ]);
+    data = await getAnimeCharactersPage(animeId, page);
   } catch (error) {
     if (!(error instanceof CharacterProviderUnavailableError)) throw error;
     return (
@@ -42,12 +36,9 @@ export default async function AnimeCharactersContent({
     );
   }
 
-  const [anime, user, characters] = data;
-  return (
-    <CharactersClient
-      initialCharacters={characters}
-      animeTitle={anime.title_english || anime.title}
-      canSaveTranslations={Boolean(user)}
-    />
-  );
+  return <>
+    <CharactersClient key={page} initialCharacters={data.characters} />
+    {data.characters.length === 0 && <p className="py-8 text-center">No hay personajes en esta página.</p>}
+    <Pagination currentPage={page} hasNextPage={data.hasNextPage} showBoundaryPages={false} />
+  </>;
 }

@@ -29,7 +29,7 @@ export default function AniListConnectionCard({ connection, result, missing }: {
       <div className="min-w-0 flex-1">
         <h4 className="font-bold text-text-primary">AniList</h4>
         <p className="mt-1 text-sm text-text-muted">{connection.connected ? `Conectado como ${connection.username}` : "No hay una cuenta vinculada."}</p>
-        <p className="mt-1 text-xs text-text-muted">{connection.needsReconnect ? "El acceso venció. Volvé a autorizar tu cuenta." : connection.connected ? "Tu cuenta está vinculada. Podés sincronizar tus bibliotecas en segundo plano." : "Conectá tu cuenta para sincronizar tus bibliotecas."}</p>
+        <p className="mt-1 text-xs text-text-muted">{connection.needsReconnect ? "El acceso venció. Volvé a autorizar tu cuenta." : connection.connected ? "Tu cuenta está vinculada. Podés sincronizar tus bibliotecas mientras usás la app." : "Conectá tu cuenta para sincronizar tus bibliotecas."}</p>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
         {connection.connected && !connection.needsReconnect && <AniListSyncButton />}

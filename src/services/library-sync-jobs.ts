@@ -1,30 +1,47 @@
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getAuthenticatedUser } from "@/services/supabase";
-import { publicJob } from "@/services/anilist-sync";
+import { publicJob, processAniListSyncStep } from "@/services/anilist-sync";
 import type { AniListSyncJob, SyncProvider, SyncState } from "@/interfaces/anilist-sync";
 
 const headers = { "Cache-Control": "no-store" };
+async function ownJobs(userId: string) {
+  const db = createSupabaseAdminClient();
+  const result = await db.from("anilist_sync_jobs").select("*").eq("user_id", userId)
+    .order("created_at", { ascending: false }).limit(20);
+  if (result.error) throw new Error("No se pudo consultar la cola de sincronización.");
+  const all = (result.data ?? []) as AniListSyncJob[];
+  return all.filter((job, index) => all.findIndex((other) => (other.provider ?? "anilist") === (job.provider ?? "anilist")) === index).map(publicJob);
+}
+
 export async function readSyncJobs(provider?: SyncProvider) {
   const user = await getAuthenticatedUser();
   if (!user) return Response.json({ error: "No autorizado" }, { status: 401, headers });
-  const db = createSupabaseAdminClient();
-  const [result, worker] = await Promise.all([
-    db.from("anilist_sync_jobs").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
-    db.from("anilist_sync_worker").select("heartbeat_at").eq("id", true).maybeSingle(),
-  ]);
-  if (result.error || worker.error) return Response.json({ error: "No se pudo consultar la cola de sincronización." }, { status: 503, headers });
-  const all = (result.data ?? []) as AniListSyncJob[];
-  const jobs = all.filter((job, index) => all.findIndex((other) => (other.provider ?? "anilist") === (job.provider ?? "anilist")) === index).map(publicJob);
-  const workerOnline = Boolean(worker.data?.heartbeat_at && Date.parse(worker.data.heartbeat_at) > Date.now() - 180000);
-  return Response.json(provider ? { job: jobs.find((job) => job.provider === provider) ?? null, workerOnline } : { jobs, workerOnline }, { headers });
+  try {
+    const jobs = await ownJobs(user.id);
+    return Response.json(provider ? { job: jobs.find(job => job.provider === provider) ?? null } : { jobs }, { headers });
+  } catch {
+    return Response.json({ error: "No se pudo consultar la cola de sincronización." }, { status: 503, headers });
+  }
+}
+
+export async function advanceSyncJob(request: Request) {
+  if (request.headers.get("origin") !== new URL(request.url).origin) return Response.json({ error: "Origen inválido" }, { status: 403, headers });
+  const user = await getAuthenticatedUser();
+  if (!user) return Response.json({ error: "No autorizado" }, { status: 401, headers });
+  try {
+    // Identity comes exclusively from the authenticated session, never request data.
+    const result = await processAniListSyncStep(user.id);
+    return Response.json({ jobs: await ownJobs(user.id), nextPollMs: result.nextPollMs }, { headers });
+  } catch {
+    return Response.json({ error: "No pudimos procesar la tanda. Se reintentará mientras la app esté abierta." }, { status: 503, headers });
+  }
 }
 
 export async function startSyncJob(request: Request, fixedProvider?: SyncProvider) {
   if (request.headers.get("origin") !== new URL(request.url).origin) return Response.json({ error: "Origen inválido" }, { status: 403, headers });
   const user = await getAuthenticatedUser();
   if (!user) return Response.json({ error: "No autorizado" }, { status: 401, headers });
-  if (!process.env.ANILIST_SYNC_WORKER_SECRET) return Response.json({ error: "Falta configurar el worker de sincronización." }, { status: 503, headers });
   const body = await request.json().catch(() => null);
   const provider = fixedProvider ?? body?.provider;
   if (provider !== "anilist" && provider !== "myanimelist") return Response.json({ error: "Proveedor inválido." }, { status: 400, headers });

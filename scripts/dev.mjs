@@ -1,3 +1,4 @@
+import "./generate-icon-subset.mjs";
 import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
@@ -15,9 +16,5 @@ const web = spawn(process.execPath, [require.resolve("next/dist/bin/next"), "dev
 children.push(web);
 web.on("exit", (code) => stop(code ?? 0));
 web.on("error", () => stop(1));
-if (process.env.ANILIST_SYNC_WORKER_SECRET) {
-  const worker = spawn(process.execPath, ["scripts/anilist-sync-worker.mjs"], { stdio: "inherit", windowsHide: true });
-  children.push(worker);
-  worker.on("error", () => console.error("No se pudo iniciar el worker de AniList. Usá npm run worker:anilist."));
-}
+
 for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => stop());

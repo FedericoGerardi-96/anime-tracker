@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { AnimeCharacter } from "@/interfaces/character";
 import { slugify } from "@/lib/utils";
 import TranslatedCharacterDescription from "@/components/anime/TranslatedCharacterDescription";
@@ -16,8 +17,6 @@ export default function CharactersClient({
   initialCharacters,
 }: Readonly<{
   initialCharacters: AnimeCharacter[];
-  animeTitle: string;
-  canSaveTranslations: boolean;
 }>) {
   const [selected, setSelected] = useState<AnimeCharacter | null>(
     initialCharacters[0] ?? null,
@@ -36,16 +35,16 @@ export default function CharactersClient({
               className={`group relative overflow-hidden rounded-2xl border-2 bg-card text-left transition hover:scale-[1.02] ${selected?.id === character.id ? "border-primary shadow-2xl shadow-primary/20" : "border-border hover:border-primary/50"}`}
             >
               <div className="relative aspect-3/4">
-                <img
+                <Image fill sizes="(max-width: 639px) 44vw, (max-width: 767px) 29vw, (max-width: 1279px) 21vw, 15vw"
                   className={`size-full object-cover transition duration-500 group-hover:scale-105 group-hover:grayscale-0 ${selected?.id === character.id ? "grayscale-0" : "grayscale"}`}
-                  src={character.image}
+                  src={character.image || "/placeholder-cover.svg"}
                   alt={character.name}
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/90 via-transparent to-transparent" />
               </div>
               <div className="absolute inset-x-0 bottom-0 p-4">
                 <span
-                  className={`mb-1 block w-fit rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.18em] ${character.role === "MAIN" ? "bg-primary text-white" : "bg-black/60 text-slate-200"}`}
+                  className={`mb-1 block w-fit rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.18em] ${character.role === "MAIN" ? "bg-primary text-primary-foreground" : "bg-black/60 text-slate-200"}`}
                 >
                   {ROLE_LABELS[character.role]}
                 </span>
@@ -62,9 +61,9 @@ export default function CharactersClient({
         {selected && (
           <div className="sticky top-24 overflow-hidden rounded-4xl border border-border bg-card p-7 shadow-2xl">
             <div className="mb-6 flex items-center gap-4">
-              <img
+              <Image width={80} height={80} sizes="80px"
                 className="size-20 shrink-0 rounded-2xl border-2 border-primary object-cover"
-                src={selected.image}
+                src={selected.image || "/placeholder-cover.svg"}
                 alt={selected.name}
               />
               <div className="min-w-0">
@@ -88,9 +87,9 @@ export default function CharactersClient({
             </div>
             {voiceActor && (
               <div className="mt-6 flex items-center gap-4 rounded-2xl border border-border bg-muted/50 p-4">
-                <img
+                <Image width={48} height={48} sizes="48px"
                   className="size-12 rounded-full object-cover"
-                  src={voiceActor.image}
+                  src={voiceActor.image || "/placeholder-cover.svg"}
                   alt={voiceActor.name}
                 />
                 <div className="min-w-0 flex-1">

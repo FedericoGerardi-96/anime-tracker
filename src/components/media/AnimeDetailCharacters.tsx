@@ -1,15 +1,13 @@
 import Link from "next/link";
+import Image from "next/image";
 import { slugify } from "@/lib/utils";
-import { getAnimeCharacters } from "@/services/anilist-characters";
+import { getAnimeCharacterPreview } from "@/services/anilist-characters";
 import type { MediaSectionProps } from "@/interfaces/media-detail-components";
 export default async function AnimeDetailCharacters({
   malId,
   slug,
 }: Readonly<MediaSectionProps>) {
-  const characters = await getAnimeCharacters(malId).catch(() => []);
-  const mainCharacters = characters
-    .filter((character) => character.role === "MAIN")
-    .slice(0, 6);
+  const mainCharacters = await getAnimeCharacterPreview(malId).catch(() => []);
   return (
     <>
       {mainCharacters.length > 0 && (
@@ -19,9 +17,6 @@ export default async function AnimeDetailCharacters({
               <h2 className="text-2xl font-bold text-text-primary">
                 Personajes principales
               </h2>
-              <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold text-text-muted">
-                {characters.length} EN TOTAL
-              </span>
             </div>
             <Link
               href={`/anime/${slug}/characters`}
@@ -40,9 +35,9 @@ export default async function AnimeDetailCharacters({
                 key={`${character.provider}-${character.id}`}
                 className="flex flex-col items-center rounded-2xl p-3 text-center transition hover:scale-105"
               >
-                <img
+                <Image width={96} height={96} sizes="96px"
                   className="mb-3 size-24 rounded-full border-2 border-primary/20 object-cover shadow-lg"
-                  src={character.image}
+                  src={character.image || "/placeholder-cover.svg"}
                   alt={character.name}
                 />
                 <p className="w-full truncate text-sm font-bold text-text-primary">

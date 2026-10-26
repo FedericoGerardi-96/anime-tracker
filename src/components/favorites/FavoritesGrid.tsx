@@ -56,19 +56,24 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
   const handleRemove = async (media: Media) => {
     if (confirm(`¿Quitar "${media.title}" de favoritos?`)) {
       setRemovingId(media.mal_id)
-      const res = await toggleFavorite({
-        mal_id: media.mal_id,
-        title: media.title,
-        image: media.image,
-        type: media.type as 'anime' | 'manga',
-      })
-      if (res.success) {
-        router.refresh()
-        if (res.warning) warning(res.warning)
-      } else if (res.error) {
-        error(res.error)
+      try {
+        const res = await toggleFavorite({
+          mal_id: media.mal_id,
+          title: media.title,
+          image: media.image,
+          type: media.type as 'anime' | 'manga',
+        })
+        if (res.success) {
+          router.refresh()
+          if (res.warning) warning(res.warning)
+        } else if (res.error) {
+          error(res.error)
+        }
+      } catch {
+        error('No se pudo quitar el favorito. Revisá tu conexión e intentá nuevamente.')
+      } finally {
+        setRemovingId(null)
       }
-      setRemovingId(null)
     }
   }
 
@@ -82,7 +87,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
             onClick={() => setViewMode('grid')}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-xs font-bold uppercase tracking-wider cursor-pointer ${
               viewMode === 'grid'
-                ? 'bg-primary text-white shadow-lg'
+                ? 'bg-primary text-primary-foreground shadow-lg'
                 : 'text-text-muted hover:text-text-primary'
             }`}
           >
@@ -94,7 +99,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
             onClick={() => setViewMode('list')}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-xs font-bold uppercase tracking-wider cursor-pointer ${
               viewMode === 'list'
-                ? 'bg-primary text-white shadow-lg'
+                ? 'bg-primary text-primary-foreground shadow-lg'
                 : 'text-text-muted hover:text-text-primary'
             }`}
           >
@@ -123,7 +128,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                     className="w-full! h-full! object-cover transition-transform duration-700 group-hover:scale-110"
                     src={
                       media.image ||
-                      "https://via.placeholder.com/300x400?text=No+Image"
+                      "/placeholder-cover.svg"
                     }
                     width={300}
                     height={400}
@@ -257,7 +262,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                   <div className="w-16 h-22 rounded-xl overflow-hidden shrink-0 border border-white/5 relative aspect-3/4 shadow-lg">
                     <Image
                       alt={media.title}
-                      src={media.image || "https://via.placeholder.com/300x400?text=No+Image"}
+                      src={media.image || "/placeholder-cover.svg"}
                       fill
                       sizes="64px"
                       loading={index < 2 ? 'eager' : 'lazy'}

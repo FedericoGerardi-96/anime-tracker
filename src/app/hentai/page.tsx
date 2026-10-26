@@ -43,7 +43,7 @@ export default async function HentaiPage({
   const currentPage = Math.max(1, Number.parseInt(params.page ?? "1", 10));
   const query = (params.q ?? "").trim();
 
-  const { data, count, error: _error } = await getHentaiEntries(currentPage, PAGE_SIZE, query);
+  const { data, count } = await getHentaiEntries(currentPage, PAGE_SIZE, query);
 
   const totalCount = count || 0;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);

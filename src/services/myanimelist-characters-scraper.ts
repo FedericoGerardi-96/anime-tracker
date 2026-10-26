@@ -1,4 +1,5 @@
 import 'server-only';
+import { unstable_cache } from 'next/cache';
 
 import * as cheerio from 'cheerio';
 import type { AnimeCharacter, CharacterAppearance, CharacterDetail, CharacterSearchResult, CharacterVoiceActor } from '@/interfaces/character';
@@ -32,7 +33,7 @@ function japaneseVoiceActor($: cheerio.CheerioAPI, table: ReturnType<cheerio.Che
   return [{ id, name: clean(link.text()), image: originalImage(row.find('img').attr('data-src') || row.find('img').attr('src')), language: 'Japonés', url: link.attr('href') || `${MAL_ORIGIN}/people/${id}` }];
 }
 
-export async function scrapeMalAnimeCharacters(animeMalId: number): Promise<AnimeCharacter[]> {
+export const scrapeMalAnimeCharacters = unstable_cache(async (animeMalId: number): Promise<AnimeCharacter[]> => {
   const $ = cheerio.load(await html(`/anime/${animeMalId}/_/characters`));
   const characters: AnimeCharacter[] = [];
   $('.js-anime-character-table').each((_, element) => {
@@ -52,7 +53,7 @@ export async function scrapeMalAnimeCharacters(animeMalId: number): Promise<Anim
   });
   if (!characters.length) throw new MalScrapingUnavailableError();
   return characters;
-}
+}, ['mal-anime-characters-v1'], { revalidate: 3600 });
 
 export async function scrapeMalCharacterSearch(query: string): Promise<CharacterSearchResult> {
   const $ = cheerio.load(await html(`/character.php?q=${encodeURIComponent(query)}&cat=character`));

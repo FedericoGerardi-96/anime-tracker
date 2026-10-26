@@ -1,7 +1,8 @@
 import 'server-only';
+import { selectFavoritePage } from '@/lib/favorite-collection';
 import { hasExtendedLibraryFilters, filterValues } from '@/lib/library-filters';
 import { getSupabaseServer, getAuthenticatedUser } from '@/services/supabase';
-import { getAllFavoritesFull, getFavorites } from '@/services/favorites';
+import { getAllFavoritesFull } from '@/services/favorites';
 import type { FavoritesPageData, GetFavoritesOptions } from '@/interfaces/favorites-service';
 
 export async function getFavoritesPageData(userId: string, options: GetFavoritesOptions): Promise<FavoritesPageData> {
@@ -17,7 +18,8 @@ export async function getFavoritesPageData(userId: string, options: GetFavorites
   }
 
   // Temporary compatibility path: remove after the SQL migration is deployed.
-  const [result, allFavorites] = await Promise.all([getFavorites(userId, options), getAllFavoritesFull(userId)]);
+  const allFavorites = await getAllFavoritesFull(userId);
+  const result = selectFavoritePage(allFavorites, options);
   const media = allFavorites.flatMap(favorite => {
     const item = Array.isArray(favorite.media) ? favorite.media[0] : favorite.media;
     return item ? [item] : [];

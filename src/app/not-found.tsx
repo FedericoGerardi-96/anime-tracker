@@ -1,5 +1,4 @@
 import Link from 'next/link';
-// @ts-ignore
 import './not-found.css';
 
 const NotFound = () => {

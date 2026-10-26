@@ -22,7 +22,7 @@ function AnimePoster({
           src={image}
           alt={title}
           fill
-          sizes="(max-width: 640px) 42vw, (max-width: 1024px) 22vw, 180px"
+          sizes="(max-width: 639px) 44vw, (max-width: 767px) 29vw, (max-width: 1023px) 17vw, (max-width: 1279px) 8vw, 114px"
           className="object-cover transition duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/70 to-transparent" />

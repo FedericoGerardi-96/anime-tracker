@@ -4,20 +4,21 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "next build",
+    "build": "node scripts/generate-icon-subset.mjs && next build",
     "start": "next start",
     "lint": "eslint",
-    "worker:anilist": "node scripts/anilist-sync-worker.mjs",
-    "worker:sync": "node scripts/anilist-sync-worker.mjs",
     "test:anilist-sync": "node --test tests/anilist-sync-policy.test.mjs",
     "test:provider-sync": "node --test tests/media-provider-sync.test.mjs",
-    "test:oauth-return": "node --test tests/oauth-return-path.test.mjs"
+    "test:oauth-return": "node --test tests/oauth-return-path.test.mjs",
+    "icons:generate": "node scripts/generate-icon-subset.mjs",
+    "test:audit": "node --test tests/library-pagination.test.mjs tests/character-loading.test.mjs tests/translation-ssr.test.mjs",
+    "test:sync": "node --test tests/browser-sync.test.mjs tests/sync-lease.test.mjs tests/sync-route.test.mjs tests/sync-step.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.3",
     "cheerio": "^1.2.0",
-    "next": "16.1.6",
+    "next": "16.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "use-debounce": "^10.1.0",
@@ -29,7 +30,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "16.4.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

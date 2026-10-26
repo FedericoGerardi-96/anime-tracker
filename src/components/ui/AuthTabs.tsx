@@ -8,12 +8,12 @@ export default function AuthTabs() {
   const isLogin = pathname === "/login";
 
   return (
-    <div className="flex bg-slate-950/40 p-1 rounded-xl mb-8">
+    <div className="flex bg-muted p-1 rounded-xl mb-8">
       <Link 
         href="/login"
         className={`
           flex-1 py-2 text-sm font-semibold rounded-lg text-center transition-all
-          ${isLogin ? "bg-white/10 text-white shadow-sm" : "text-slate-400 hover:text-white"}
+          ${isLogin ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}
         `}
       >
         Login
@@ -22,7 +22,7 @@ export default function AuthTabs() {
         href="/register"
         className={`
           flex-1 py-2 text-sm font-semibold rounded-lg text-center transition-all
-          ${isLogin ? "text-slate-400 hover:text-white" : "bg-white/10 text-white shadow-sm"}
+          ${isLogin ? "text-muted-foreground hover:text-foreground" : "bg-card text-foreground shadow-sm"}
         `}
       >
         Register

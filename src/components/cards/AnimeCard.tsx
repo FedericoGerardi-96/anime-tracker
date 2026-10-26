@@ -27,7 +27,7 @@ export interface AnimeCardProps {
   totalUnits?: number;
   type?: 'anime' | 'manga';
   userId?: string;
-  onAddClick?: (anime: any) => void;
+  onAddClick?: (anime: AnimeCardProps) => void;
   priorityImage?: boolean;
 }
 
@@ -72,27 +72,32 @@ export default function AnimeCard({
     setOptimisticFavorite(!optimisticFavorite);
 
     startTransition(async () => {
-      const result = await toggleFavorite({
-        mal_id: Number(id),
-        title,
-        image,
-        type,
-        synopsis,
-        season,
-        year,
-        genres,
-        tags,
-        format,
-        status,
-        totalUnits: totalUnits ?? episodes,
-        score
-      });
-      // if there's an error, revert state
-      if (result?.error) {
-        setOptimisticFavorite(prev => !prev);
-        error(result.error);
-      } else if (result?.warning) {
-        warning(result.warning);
+      try {
+        const result = await toggleFavorite({
+          mal_id: Number(id),
+          title,
+          image,
+          type,
+          synopsis,
+          season,
+          year,
+          genres,
+          tags,
+          format,
+          status,
+          totalUnits: totalUnits ?? episodes,
+          score
+        });
+        // if there's an error, revert state
+        if (result?.error) {
+          setOptimisticFavorite(prev => !prev);
+          error(result.error);
+        } else if (result?.warning) {
+          warning(result.warning);
+        }
+      } catch {
+        setOptimisticFavorite(isFavorite);
+        error('No se pudo actualizar el favorito. Revisá tu conexión e intentá nuevamente.');
       }
     });
   };

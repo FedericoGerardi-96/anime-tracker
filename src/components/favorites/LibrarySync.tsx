@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { createBrowserSyncRunner, type SyncBatch } from "@/lib/browser-sync";
 import Dropdown from "@/components/dropdown/dropdown";
 import type { PublicAniListSyncJob as SyncJob, SyncProvider } from "@/interfaces/anilist-sync";
 
@@ -19,11 +20,10 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
   const [selection, setSelection] = useState({ anime: true, manga: true });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [workerOnline, setWorkerOnline] = useState(false);
   const [connectionLost, setConnectionLost] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const previous = useRef<SyncJob[]>([]);
-  const version = useRef(0);
+  const sessionVersion = useRef({ value: 0 });
   const refresh = useRef<() => void>(() => {});
 
   const accept = useCallback((next: SyncJob[]) => {
@@ -34,90 +34,54 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const supabase = createClient();
+    const sessionEpoch = sessionVersion.current;
     let disposed = false;
     let userId: string | undefined;
-    let channel: ReturnType<typeof supabase.channel> | undefined;
-    let connected = false;
-    let inFlight = false;
-    let dirty = false;
-    let generation = 0;
-    let controller: AbortController | undefined;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-
-    async function reload() {
-      if (disposed || !userId) return;
-      if (inFlight) { dirty = true; return; }
-      clearTimeout(timer);
-      inFlight = true;
-      const requestGeneration = generation;
-      const currentVersion = version.current;
-      controller = new AbortController();
-      try {
-        const response = await fetch("/api/library/sync", { cache: "no-store", signal: controller.signal });
-        const data = response.ok ? await response.json() : null;
-        if (!disposed && requestGeneration === generation && currentVersion === version.current) {
-          if (response.status === 401) accept([]);
-          else if (response.ok) { accept(data.jobs); setWorkerOnline(data.workerOnline); setConnectionLost(false); }
-          else setConnectionLost(true);
-        }
-      } catch {
-        if (!disposed && requestGeneration === generation) setConnectionLost(true);
-      } finally {
-        inFlight = false;
-        if (!disposed && userId) {
-          if (dirty || requestGeneration !== generation || currentVersion !== version.current) {
-            dirty = false;
-            void reload();
-          } else {
-            // Reconcile missed events; idle healthy connections only read every five minutes.
-            timer = setTimeout(() => void reload(), connected ? previous.current.some(active) ? 60000 : 300000 : 30000);
-          }
-        }
-      }
-    }
-    refresh.current = () => void reload();
+    let runner: ReturnType<typeof createBrowserSyncRunner> | undefined;
+    const canRun = () => document.visibilityState === "visible" && navigator.onLine;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (disposed || userId === session?.user.id) return;
       userId = session?.user.id;
-      generation++;
-      connected = false;
-      controller?.abort();
-      clearTimeout(timer);
-      if (channel) void supabase.removeChannel(channel);
-      channel = undefined;
+      sessionEpoch.value++;
+      runner?.dispose();
+      runner = undefined;
       previous.current = [];
       setJobs([]);
-      setWorkerOnline(false);
       setConnectionLost(false);
+      setOpen(false);
+      setError("");
       if (!userId) return;
-      const channelGeneration = generation;
-      channel = supabase.channel(`library-sync:${userId}`, { config: { private: true } })
-        .on("broadcast", { event: "changed" }, () => {
-          if (!disposed && channelGeneration === generation) void reload();
-        })
-        .subscribe((status) => {
-          if (disposed || channelGeneration !== generation) return;
-          connected = status === "SUBSCRIBED";
-          if (connected) void reload(); // Includes reconnects after missed notifications.
-          else {
-            clearTimeout(timer);
-            timer = setTimeout(() => void reload(), 30000);
-          }
-        });
-      // Do not await Supabase calls inside the auth callback.
-      queueMicrotask(() => void reload());
+      runner = createBrowserSyncRunner({
+        canRun,
+        onJobs: accept,
+        onError: setConnectionLost,
+        async request(step) {
+          const response = await fetch(step ? "/api/library/sync/step" : "/api/library/sync", {
+            method: step ? "POST" : "GET", cache: "no-store", signal: AbortSignal.timeout(65_000),
+          });
+          if (!response.ok) throw Object.assign(new Error("No se pudo actualizar la sincronización."), { status: response.status });
+          return await response.json() as SyncBatch;
+        },
+      });
+      const current = runner;
+      // Never await Supabase/network work inside its auth callback.
+      queueMicrotask(() => current.refresh());
     });
-    const reconcile = () => { if (document.visibilityState === "visible") void reload(); };
+    refresh.current = () => runner?.refresh();
+    const reconcile = () => { if (canRun()) runner?.refresh(); else runner?.pause(); };
+    document.addEventListener("visibilitychange", reconcile);
     window.addEventListener("online", reconcile);
+    window.addEventListener("offline", reconcile);
     window.addEventListener("focus", reconcile);
     return () => {
       disposed = true;
+      sessionEpoch.value++;
       refresh.current = () => {};
+      runner?.dispose();
       subscription.unsubscribe();
-      controller?.abort();
-      clearTimeout(timer);
-      if (channel) void supabase.removeChannel(channel);
+      document.removeEventListener("visibilitychange", reconcile);
       window.removeEventListener("online", reconcile);
+      window.removeEventListener("offline", reconcile);
       window.removeEventListener("focus", reconcile);
     };
   }, [accept]);
@@ -139,15 +103,16 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
   function minimize() { setOpen(false); }
 
   async function mutate(url: string, body?: unknown) {
-    version.current++;
+    const currentSession = sessionVersion.current.value;
     setBusy(true); setError("");
     try {
       const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo procesar la solicitud.");
+      if (currentSession !== sessionVersion.current.value) return;
       accept([data.job, ...previous.current.filter((job) => job.provider !== data.job.provider)]);
-    } catch (failure) { setError(failure instanceof Error ? failure.message : "No se pudo procesar la solicitud."); }
-    finally { version.current++; setBusy(false); refresh.current(); }
+    } catch (failure) { if (currentSession === sessionVersion.current.value) setError(failure instanceof Error ? failure.message : "No se pudo procesar la solicitud."); }
+    finally { setBusy(false); if (currentSession === sessionVersion.current.value) refresh.current(); }
   }
 
   function download(job: SyncJob) {
@@ -163,7 +128,7 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
   const renderJob = (job: SyncJob) => (
     <section key={job.id} className="rounded-2xl border border-border p-4" aria-label={`Progreso de ${names[job.provider]}`}>
           <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-bold">{names[job.provider]}</h3><span className={`rounded-full px-3 py-1 text-xs font-semibold ${active(job) ? "bg-sky-500/10 text-sky-400" : job.status === "error" ? "bg-red-500/10 text-red-400" : "bg-muted text-muted-foreground"}`}>{job.cancelRequested && active(job) ? "Cancelando…" : { queued: "En cola", running: "En curso", complete: "Completada", error: "Requiere atención", cancelled: "Cancelada" }[job.status]}</span></div>
-          <p role="status" className="mt-3 text-sm text-muted-foreground">{job.cancelRequested && active(job) ? "Se detendrá al finalizar la operación en curso. Lo ya sincronizado se conserva." : active(job) && !workerOnline ? "Esperando al proceso de sincronización en segundo plano." : job.message}</p>
+          <p role="status" className="mt-3 text-sm text-muted-foreground">{job.cancelRequested && active(job) ? "Se detendrá al finalizar la operación en curso. Lo ya sincronizado se conserva." : job.message}</p>
           {active(job) && <progress className="mt-4 h-2 w-full overflow-hidden rounded-full accent-primary [&::-moz-progress-bar]:bg-primary [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-value]:bg-primary" aria-label={`Avance de ${names[job.provider]}`} max={job.total || undefined} value={job.total ? job.current : undefined} />}
           {active(job) && job.total > 0 && <p className="mt-1 text-right text-xs text-muted-foreground">{job.current} de {job.total} en esta etapa</p>}
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{[["Importadas", job.imported], ["Exportadas", job.exported], ["Actualizadas", job.updated], ["Omitidas", job.skipped]].map(([label, count]) => <div key={label} className="rounded-xl bg-muted/60 p-3 text-center"><strong className="block text-lg">{count}</strong><span className="text-xs text-muted-foreground">{label}</span></div>)}</div>
@@ -191,7 +156,7 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
     </button>}
     <dialog ref={dialog} onCancel={(event) => { event.preventDefault(); minimize(); }} onClose={minimize} onClick={(event) => { if (event.target === event.currentTarget) minimize(); }} aria-labelledby="library-sync-title" className="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-3xl border border-border bg-background p-0 text-foreground shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm">
       <div className="flex items-start justify-between gap-4 border-b border-border p-5 sm:p-6">
-        <div><h2 id="library-sync-title" className="text-xl font-bold">Sincronizaciones</h2><p className="mt-1 text-sm text-muted-foreground">{running ? "El trabajo sigue en segundo plano. Podés minimizar este panel." : "Elegí qué bibliotecas querés comparar y sincronizar."}</p></div>
+        <div><h2 id="library-sync-title" className="text-xl font-bold">Sincronizaciones</h2><p className="mt-1 text-sm text-muted-foreground">{running ? "Podés minimizar este panel y seguir usando la app. Si cerrás o dejás esta pestaña, se pausa después de la tanda actual y retoma al volver." : "Elegí qué bibliotecas querés comparar y sincronizar."}</p></div>
         <button type="button" onClick={minimize} aria-label="Minimizar panel de sincronización" className="cursor-pointer rounded-xl border border-border p-2 transition hover:bg-muted"><span className="material-symbols-outlined block">remove</span></button>
       </div>
       <div className="space-y-5 p-5 sm:p-6">
@@ -199,7 +164,7 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
           <h3 className="font-bold">Nueva sincronización</h3>
           <div className="mt-3 text-sm"><p className="mb-2">Plataforma</p><Dropdown ariaLabel="Plataforma de sincronización" value={provider} disabled={busy} onChange={(value) => { setProvider(value as SyncProvider); setError(""); }} options={[{ value: "anilist", label: "AniList" }, { value: "myanimelist", label: "MyAnimeList" }]} className="!w-full" buttonClassName="!w-full rounded-xl bg-card py-3" menuClassName="!w-full" /></div>
           <div className="my-4 flex gap-6">{(["anime", "manga"] as const).map((type) => <label key={type} className="flex cursor-pointer items-center gap-2 text-sm"><input type="checkbox" checked={selection[type]} disabled={busy} onChange={(event) => setSelection((current) => ({ ...current, [type]: event.target.checked }))} className="size-4 accent-primary" />{type === "anime" ? "Anime" : "Manga"}</label>)}</div>
-          <p className="text-xs text-muted-foreground">Se comparan tus bibliotecas y se aplican solo las diferencias. No se eliminan favoritos.</p>
+          <p className="text-xs text-muted-foreground">Se comparan tus bibliotecas y se aplican solo las diferencias. No se eliminan favoritos. Mantené la app abierta y visible hasta terminar; el avance se guarda para retomarlo después.</p>
           {error && <p role="alert" className="mt-3 text-sm text-red-400">{error}</p>}
           <div className="mt-4 flex justify-end"><button type="button" disabled={busy || running || (!selection.anime && !selection.manga)} onClick={() => void mutate("/api/library/sync", { provider, ...selection })} className="cursor-pointer rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50">{busy ? "Procesando…" : selectedJob?.status === "cancelled" || selectedJob?.status === "error" ? "Reevaluar y sincronizar" : `Sincronizar con ${names[provider]}`}</button></div>
           {running && <p className="mt-2 text-right text-xs text-muted-foreground">Esperá o cancelá el trabajo activo para iniciar otro.</p>}

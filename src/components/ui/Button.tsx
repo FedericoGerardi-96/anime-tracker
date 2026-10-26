@@ -7,7 +7,7 @@ export default function Button({ variant = "primary", isLoading, className = "",
   const baseStyles = "w-full py-3.5 rounded-xl text-sm font-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
   
   const variants = {
-    primary: "bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/40",
+    primary: "bg-primary text-primary-foreground shadow-xl shadow-primary/20 hover:shadow-primary/40",
     secondary: "bg-slate-700/50 text-white hover:bg-slate-700 transition-colors",
     outline: "bg-transparent border border-white/10 text-white hover:bg-white/5",
     ghost: "bg-transparent text-slate-400 hover:text-white hover:bg-white/5 font-semibold py-2 px-4 rounded-lg",

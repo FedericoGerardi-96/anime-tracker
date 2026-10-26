@@ -19,7 +19,7 @@ function DetailRecommendationList({
   return (
     <section className="mt-20 pb-10">
       <h2 className="mb-8 text-2xl font-bold text-foreground">
-        {mediaType === "anime" ? "More Like This" : "Recommended Reads"}
+        {mediaType === "anime" ? "Si te gustó, mira esto" : "Si te gustó, lee esto"}
       </h2>
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
         {recommendations.map(({ entry }) => (

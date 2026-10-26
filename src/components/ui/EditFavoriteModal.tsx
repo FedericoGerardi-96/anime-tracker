@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback, KeyboardEvent } from 'react'
+import { useState, useCallback, KeyboardEvent } from 'react'
 import Image from 'next/image'
+import Modal from '@/components/ui/Modal'
 import { upsertUserMediaMetadata } from '@/lib/actions/favorite-metadata'
 import { updatePersonalProgress } from '@/lib/actions/lists'
 import { useToast } from '@/components/ui/Toast'
@@ -44,16 +45,6 @@ export default function EditFavoriteModal({
   )
   const [tagInput, setTagInput] = useState('')
   const [error, setError] = useState<string | null>(null)
-
-  // Close on Escape key
-  useEffect(() => {
-    if (!isOpen) return
-    const handleEsc = (e: globalThis.KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleEsc)
-    return () => document.removeEventListener('keydown', handleEsc)
-  }, [isOpen, onClose])
 
   const handleAddTag = useCallback(() => {
     const tag = tagInput.trim().toLowerCase()
@@ -100,13 +91,10 @@ export default function EditFavoriteModal({
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm cursor-default"
-      onClick={onClose}
-    >
+    <Modal open={isOpen} onClose={onClose} label={`Editar ${mediaData.title}`}>
       {/* Modal Content */}
       <div
-        className="glass-card w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+        className="border border-border bg-card w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with media preview */}
@@ -114,7 +102,7 @@ export default function EditFavoriteModal({
           {/* Background blur image */}
           <div className="absolute inset-0 overflow-hidden">
             <Image
-              src={mediaData.image || 'https://via.placeholder.com/300x400?text=No+Image'}
+              src={mediaData.image || '/placeholder-cover.svg'}
               alt=""
               fill
               className="object-cover blur-2xl scale-150 opacity-30"
@@ -126,7 +114,7 @@ export default function EditFavoriteModal({
             {/* Thumbnail */}
             <div className="w-16 h-22 rounded-lg overflow-hidden shrink-0 border border-white/10 shadow-lg">
               <Image
-                src={mediaData.image || 'https://via.placeholder.com/300x400?text=No+Image'}
+                src={mediaData.image || '/placeholder-cover.svg'}
                 alt={mediaData.title}
                 width={64}
                 height={88}
@@ -297,6 +285,6 @@ export default function EditFavoriteModal({
             </div>
           </>
       </div>
-    </div>
+    </Modal>
   )
 }

@@ -1,6 +1,5 @@
 'use client';
 import { useEffect } from 'react';
-//@ts-ignore
 import './not-found.css';
 
 export default function ErrorPage({ error, unstable_retry }: Readonly<{ error: Error & { digest?: string }; unstable_retry: () => void }>) {

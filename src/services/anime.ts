@@ -5,9 +5,8 @@ import {
   getMalYearOptions,
   mapMalAnimeToCard,
 } from "@/lib/myanimelist-service";
-import type { FavoriteMediaRow, HentaiFavoriteRow } from "@/interfaces/anime-service";
 import type { MalAnimeCatalogOptions } from "@/interfaces/myanimelist";
-import { getSupabaseServer } from "@/services/supabase";
+import { getCatalogFavoriteIds } from "@/services/catalog-favorites";
 import { getAniListCatalog } from '@/services/anilist-catalog';
 import type { AniListCatalogOptions, CatalogProvider } from '@/interfaces/anilist-catalog';
 
@@ -34,32 +33,7 @@ export async function getAnimeListWithFavorites(options: MalAnimeCatalogOptions 
     totalPages = undefined;
     hasNextPage = catalog.hasNextPage;
   }
-  const favoriteMalIds = new Set<number>();
-
-  if (userId) {
-    const supabase = await getSupabaseServer();
-    const [{ data: favorites }, { data: hentaiFavorites }] = await Promise.all([
-      supabase
-        .from("favorites")
-        .select("media!inner(mal_id, type)")
-        .eq("user_id", userId)
-        .eq("media.type", "anime"),
-      supabase
-        .from("hentai")
-        .select("mal_id")
-        .eq("user_id", userId)
-        .eq("type", "anime").not("mal_id", "is", null),
-    ]);
-
-    for (const favorite of (favorites ?? []) as FavoriteMediaRow[]) {
-      const media = Array.isArray(favorite.media) ? favorite.media[0] : favorite.media;
-      if (media?.mal_id != null) favoriteMalIds.add(Number(media.mal_id));
-    }
-
-    for (const favorite of (hentaiFavorites ?? []) as HentaiFavoriteRow[]) {
-      if (favorite.mal_id != null) favoriteMalIds.add(Number(favorite.mal_id));
-    }
-  }
+  const favoriteMalIds = await getCatalogFavoriteIds(userId, 'anime', displayAnime.map(item => Number(item.id)));
 
   displayAnime = displayAnime.map((anime) => ({ ...anime, isFavorite: favoriteMalIds.has(Number(anime.id)) }));
   return {

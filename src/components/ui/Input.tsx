@@ -12,7 +12,7 @@ export default function Input({ label, icon, error, forgotLink, ...props }: Read
     <div className="space-y-1.5 w-full">
       <div className="flex justify-between items-center ml-1">
         {label && (
-          <label htmlFor={inputId} className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <label htmlFor={inputId} className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
             {label}
           </label>
         )}
@@ -24,7 +24,7 @@ export default function Input({ label, icon, error, forgotLink, ...props }: Read
       </div>
       <div className="relative">
         {icon && (
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg">
             {icon}
           </span>
         )}
@@ -35,7 +35,7 @@ export default function Input({ label, icon, error, forgotLink, ...props }: Read
             w-full bg-slate-dark/50 border-white/5 border rounded-xl py-3 
             ${icon ? "pl-12" : "pl-4"} pr-4 text-sm 
             focus:ring-1 focus:ring-primary focus:bg-slate-dark/80 
-            transition-all outline-none text-white placeholder:text-slate-400
+            transition-all outline-none text-foreground placeholder:text-muted-foreground
             ${error ? "border-red-500" : "border-white/5"}
           `}
           {...props}

@@ -1,6 +1,7 @@
 
 'use server'
 
+import { readAllPages, readInBatches } from '@/lib/read-all-pages'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/services/supabase'
 import { revalidatePath } from 'next/cache'
@@ -40,16 +41,12 @@ export async function getLists() {
     return { error: 'Not authenticated', data: null }
   }
 
-  const { data, error } = await supabase
+  const data = await readAllPages((from, to) => supabase
     .from('lists')
     .select('*')
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false }).order('id').range(from, to))
 
-  if (error) {
-    console.error('Error fetching lists:', error)
-    return { error: error.message, data: null }
-  }
 
   return { error: null, data }
 }
@@ -103,7 +100,7 @@ export async function getMediaByProgressStatus(status: string) {
 
   if (!user) return []
 
-  const { data, error } = await supabase
+  const data = await readAllPages((from, to) => supabase
     .from('user_media_progress')
     .select(`
       id,
@@ -117,12 +114,8 @@ export async function getMediaByProgressStatus(status: string) {
     `)
     .eq('user_id', user.id)
     .eq('status', status)
-    .order('updated_at', { ascending: false })
+    .order('updated_at', { ascending: false }).order('id').range(from, to))
 
-  if (error || !data) {
-    console.error(`Error fetching progress for status ${status}:`, error)
-    return []
-  }
 
   return data
 }
@@ -135,7 +128,7 @@ export async function getListMedia(listId: string) {
 
   // Check if user owns list or if it's public (we only check strictly for user here to keep it simple)
   // But usually we just fetch the items
-  const { data, error } = await supabase
+  const data = await readAllPages((from, to) => supabase
     .from('list_media')
     .select(`
       id,
@@ -143,22 +136,18 @@ export async function getListMedia(listId: string) {
       media ( id, mal_id, title, image, type, season, year, genres, format, status, total_units, score )
     `)
     .eq('list_id', listId)
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false }).order('id').range(from, to))
 
-  if (error || !data) {
-    console.error(`Error fetching media for list ${listId}:`, error)
-    return []
-  }
 
   const mediaIds = data.flatMap((item) => {
     const media = Array.isArray(item.media) ? item.media[0] : item.media
     return media?.id ? [media.id] : []
   })
   if (!mediaIds.length) return data
-  const { data: personalRows } = await supabase.from('user_media_progress')
+  const personalRows = await readInBatches(mediaIds, batch => supabase.from('user_media_progress')
     .select('media_id, status, current_episode, custom_description, custom_tags, watch_link, updated_at')
     .eq('user_id', user.id)
-    .in('media_id', mediaIds)
+    .in('media_id', batch))
   const personalByMedia = new Map((personalRows ?? []).map((row) => [row.media_id, row]))
   return data.map((item) => {
     const media = Array.isArray(item.media) ? item.media[0] : item.media
@@ -329,29 +318,14 @@ export async function addMediaToLists(mediaData: {
 export async function getProgressStats(): Promise<Record<string, number> | null> {
   const supabase = await createClient()
   const user = await getAuthenticatedUser()
-
   if (!user) return null
-
-  const { data, error } = await supabase
-    .from('user_media_progress')
-    .select('status')
-    .eq('user_id', user.id)
-
-  if (error || !data) return null
-
-  const counts: Record<string, number> = {
-    watching: 0,
-    completed: 0,
-    on_hold: 0,
-    dropped: 0,
-    plan_to_watch: 0,
-  }
-
-  data.forEach(row => {
-    if (row.status in counts) counts[row.status]++
-  })
-
-  return counts
+  const entries = await Promise.all(PROGRESS_STATUSES.map(async status => {
+    const { count, error } = await supabase.from('user_media_progress')
+      .select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', status)
+    if (error) throw new Error('No pudimos cargar las estadísticas.')
+    return [status, count ?? 0] as const
+  }))
+  return Object.fromEntries(entries)
 }
 
 type MediaProgressType = 'anime' | 'manga'

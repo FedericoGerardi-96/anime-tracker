@@ -198,7 +198,7 @@ export default function AnimeActions({
     <div className="relative z-20 w-full">
       <div className="flex flex-wrap items-center gap-3 detail-panel p-3 rounded-2xl">
         <div ref={menuRef} className="relative w-full sm:w-auto sm:min-w-[240px]">
-          <div className={`flex overflow-hidden rounded-xl border ${isFavorite ? 'border-border bg-muted/60 dark:bg-white/5' : 'border-primary bg-primary text-white'}`}>
+          <div className={`flex overflow-hidden rounded-xl border ${isFavorite ? 'border-border bg-muted/60 dark:bg-white/5' : 'border-primary bg-primary text-primary-foreground'}`}>
             <button type="button"
               onClick={() => isFavorite ? setIsMenuOpen(!isMenuOpen) : handleFavoriteClick()}
               disabled={busy}

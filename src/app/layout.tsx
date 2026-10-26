@@ -1,9 +1,9 @@
+import { materialSymbolNames } from "@/lib/material-symbols";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 
-//@ts-ignore
 import "./globals.css";
 
 import Topbar from "@/components/shared/Topbar";
@@ -36,12 +36,12 @@ export default async function RootLayout({
 }>) {
   const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value) ?? 'dark';
   return (
-    <html lang="en" className={theme === 'dark' ? 'dark' : ''} suppressHydrationWarning>
+    <html lang="es" className={theme === 'dark' ? 'dark' : ''} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+        <link href={`https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&icon_names=${materialSymbolNames}&display=block`} rel="stylesheet"/>
       </head>
       <body className={`${inter.variable} font-display antialiased bg-background text-foreground`}>
         <ToastProvider>

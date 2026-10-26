@@ -1,4 +1,5 @@
 import "server-only";
+import { claimUserSyncStep } from "@/services/sync-lease";
 import { randomUUID } from "node:crypto";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { decryptAniListToken } from "@/lib/anilist-token-crypto";
@@ -294,17 +295,12 @@ async function advance(db: DB, job: AniListSyncJob, auth: Awaited<ReturnType<typ
   return { message: `Actualizando ${type} en ${label}… ${state.exportOffset} de ${state.exportQueue?.length ?? 0}`, complete: false };
 }
 
-export async function processAniListSyncStep() {
+export async function processAniListSyncStep(userId: string) {
   const db = createSupabaseAdminClient();
   const lease = randomUUID();
-  const claimed = await db.rpc("claim_anilist_sync_step", { p_lease: lease });
-  check(claimed.error);
-  const job = (claimed.data as AniListSyncJob[] | null)?.[0];
-  if (!job) {
-    const next = await db.rpc("library_sync_next_delay");
-    // Compatibility while the Broadcast migration is being installed.
-    return { idle: true, nextPollMs: next.error ? 4000 : Number(next.data) || 60000 };
-  }
+  const claimed = await claimUserSyncStep(db, userId, lease);
+  const job = claimed.job;
+  if (!job) return { idle: true, nextPollMs: claimed.nextPollMs };
   const originalState = structuredClone(job.state);
   const budget = { delay: job.provider === "myanimelist" ? 500 : 3500 };
   let status: AniListSyncJob["status"] = "running";
@@ -356,5 +352,5 @@ export async function processAniListSyncStep() {
     p_message: message, p_delay_ms: budget.delay, p_attempts: attempts,
   });
   check(finished.error);
-  return { idle: false, provider: job.provider ?? "anilist", status, message, phase: job.state.phase, nextPollMs: job.provider === "myanimelist" ? 500 : 4000, retryInSeconds: attempts ? Math.ceil(budget.delay / 1000) : 0 };
+  return { idle: false, provider: job.provider ?? "anilist", status, message, phase: job.state.phase, nextPollMs: Math.max(500, budget.delay), retryInSeconds: attempts ? Math.ceil(budget.delay / 1000) : 0 };
 }

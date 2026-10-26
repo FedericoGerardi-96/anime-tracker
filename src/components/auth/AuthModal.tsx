@@ -1,7 +1,8 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
+import Modal from '@/components/ui/Modal'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -12,6 +13,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Readonly<AuthModalProps>) {
+  const formId = useId()
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -50,8 +52,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
         onClose()
         router.refresh()
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión.')
     } finally {
       setLoading(false)
     }
@@ -66,18 +68,15 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
         },
       })
       if (error) throw error
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión.')
     }
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-8 animate-in fade-in duration-300">
-      {/* Click outside to close */}
-      <button type="button" aria-label="Cerrar ventana de inicio de sesión" className="absolute inset-0" onClick={onClose}></button>
-      
+    <Modal open={isOpen} onClose={onClose} label={mode === "login" ? "Iniciar sesión" : "Crear cuenta"}>
       {/* Modal Container */}
-      <div className="glass-panel w-full max-w-md rounded-3xl shadow-2xl relative animate-in zoom-in-95 duration-300 pointer-events-auto max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
+      <div className="border border-border bg-card w-full max-w-md rounded-3xl shadow-2xl relative animate-in zoom-in-95 duration-300 pointer-events-auto max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
         
         {/* Decorative Top Section */}
         <div className="h-32 bg-gradient-to-br from-primary/30 to-purple-900/30 relative flex items-center justify-center">
@@ -88,12 +87,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
                 play_circle
               </span>
             </div>
-            <h2 className="text-2xl font-black tracking-tighter text-white">AniTrack</h2>
+            <h2 className="text-2xl font-black tracking-tighter text-foreground">AniTrack</h2>
           </div>
           <button type="button"
             aria-label="Cerrar ventana de inicio de sesión"
             onClick={onClose}
-            className="absolute top-4 right-4 text-white/50 hover:text-white transition-all hover:rotate-90 cursor-pointer"
+            className="absolute top-4 right-4 text-foreground/50 hover:text-foreground transition-all hover:rotate-90 cursor-pointer"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -102,7 +101,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
         {/* Modal Content */}
         <div className="p-8 pt-6">
           <div className="text-center mb-8">
-            <h3 className="text-xl font-bold text-white">
+            <h3 className="text-xl font-bold text-foreground">
               {mode === 'login' ? 'Welcome Back' : 'Create Account'}
             </h3>
             <p className="text-text-muted text-sm mt-1">
@@ -148,18 +147,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
           {/* Email Form */}
           <form className="space-y-4" onSubmit={handleAuth}>
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-[10px] font-black text-text-muted uppercase ml-1 tracking-wider">Email Address</label>
+              <label htmlFor={`${formId}-email`} className="text-[10px] font-black text-text-muted uppercase ml-1 tracking-wider">Email Address</label>
               <div className="relative group">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-text-muted text-lg group-focus-within:text-primary transition-colors">
                   mail
                 </span>
                 <input 
-                  id="email"
+                  id={`${formId}-email`} name="email" autoComplete="email"
                   required
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
+                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-foreground placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
                   placeholder="name@example.com" 
                 />
               </div>
@@ -167,7 +166,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center ml-1">
-                <label htmlFor="password" className="text-[10px] font-black text-text-muted uppercase tracking-wider">Password</label>
+                <label htmlFor={`${formId}-password`} className="text-[10px] font-black text-text-muted uppercase tracking-wider">Password</label>
                 {mode === 'login' && (
                   <button type="button" className="text-[10px] text-primary font-black hover:underline uppercase tracking-wider">Forgot?</button>
                 )}
@@ -177,12 +176,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
                   lock
                 </span>
                 <input 
-                  id="password"
+                  id={`${formId}-password`} name="password" autoComplete={mode === "login" ? "current-password" : "new-password"}
                   required
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
+                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-foreground placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
                   placeholder="••••••••"
                 />
               </div>
@@ -190,7 +189,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
 
             <button type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-white py-3.5 rounded-xl font-black text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3.5 rounded-xl font-black text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -226,10 +225,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
         {/* Bottom Note */}
         <div className="bg-white/5 px-8 py-4 text-center border-t border-white/5">
           <p className="text-[10px] text-text-muted uppercase font-bold tracking-tight leading-relaxed">
-            By continuing, you agree to AniTrack's <button type="button" className="underline hover:text-white transition-colors cursor-pointer">Terms</button> and <button type="button" className="underline hover:text-white transition-colors cursor-pointer">Privacy</button>.
+            By continuing, you agree to AniTrack&apos;s <button type="button" className="underline hover:text-foreground transition-colors cursor-pointer">Terms</button> and <button type="button" className="underline hover:text-foreground transition-colors cursor-pointer">Privacy</button>.
           </p>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }

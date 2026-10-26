@@ -6,8 +6,8 @@ import type { BrowserTranslationOptions, BrowserTranslationState, TranslatorApi,
 
 export function useBrowserTranslation({ original, label }: BrowserTranslationOptions) {
   const source = normalizeTranslatableText(original);
-  const [state, setState] = useState<BrowserTranslationState>({ source, text: source ? null : '', status: null });
-  if (state.source !== source) setState({ source, text: source ? null : '', status: null });
+  const [state, setState] = useState<BrowserTranslationState>({ source, text: source, status: null });
+  if (state.source !== source) setState({ source, text: source, status: null });
 
   useEffect(() => {
     if (!source) return;
@@ -19,7 +19,7 @@ export function useBrowserTranslation({ original, label }: BrowserTranslationOpt
       instance?.destroy();
     };
     const updateStatus = (status: string) => {
-      if (!cancelled) setState({ source, text: null, status });
+      if (!cancelled) setState({ source, text: source, status });
     };
     async function run() {
       try {

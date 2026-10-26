@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useTransition } from "react";
-import * as XLSX from "xlsx";
 import { exportFavoritesAction } from "@/lib/actions/media";
 
 export default function ExportFavoritesButton() {
@@ -16,6 +15,8 @@ export default function ExportFavoritesButton() {
           return;
         }
 
+        const XLSX = await import("xlsx");
+
         // Create a worksheet
         const worksheet = XLSX.utils.json_to_sheet(data);
 
@@ -25,8 +26,8 @@ export default function ExportFavoritesButton() {
 
         // Auto-fit column widths
         const colWidths = Object.keys(data[0]).map((key) => {
-          const maxLen = data.reduce((max, row: any) => {
-            const val = String(row[key] || "");
+          const maxLen = data.reduce((max, row) => {
+            const val = String(row[key as keyof typeof row] ?? "");
             return Math.max(max, val.length);
           }, key.length);
           return { wch: Math.min(Math.max(maxLen, 10), 50) };
@@ -46,7 +47,7 @@ export default function ExportFavoritesButton() {
     <button type="button"
       onClick={handleExport}
       disabled={isPending}
-      className="flex items-center gap-2 bg-primary hover:bg-primary/80 text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+      className="flex items-center gap-2 bg-primary hover:bg-primary/80 text-primary-foreground px-6 py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
     >
       <span
         className={`material-symbols-outlined ${isPending ? "animate-spin" : ""}`}

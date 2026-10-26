@@ -7,12 +7,14 @@ import AnimeCharactersTitle from "@/components/anime/AnimeCharactersTitle";
 import AnimeCharactersSkeleton from "@/components/fallbacks/AnimeCharactersSkeleton";
 
 export default async function CharactersPage({
-  params,
-}: Readonly<DetailPageProps>) {
+  params, searchParams,
+}: Readonly<DetailPageProps & { searchParams: Promise<{ page?: string }> }>) {
   const { slug } = await params;
+  const requestedPage = Number((await searchParams).page);
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   if (!/^\d+(?:-|$)/.test(slug) || Number.parseInt(slug) < 1) notFound();
   return (
-    <main className="min-h-screen pb-6">
+    <div className="min-h-screen pb-6">
       <div className="mx-auto max-w-400 p-6 md:p-10">
         <nav className="mb-8 flex gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">
           <Link href="/anime">Anime</Link>
@@ -22,7 +24,7 @@ export default async function CharactersPage({
           <span className="text-foreground">Personajes</span>
         </nav>
         <header className="mb-12">
-          <h1 className="mb-4 text-4xl font-black leading-tight tracking-tighter text-white md:text-6xl">
+          <h1 className="mb-4 text-4xl font-black leading-tight tracking-tighter text-foreground md:text-6xl">
             Personajes —{" "}
             <span className="text-primary">
               <Suspense
@@ -43,10 +45,10 @@ export default async function CharactersPage({
             como respaldo.
           </p>
         </header>
-        <Suspense key={slug} fallback={<AnimeCharactersSkeleton />}>
-          <AnimeCharactersContent slug={slug} />
+        <Suspense key={`${slug}-${page}`} fallback={<AnimeCharactersSkeleton />}>
+          <AnimeCharactersContent slug={slug} page={page} />
         </Suspense>
       </div>
-    </main>
+    </div>
   );
 }
