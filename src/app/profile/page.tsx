@@ -154,7 +154,7 @@ export default async function ProfilePage({ searchParams }: Readonly<ProfilePage
 
             {watching.length === 0 ? (
               <div className="glass-card rounded-2xl p-10 text-center">
-                <span className="material-symbols-outlined text-4xl text-slate-400 mb-3 block">tv_off</span>
+                <span className="material-symbols-outlined text-4xl text-muted-foreground mb-3 block">tv_off</span>
                 <p className="text-sm text-text-muted">Todavía no tenés títulos en curso.</p>
                 <Link href="/anime" className="inline-block mt-4 text-primary text-sm font-semibold hover:underline">
                   Explorar anime
@@ -202,7 +202,7 @@ export default async function ProfilePage({ searchParams }: Readonly<ProfilePage
 
             {favorites.length === 0 ? (
               <div className="glass-card rounded-2xl p-10 text-center">
-                <span className="material-symbols-outlined text-4xl text-slate-400 mb-3 block">favorite_border</span>
+                <span className="material-symbols-outlined text-4xl text-muted-foreground mb-3 block">favorite_border</span>
                 <p className="text-sm text-text-muted">Todavía no agregaste favoritos.</p>
               </div>
             ) : (

@@ -14,7 +14,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
   return (
     <div className="flex-1 p-4 sm:p-8 lg:p-12 space-y-6">
       {/* Breadcrumb / Back button */}
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Link href="/" className="hover:text-primary transition-colors">
           Inicio
         </Link>
@@ -23,7 +23,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
           Catálogo de anime
         </Link>
         <span className="material-symbols-outlined text-[10px]">chevron_right</span>
-        <span className="text-slate-300 font-medium">Calendario</span>
+        <span className="text-muted-foreground font-medium">Calendario</span>
       </div>
 
       <Suspense key={JSON.stringify(params)} fallback={<ScheduleSkeleton />}><ScheduleContent params={params} /></Suspense>

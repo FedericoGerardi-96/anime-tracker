@@ -16,7 +16,7 @@ export default async function CharactersPage({
   return (
     <div className="min-h-screen pb-6">
       <div className="mx-auto max-w-400 p-6 md:p-10">
-        <nav className="mb-8 flex gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+        <nav className="mb-8 flex gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
           <Link href="/anime">Anime</Link>
           <span aria-hidden="true">/</span>
           <Link href={`/anime/${slug}`}>Volver a la ficha</Link>

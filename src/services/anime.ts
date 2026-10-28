@@ -1,4 +1,5 @@
 import "server-only";
+import { getCatalogProvider } from "@/services/catalog-provider";
 
 import {
   getMalAnimeCatalog,
@@ -10,24 +11,19 @@ import { getCatalogFavoriteIds } from "@/services/catalog-favorites";
 import { getAniListCatalog } from '@/services/anilist-catalog';
 import type { AniListCatalogOptions, CatalogProvider } from '@/interfaces/anilist-catalog';
 
-/**
- * Loads anime from MyAnimeList's official API and enriches each card with
- * the authenticated user's AniTrack favorites stored in Supabase.
- */
+/** Loads the selected catalog and adds local favorites. */
 export async function getAnimeListWithFavorites(options: MalAnimeCatalogOptions & AniListCatalogOptions, userId?: string) {
-  let provider: CatalogProvider = 'anilist';
+  const provider: CatalogProvider = await getCatalogProvider();
   let displayAnime;
   let totalPages: number | undefined;
   let hasNextPage: boolean;
 
-  try {
+  if (provider === 'anilist') {
     const catalog = await getAniListCatalog('anime', options);
     displayAnime = catalog.items;
     totalPages = catalog.totalPages;
     hasNextPage = catalog.hasNextPage;
-  } catch (error) {
-    console.error('AniList catalog unavailable; using MyAnimeList fallback:', error);
-    provider = 'myanimelist';
+  } else {
     const catalog = await getMalAnimeCatalog(options);
     displayAnime = catalog.anime.map(mapMalAnimeToCard);
     totalPages = undefined;

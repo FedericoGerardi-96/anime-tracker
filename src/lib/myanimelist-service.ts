@@ -1,4 +1,5 @@
 import "server-only";
+import { providerRead, ProviderRequestError } from "@/services/provider-request";
 
 import type { AnimeCardProps } from "@/components/cards/AnimeCard";
 import type {
@@ -33,7 +34,7 @@ export class MyAnimeListApiError extends Error {
 }
 
 export function isMyAnimeListUnavailableError(error: unknown): boolean {
-  return error instanceof MyAnimeListApiError && (error.status === 429 || error.status >= 500);
+  return (error instanceof MyAnimeListApiError || error instanceof ProviderRequestError) && (error.status === 0 || error.status === 408 || error.status === 429 || error.status >= 500);
 }
 
 function getClientId(): string {
@@ -48,7 +49,7 @@ async function malFetch<T>(path: string, searchParams?: Record<string, string | 
     url.searchParams.set(key, String(value));
   }
 
-  const response = await fetch(url, {
+  return providerRead<T>("myanimelist", path.replace(/\d+/g, ":id"), url, {
     headers: {
       "X-MAL-CLIENT-ID": getClientId(),
       Accept: "application/json",
@@ -56,19 +57,6 @@ async function malFetch<T>(path: string, searchParams?: Record<string, string | 
     next: { revalidate: 3600 },
   });
 
-  if (!response.ok) {
-    let message = `MyAnimeList API respondió ${response.status}`;
-    try {
-      const body = await response.clone().json();
-      if (typeof body?.message === "string") message = body.message;
-      if (typeof body?.error === "string") message = body.error;
-    } catch {
-      // Keep the status-based message when MAL does not return JSON.
-    }
-    throw new MyAnimeListApiError(response.status, message);
-  }
-
-  return response.json() as Promise<T>;
 }
 
 const ANIME_LIST_FIELDS = [

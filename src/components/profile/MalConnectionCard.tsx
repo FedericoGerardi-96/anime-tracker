@@ -52,14 +52,14 @@ export default function MalConnectionCard({ connection, result, missingConfigura
               <p className="mt-1 text-sm text-text-muted">
                 {needsReconnect ? "Es necesario volver a autorizar la cuenta" : `Conectado como ${connection.username}`}
               </p>
-              <p className="mt-1 text-xs text-text-muted/75">
+              <p className="mt-1 text-xs text-text-muted">
                 {needsReconnect ? "Volvé a conectar tu cuenta para habilitar la sincronización." : "El acceso se renovará automáticamente; no tendrás que iniciar sesión todos los días."}
               </p>
             </>
           ) : (
             <>
               <p className="mt-1 text-sm text-text-muted">No hay una cuenta vinculada.</p>
-              <p className="mt-1 text-xs text-text-muted/75">
+              <p className="mt-1 text-xs text-text-muted">
                 La conexión es opcional y solo se utilizará para sincronizar tu biblioteca.
               </p>
             </>

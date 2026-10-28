@@ -12,7 +12,7 @@ export default function ListsTabs({ activeTab }: Readonly<ListsTabsProps>) {
           className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
             tab.id === activeTab
               ? 'bg-primary text-white shadow-lg shadow-primary/20'
-              : 'text-slate-400 dark:hover:bg-white/5 hover:bg-muted  dark:hover:text-white hover:text-primary'
+              : 'text-muted-foreground dark:hover:bg-white/5 hover:bg-muted  dark:hover:text-white hover:text-primary'
           }`}
         >
           <span className='material-symbols-outlined text-[18px]'>{tab.icon}</span>

@@ -107,7 +107,7 @@ export default function EditFavoriteModal({
               fill
               className="object-cover blur-2xl scale-150 opacity-30"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-900" />
+            <div className="absolute inset-0 bg-gradient-to-b from-card/90 to-card" />
           </div>
 
           <div className="relative p-6 flex items-start gap-4">
@@ -162,7 +162,7 @@ export default function EditFavoriteModal({
                     const nextStatus = event.target.value
                     setStatus(nextStatus)
                     if (nextStatus === 'completed' && mediaData.total_units) setCurrentEpisode(mediaData.total_units)
-                  }} className="w-full rounded-xl border border-primary/20 bg-slate-950/50 px-4 py-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-primary/50">
+                  }} className="w-full rounded-xl border border-primary/20 bg-muted px-4 py-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-primary/50">
                     <option value="watching">{mediaData.type === 'manga' ? 'Leyendo' : 'Viendo'}</option>
                     <option value="completed">Completado</option>
                     <option value="plan_to_watch">Pendiente</option>
@@ -172,7 +172,7 @@ export default function EditFavoriteModal({
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-text-muted">{mediaData.type === 'manga' ? 'Capítulo / página actual' : 'Episodios vistos'}{mediaData.total_units ? ` · Total ${mediaData.total_units}` : ''}</label>
-                  <input aria-label={mediaData.type === 'manga' ? 'Capítulo o página actual' : 'Episodios vistos'} type="number" min={0} max={mediaData.total_units || undefined} value={currentEpisode} onChange={(event) => setCurrentEpisode(Math.max(0, Number(event.target.value)))} className="w-full rounded-xl border border-primary/20 bg-slate-950/50 px-4 py-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-primary/50" />
+                  <input aria-label={mediaData.type === 'manga' ? 'Capítulo o página actual' : 'Episodios vistos'} type="number" min={0} max={mediaData.total_units || undefined} value={currentEpisode} onChange={(event) => setCurrentEpisode(Math.max(0, Number(event.target.value)))} className="w-full rounded-xl border border-primary/20 bg-muted px-4 py-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
               </div>
 
@@ -184,7 +184,7 @@ export default function EditFavoriteModal({
                 </label>
                   <textarea
                     aria-label="Notas personales"
-                    className="w-full bg-slate-950/50 border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 text-sm resize-none custom-scrollbar"
+                    className="w-full bg-muted border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-muted-foreground text-sm resize-none custom-scrollbar"
                   placeholder="Escribí tus notas o recordatorios sobre esta obra..."
                   rows={3}
                   value={customDescription}
@@ -201,7 +201,7 @@ export default function EditFavoriteModal({
                 <div className="relative group">
                   <input
                     aria-label="Enlace personal"
-                    className="w-full bg-slate-950/50 border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 text-sm"
+                    className="w-full bg-muted border border-primary/20 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-muted-foreground text-sm"
                     placeholder="https://crunchyroll.com/..."
                     type="url"
                     value={watchLink}
@@ -252,7 +252,7 @@ export default function EditFavoriteModal({
                 <div className="flex gap-2">
                   <input
                     aria-label="Nueva etiqueta"
-                    className="flex-1 bg-slate-950/50 border border-primary/20 rounded-xl py-2.5 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 text-sm"
+                    className="flex-1 bg-muted border border-primary/20 rounded-xl py-2.5 px-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-muted-foreground text-sm"
                     placeholder="Agregá una etiqueta y presioná Enter..."
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
@@ -262,7 +262,7 @@ export default function EditFavoriteModal({
                     type="button"
                     onClick={handleAddTag}
                     disabled={!tagInput.trim()}
-                    className="bg-primary/20 text-primary hover:bg-primary hover:text-white px-3 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="bg-primary/20 text-primary hover:bg-primary hover:text-primary-foreground px-3 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-lg">add</span>
                   </button>
@@ -275,7 +275,7 @@ export default function EditFavoriteModal({
               <button type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-xl shadow-lg shadow-primary/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined font-bold">
                   {saving ? 'sync' : 'save'}

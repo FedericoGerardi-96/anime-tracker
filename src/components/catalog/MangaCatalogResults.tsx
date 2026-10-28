@@ -1,3 +1,6 @@
+import ProviderChoice from '@/components/catalog/ProviderChoice';
+import { getCatalogProvider } from '@/services/catalog-provider';
+import { ProviderRequestError } from '@/services/provider-request';
 import { Suspense } from 'react';
 import { CatalogInteraction, CatalogResultsArea } from '@/components/catalog/CatalogInteraction';
 import Link from 'next/link';
@@ -23,16 +26,24 @@ export default async function MangaCatalogResults({ params }: Readonly<CatalogRe
   
   const user = await getAuthenticatedUser();
 
-  const { displayManga, totalPages, hasNextPage, provider } = await getMangaListWithFavorites({
+  let result;
+  try {
+  result = await getMangaListWithFavorites({
     q: stringParam(params.q), genre: stringParam(params.genre), excludeGenre: stringParam(params.excludeGenre),
     yearFrom: Number(stringParam(params.yearFrom)) || undefined, yearTo: Number(stringParam(params.yearTo)) || undefined,
     scoreBands: stringParam(params.scoreBands), format: stringParam(params.format), minScore: Number(stringParam(params.minScore)) || undefined,
     status: stringParam(params.status), sort: stringParam(params.sort), year: Number(stringParam(params.year)) || undefined,
     page: currentPage,
   }, user?.id);
+  } catch (error) {
+    if (!(error instanceof ProviderRequestError)) throw error;
+    return <ProviderChoice provider={await getCatalogProvider()} failed retryAfterMs={error.retryAfterMs} />;
+  }
+  const { displayManga, totalPages, hasNextPage, provider } = result;
 
   return (
     <CatalogInteraction>
+    <ProviderChoice provider={provider} />
     <div className={provider === 'anilist' ? 'grid items-start gap-6 lg:grid-cols-[276px_minmax(0,1fr)]' : 'space-y-8'}>
       {/* Filters Bar */}
       <div className={provider === 'anilist' ? 'relative z-30 min-w-0 space-y-3 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 lg:[scrollbar-gutter:stable] lg:[scrollbar-width:thin] lg:[scrollbar-color:var(--color-primary)_transparent]' : 'glass relative z-30 rounded-xl p-4 space-y-4'}>
@@ -44,7 +55,6 @@ export default async function MangaCatalogResults({ params }: Readonly<CatalogRe
         <Suspense fallback={<div className="h-10 w-full sm:w-[500px] bg-slate-200 dark:bg-slate-800/50 rounded-lg animate-pulse" />}>
           {provider === 'anilist' ? <AniListFilters mediaType='manga' /> : <MalFilters mediaType='manga' />}
         </Suspense>
-        {provider === 'myanimelist' && <p className='w-full text-xs text-amber-400'>AniList no está disponible. Se activó automáticamente el catálogo básico de MyAnimeList.</p>}
       </div>
 
       <CatalogResultsArea>

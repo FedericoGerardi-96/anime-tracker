@@ -223,13 +223,12 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
                 <div className="absolute right-0 top-full mt-2 w-full min-w-80 rounded-2xl border border-amber-500/25 bg-popover p-4 text-sm shadow-2xl">
                   <p className="flex items-center gap-2 font-semibold">
                     <span className="material-symbols-outlined text-lg text-amber-500">cloud_off</span>
-                    {searchType === 'character' ? 'Los proveedores de personajes no están disponibles' : 'Búsqueda temporalmente no disponible'}
+                    Búsqueda temporalmente no disponible
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    {searchType === 'character'
-                      ? 'No pudimos consultar ni AniList ni MyAnimeList. Probá nuevamente más tarde.'
-                      : 'MyAnimeList no está respondiendo. Probá nuevamente en unos minutos.'}
+                    {searchError}
                   </p>
+                  <Link href={`/${searchType === "character" ? "characters" : searchType}?q=${encodeURIComponent(query)}`} className="mt-2 inline-block underline">Abrir búsqueda y elegir proveedor</Link>
                 </div>
               )}
             </div>

@@ -136,7 +136,7 @@ export default function AnimeFilters({ yearOptions = [], hideSeason = false, off
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap w-full md:w-auto">
       {officialMal && (
         <div className="group relative min-w-[240px] flex-1 sm:max-w-sm">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-lg text-slate-500 transition-colors group-focus-within:text-primary">search</span>
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-lg text-muted-foreground transition-colors group-focus-within:text-primary">search</span>
           <input
             type="search"
             value={searchQuery}

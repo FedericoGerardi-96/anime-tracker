@@ -1,4 +1,5 @@
 import "server-only";
+import { getCatalogProvider } from "@/services/catalog-provider";
 
 import type { MalMangaCatalogOptions } from "@/interfaces/myanimelist";
 import { getMalMangaCatalog, mapMalMangaToCatalog } from "@/lib/myanimelist-service";
@@ -7,19 +8,17 @@ import { getAniListCatalog } from '@/services/anilist-catalog';
 import type { AniListCatalogOptions, CatalogProvider } from '@/interfaces/anilist-catalog';
 
 export async function getMangaListWithFavorites(options: MalMangaCatalogOptions & AniListCatalogOptions, userId?: string) {
-  let provider: CatalogProvider = 'anilist';
+  const provider: CatalogProvider = await getCatalogProvider();
   let displayManga;
   let totalPages: number | undefined;
   let hasNextPage: boolean;
 
-  try {
+  if (provider === 'anilist') {
     const catalog = await getAniListCatalog('manga', options);
     displayManga = catalog.items;
     totalPages = catalog.totalPages;
     hasNextPage = catalog.hasNextPage;
-  } catch (error) {
-    console.error('AniList catalog unavailable; using MyAnimeList fallback:', error);
-    provider = 'myanimelist';
+  } else {
     const catalog = await getMalMangaCatalog(options);
     displayManga = catalog.manga.map((manga) => {
       const item = mapMalMangaToCatalog(manga);

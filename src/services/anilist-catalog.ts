@@ -1,4 +1,5 @@
 import 'server-only';
+import { providerRead, ProviderRequestError } from '@/services/provider-request';
 
 import type { AniListCatalogOptions, AniListCatalogResult, CatalogMediaType } from '@/interfaces/anilist-catalog';
 
@@ -103,16 +104,14 @@ function variables(type: CatalogMediaType, options: AniListCatalogOptions, maxim
 }
 
 async function fetchCatalogPage(type: CatalogMediaType, options: AniListCatalogOptions, maximumScore?: number) {
-  const response = await fetch(ENDPOINT, {
+  const payload = await providerRead<AniListResponse>('anilist', 'catalog', ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ query: QUERY, variables: variables(type, options, maximumScore) }),
     signal: AbortSignal.timeout(10_000),
     next: { revalidate: 300 },
   });
-  if (!response.ok) throw new Error(`AniList respondió ${response.status}`);
-  const payload = await response.json() as AniListResponse;
-  if (payload.errors?.length || !payload.data?.Page) throw new Error(payload.errors?.[0]?.message ?? 'Respuesta inválida de AniList');
+  if (payload.errors?.length || !payload.data?.Page) throw new ProviderRequestError('anilist', 502);
   return payload.data.Page;
 }
 

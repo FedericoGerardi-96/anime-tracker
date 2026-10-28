@@ -1,3 +1,6 @@
+import ProviderChoice from '@/components/catalog/ProviderChoice';
+import { getCatalogProvider } from '@/services/catalog-provider';
+import { ProviderRequestError } from '@/services/provider-request';
 import { buildMediaDetailMetadata } from '@/lib/media-detail-metadata';
 import { notFound } from 'next/navigation';
 import { isMyAnimeListUnavailableError } from '@/lib/myanimelist-service';
@@ -17,6 +20,7 @@ export default async function MediaDetailContent({ slug, mediaType }: Readonly<D
       ? await getPreferredAnimeByMalId(malId)
       : await getPreferredMangaByMalId(malId);
   } catch (error) {
+    if (error instanceof ProviderRequestError) return <ProviderChoice provider={await getCatalogProvider()} failed retryAfterMs={error.retryAfterMs} />;
     console.error(`Error fetching ${mediaType} data:`, error);
     if (isMyAnimeListUnavailableError(error)) throw error;
     notFound();

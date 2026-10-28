@@ -27,7 +27,7 @@ function ListDialogSession(props: Readonly<AddToListModalProps>) {
   const placeholder = (message?: string) => <div className="w-full max-w-md">
     <div className="border border-border bg-card w-full max-w-md space-y-5 rounded-xl p-6" onClick={event => event.stopPropagation()}>
       <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Agregar a lista</h2><button type="button" onClick={props.onClose} aria-label="Cerrar">✕</button></div>
-      {message ? <><p role="alert">{message}</p><button type="button" onClick={retry} className="rounded-xl bg-primary px-4 py-2 text-white">Reintentar</button></> : <div role="status" aria-label="Cargando listas y progreso…" className="space-y-4"><span className="sr-only">Cargando listas y progreso…</span><Skeleton className="h-12" /><Skeleton className="h-28" /><Skeleton className="h-12" /></div>}
+      {message ? <><p role="alert">{message}</p><button type="button" onClick={retry} className="rounded-xl bg-primary px-4 py-2 text-primary-foreground">Reintentar</button></> : <div role="status" aria-label="Cargando listas y progreso…" className="space-y-4"><span className="sr-only">Cargando listas y progreso…</span><Skeleton className="h-12" /><Skeleton className="h-28" /><Skeleton className="h-12" /></div>}
     </div>
   </div>
   if (!promise) return placeholder('No pudimos iniciar la carga.')
@@ -232,7 +232,7 @@ function ListDialogForm({
                 </span>
                 <input 
                   aria-label="Buscar listas existentes"
-                  className="w-full bg-slate-900/50 border border-primary/20 rounded-lg py-2.5 pl-10 pr-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted"
+                  className="w-full bg-muted border border-primary/20 rounded-lg py-2.5 pl-10 pr-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted"
                   placeholder="Search existing lists"
                   type="text"
                   value={searchQuery}
@@ -249,7 +249,7 @@ function ListDialogForm({
         )}
 
         {/* Create New List Section */}
-        <div className={`p-6 bg-slate-900/10 ${mode === 'add-anime' ? 'border-t border-white/5' : ''}`}>
+        <div className={`p-6 bg-muted ${mode === 'add-anime' ? 'border-t border-white/5' : ''}`}>
           {mode === 'add-anime' && (
             <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Create New List</p>
           )}
@@ -264,7 +264,7 @@ function ListDialogForm({
             <div className="flex gap-2">
               <input 
                 aria-label="Nombre de la lista"
-                className="flex-1 bg-slate-900/50 border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-400 text-sm"
+                className="flex-1 bg-muted border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm"
                 placeholder="Enter list name..."
                 type="text"
                 value={newName}
@@ -275,7 +275,7 @@ function ListDialogForm({
                 <button 
                   type="submit"
                   disabled={!newName.trim() || isCreating}
-                  className="bg-primary/20 text-primary hover:bg-primary hover:text-white p-2 rounded-lg transition-all flex items-center justify-center disabled:opacity-50"
+                  className="bg-primary/20 text-primary hover:bg-primary hover:text-primary-foreground p-2 rounded-lg transition-all flex items-center justify-center disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined">{isCreating ? 'sync' : 'add'}</span>
                 </button>
@@ -284,7 +284,7 @@ function ListDialogForm({
             {mode === 'create' && (
               <input 
                 aria-label="Descripción de la lista"
-                className="w-full bg-slate-900/50 border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-400 text-sm"
+                className="w-full bg-muted border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm"
                 placeholder="Enter list description..."
                 type="text"
                 value={newDescription}
@@ -295,7 +295,7 @@ function ListDialogForm({
               <button 
                 type="submit"
                 disabled={!newName.trim() || isCreating}
-                className="w-full bg-primary/20 text-primary hover:bg-primary hover:text-white py-2 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm"
+                className="w-full bg-primary/20 text-primary hover:bg-primary hover:text-primary-foreground py-2 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm"
               >
                 <span className="material-symbols-outlined text-lg">
                   {isCreating ? 'sync' : 'add'}
@@ -309,13 +309,13 @@ function ListDialogForm({
         {mode === 'add-anime' && (
           <>
             {/* Progress and Status Section */}
-            <div className="px-6 py-4 border-t border-white/5 bg-slate-900/20 grid grid-cols-2 gap-4">
+            <div className="px-6 py-4 border-t border-white/5 bg-muted grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="episode" className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Progress</label>
                 <div className="relative flex items-center">
                   <input 
                     id="episode"
-                    className="w-full bg-slate-950/50 border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-slate-400 transition-all text-sm"
+                    className="w-full bg-muted border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground transition-all text-sm"
                     min="0" 
                     placeholder="Ep #" 
                     type="number" 
@@ -332,7 +332,7 @@ function ListDialogForm({
                 <div className="relative">
                   <select 
                     id="status"
-                    className="w-full bg-slate-950/50 border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-sm"
+                    className="w-full bg-muted border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-sm"
                     value={status}
                     onChange={(e) => {
                       const newStatus = e.target.value;
@@ -359,7 +359,7 @@ function ListDialogForm({
               <button type="button"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined font-bold">
                   {isSaving ? 'sync' : 'save'}

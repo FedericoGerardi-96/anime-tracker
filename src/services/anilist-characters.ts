@@ -1,4 +1,7 @@
 import "server-only";
+import { providerRead } from "@/services/provider-request";
+import { getCatalogProvider } from "@/services/catalog-provider";
+import type { CatalogProvider } from "@/interfaces/anilist-catalog";
 import { unstable_cache } from "next/cache";
 
 import type { AnimeCharacter, CharacterDetail, CharacterSearchResult } from "@/interfaces/character";
@@ -119,13 +122,13 @@ const PREVIEW_QUERY = `
   }
 `;
 
-const fetchCharacterPage = unstable_cache(async (malId: number, page: number, preview: boolean) => {
-  try {
+const fetchCharacterPage = unstable_cache(async (malId: number, page: number, preview: boolean, provider: CatalogProvider) => {
+  if (provider === 'anilist') {
     const payload = await anilistRequest<AniListPageResponse>(preview ? PREVIEW_QUERY : CHARACTERS_QUERY, { malId, page, perPage: 24 });
     if (payload.errors?.length || !payload.data?.Media) throw new CharacterProviderUnavailableError();
     const result = payload.data.Media.characters;
     return { characters: result.edges.map(mapEdge), hasNextPage: result.pageInfo.hasNextPage };
-  } catch {
+  } else {
     try {
       const all = await scrapeMalAnimeCharacters(malId);
       if (preview) return { characters: all.filter(character => character.role === 'MAIN').slice(0, 6), hasNextPage: false };
@@ -133,15 +136,15 @@ const fetchCharacterPage = unstable_cache(async (malId: number, page: number, pr
       return { characters: all.slice(start, start + 24), hasNextPage: all.length > start + 24 };
     } catch { throw new CharacterProviderUnavailableError(); }
   }
-}, ['anime-character-page-v1'], { revalidate: 3600 });
+}, ['anime-character-page-v2'], { revalidate: 3600 });
 
 export async function getAnimeCharacterPreview(malId: number): Promise<AnimeCharacter[]> {
-  return (await fetchCharacterPage(malId, 1, true)).characters;
+  return (await fetchCharacterPage(malId, 1, true, await getCatalogProvider())).characters;
 }
 
 export async function getAnimeCharactersPage(malId: number, page = 1): Promise<CharacterSearchResult> {
   const safePage = Number.isSafeInteger(page) && page > 0 ? page : 1;
-  return fetchCharacterPage(malId, safePage, false);
+  return fetchCharacterPage(malId, safePage, false, await getCatalogProvider());
 }
 
 interface AniListCharacterResponse {
@@ -178,12 +181,11 @@ const CHARACTER_DETAIL_QUERY = `
 `;
 
 async function anilistRequest<T>(query: string, variables: Record<string, string | number>): Promise<T> {
-  const response = await fetch(ANILIST_ENDPOINT, {
+  return providerRead<T>('anilist', 'characters', ANILIST_ENDPOINT, {
     method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ query, variables }), cache: "no-store", signal: AbortSignal.timeout(5000),
   });
-  if (!response.ok) throw new CharacterProviderUnavailableError();
-  return response.json() as Promise<T>;
+
 }
 
 export async function getCharacterById(id: number): Promise<CharacterDetail> {
@@ -253,16 +255,13 @@ const CHARACTER_SEARCH_QUERY = `
 
 export async function searchCharacters(search: string, page = 1): Promise<CharacterSearchResult> {
   if (!search.trim()) return { characters: [], hasNextPage: false };
-  try {
+  if (await getCatalogProvider() === 'myanimelist') return scrapeMalCharacterSearch(search.trim());
+  {
     const payload = await anilistRequest<AniListSearchResponse>(CHARACTER_SEARCH_QUERY, { search: search.trim(), page });
     if (!payload.data?.Page || payload.errors?.length) throw new CharacterProviderUnavailableError();
     return {
       hasNextPage: payload.data.Page.pageInfo.hasNextPage,
       characters: payload.data.Page.characters.map((node) => mapEdge({ role: "BACKGROUND", node, voiceActors: [] })),
     };
-  } catch (error) {
-    console.warn('AniList character search unavailable; using MyAnimeList HTML fallback:', error);
-    try { return await scrapeMalCharacterSearch(search.trim()); }
-    catch { throw new CharacterProviderUnavailableError(); }
   }
 }

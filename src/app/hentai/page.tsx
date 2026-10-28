@@ -66,12 +66,12 @@ export default async function HentaiPage({
             <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>
               chevron_right
             </span>
-            <span className="text-slate-500">Vault</span>
+            <span className="text-muted-foreground">Vault</span>
           </nav>
-          <h1 className="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter mb-4">
+          <h1 className="text-5xl md:text-7xl font-black text-foreground leading-none tracking-tighter mb-4">
             Hentai Vault
           </h1>
-          <p className="text-slate-400 text-lg max-w-2xl font-medium antialiased">
+          <p className="text-muted-foreground text-lg max-w-2xl font-medium antialiased">
             Your private records, stored with privacy. These items are excluded from public stats and global history.
             {totalCount > 0 && (
               <span className="text-primary font-bold ml-2">({totalCount} items)</span>
@@ -90,8 +90,8 @@ export default async function HentaiPage({
         </Suspense>
 
         {isSearching && (
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
-            Showing results for <span className="text-white">&quot;{query}&quot;</span>
+          <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">
+            Showing results for <span className="text-foreground">&quot;{query}&quot;</span>
           </p>
         )}
       </div>
@@ -114,7 +114,7 @@ export default async function HentaiPage({
                     {/* Badges */}
                     <div className="absolute top-4 left-4 flex gap-2">
                       <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 border border-white/10">
-                        <span className="text-white text-[10px] font-bold uppercase tracking-widest">
+                        <span className="text-foreground text-[10px] font-bold uppercase tracking-widest">
                           {entry.type === 'doujin' ? 'Doujin' : 'Anime'}
                         </span>
                       </div>
@@ -131,10 +131,10 @@ export default async function HentaiPage({
                   </div>
 
                   <div className="px-1">
-                    <h3 className="text-white font-bold text-lg leading-tight group-hover:text-primary transition-colors truncate mb-1">
+                    <h3 className="text-foreground font-bold text-lg leading-tight group-hover:text-primary transition-colors truncate mb-1">
                       {entry.title}
                     </h3>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                       <span>Vault Entry</span>
                       <span className="w-1 h-1 rounded-full bg-slate-700" />
                       <span>{new Date(entry.created_at).toLocaleDateString()}</span>
@@ -148,7 +148,7 @@ export default async function HentaiPage({
               <Pagination currentPage={currentPage} totalPages={totalPages} />
             </Suspense>
             
-            <p className="text-center text-xs text-slate-600 mt-8 font-medium">
+            <p className="text-center text-xs text-muted-foreground mt-8 font-medium">
               Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, totalCount)} of {totalCount} vault entries
             </p>
           </>
@@ -157,10 +157,10 @@ export default async function HentaiPage({
             <span className="material-symbols-outlined text-7xl text-slate-700 mb-6" style={{ fontVariationSettings: "'FILL' 0" }}>
               {isSearching ? "search_off" : "lock"}
             </span>
-            <h2 className="text-3xl font-black text-white mb-3">
+            <h2 className="text-3xl font-black text-foreground mb-3">
               {isSearching ? `No results for "${query}"` : "The Vault is Empty"}
             </h2>
-            <p className="text-slate-400 max-w-sm mx-auto leading-relaxed">
+            <p className="text-muted-foreground max-w-sm mx-auto leading-relaxed">
               {isSearching 
                 ? "Try a different search term or clear filters to see your collection."
                 : "You haven't manually added any entries yet. Use the 'Add New Entry' button to begin your private archive."}

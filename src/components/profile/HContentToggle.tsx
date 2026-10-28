@@ -21,7 +21,7 @@ export default function HContentToggle({ enabled }: Readonly<{ enabled: boolean 
         <span className="material-symbols-outlined text-primary">lock</span>
         <div>
           <p className="text-sm font-bold">Adult Content</p>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Show the Hentai Vault section in the sidebar
           </p>
         </div>

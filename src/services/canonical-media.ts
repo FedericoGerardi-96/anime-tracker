@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getMalAnimeById, getMalMangaById } from '@/lib/myanimelist-service';
+import { getPreferredAnimeByMalId as getMalAnimeById, getPreferredMangaByMalId as getMalMangaById } from '@/services/media-detail';
 
 export interface PersistedMediaInput {
   mal_id: number; title: string; image: string; type?: 'anime' | 'manga';
@@ -19,7 +19,7 @@ export async function getCanonicalMediaInput(input: PersistedMediaInput): Promis
     const anime = await getMalAnimeById(input.mal_id);
     return { ...input, type: 'anime', title: anime.title_english || anime.title, image: anime.images.webp.large_image_url || anime.images.jpg.large_image_url, synopsis: anime.synopsis ?? undefined, season: anime.season ?? undefined, year: anime.year ?? undefined, genres: anime.genres.map((genre) => genre.name), tags: [], format: anime.type, status: anime.status, day: anime.broadcast?.day ?? undefined, totalUnits: anime.episodes ?? undefined, score: anime.score ?? 0 };
   } catch {
-    // Si MAL está temporalmente caído, no bloqueamos la acción del usuario.
+    // Keep the selected card data if its provider cannot enrich it.
     return input;
   }
 }

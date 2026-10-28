@@ -40,9 +40,9 @@ export default function AiringToday({ todayAnime, favoriteMalIds }: Readonly<Air
 
       {isEmpty ? (
         <div className="flex flex-col items-center justify-center gap-4 py-12 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
-          <span className="material-symbols-outlined text-4xl text-slate-400">calendar_today</span>
+          <span className="material-symbols-outlined text-4xl text-muted-foreground">calendar_today</span>
           <div>
-            <p className="font-semibold text-slate-600 dark:text-slate-300">
+            <p className="font-semibold text-muted-foreground">
               {isLoggedIn
                 ? "Ninguno de tus favoritos se emite hoy"
                 : "No hay anime programado para hoy"}

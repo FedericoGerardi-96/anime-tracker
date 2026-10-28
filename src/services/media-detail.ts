@@ -1,4 +1,6 @@
 import 'server-only';
+import { providerRead, ProviderRequestError } from '@/services/provider-request';
+import { getCatalogProvider } from '@/services/catalog-provider';
 import { cache } from 'react';
 
 import type { CatalogAnime, CatalogManga } from '@/interfaces/media-catalog';
@@ -54,14 +56,12 @@ interface DetailMedia {
 }
 
 async function fetchDetail(idMal: number, type: 'ANIME' | 'MANGA'): Promise<DetailMedia> {
-  const response = await fetch(ENDPOINT, {
+  const payload = await providerRead<{ data?: { Media?: DetailMedia }; errors?: Array<{ message: string }> }>('anilist', 'detail', ENDPOINT, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ query: QUERY, variables: { idMal, type } }),
     signal: AbortSignal.timeout(10_000), next: { revalidate: 3600 },
   });
-  if (!response.ok) throw new Error(`AniList respondió ${response.status}`);
-  const payload = await response.json() as { data?: { Media?: DetailMedia }; errors?: Array<{ message: string }> };
-  if (!payload.data?.Media || payload.errors?.length) throw new Error(payload.errors?.[0]?.message ?? 'Detalle no encontrado en AniList');
+  if (!payload.data?.Media || payload.errors?.length) throw new ProviderRequestError('anilist', 404);
   return payload.data.Media;
 }
 
@@ -80,7 +80,8 @@ function rank(media: DetailMedia) {
 }
 
 export const getPreferredAnimeByMalId = cache(async (idMal: number): Promise<CatalogAnime> => {
-  try {
+  if (await getCatalogProvider() === 'myanimelist') return getMalAnimeById(idMal);
+  {
     const media = await fetchDetail(idMal, 'ANIME');
     return {
       ...detailMetadata(media),
@@ -92,14 +93,12 @@ export const getPreferredAnimeByMalId = cache(async (idMal: number): Promise<Cat
       studios: media.studios?.nodes?.map((studio) => ({ mal_id: studio.id, name: studio.name })) ?? [],
       genres: genreList(media), tags: [],
     };
-  } catch (error) {
-    console.error('AniList detail unavailable; using MyAnimeList fallback:', error);
-    return getMalAnimeById(idMal);
   }
 });
 
 export const getPreferredMangaByMalId = cache(async (idMal: number): Promise<CatalogManga> => {
-  try {
+  if (await getCatalogProvider() === 'myanimelist') return getMalMangaById(idMal);
+  {
     const media = await fetchDetail(idMal, 'MANGA');
     const authors = media.staff?.edges?.filter((edge) => /story|art|original creator/i.test(edge.role)).map((edge) => ({ mal_id: edge.node.id, name: edge.node.name.full })) ?? [];
     return {
@@ -111,8 +110,5 @@ export const getPreferredMangaByMalId = cache(async (idMal: number): Promise<Cat
       rank: rank(media), popularity: media.popularity ?? 0, synopsis: media.description ?? null,
       authors, genres: genreList(media), tags: [],
     };
-  } catch (error) {
-    console.error('AniList detail unavailable; using MyAnimeList fallback:', error);
-    return getMalMangaById(idMal);
   }
 });

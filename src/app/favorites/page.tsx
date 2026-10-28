@@ -83,7 +83,7 @@ export default async function FavoritesPage({
             >
               chevron_right
             </span>
-            <span className="text-slate-500">Favoritos</span>
+            <span className="text-muted-foreground">Favoritos</span>
           </nav>
           <h1 className="text-5xl md:text-7xl font-black text-text-primary leading-none tracking-tighter mb-4">
             Mis favoritos
@@ -139,7 +139,7 @@ export default async function FavoritesPage({
           <h2 className="text-2xl font-bold text-white mb-2">
             {hasActiveFilters ? "No encontramos favoritos con estos filtros" : "Todavía no tenés favoritos"}
           </h2>
-          <p className="text-slate-400 max-w-sm">
+          <p className="text-muted-foreground max-w-sm">
             {hasActiveFilters
               ? "Probá cambiando la búsqueda o alguno de los filtros."
               : "Cuando agregues un anime o manga, aparecerá en esta colección."}

@@ -1,18 +1,28 @@
 import "server-only";
+import { providerRead, ProviderRequestError } from "@/services/provider-request";
 import { AniListConnectionNotFoundError, getValidAniListAccessToken } from "@/services/anilist-connection";
 import { localStatus, remoteStatus } from "@/lib/anilist-sync-policy";
 import type { MediaProgressChange, MediaSyncType, ProviderSyncResult } from "@/interfaces/media-sync";
 
 class AniListChangeError extends Error {}
+class AniListMutationError extends ProviderRequestError {}
 async function request<T>(token: string, query: string, variables: Record<string, unknown>): Promise<T> {
+  if (query.trimStart().startsWith('query')) {
+    const payload = await providerRead<{ data: T }>('anilist', 'library-resolve', 'https://graphql.anilist.co', {
+      method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ query, variables }),
+    });
+    return payload.data;
+  }
   const response = await fetch("https://graphql.anilist.co", {
-    method: "POST", cache: "no-store", signal: AbortSignal.timeout(15000),
+    method: "POST", cache: "no-store", signal: AbortSignal.timeout(7000),
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify({ query, variables }),
-  });
+  }).catch(() => { throw new AniListMutationError('anilist', 0); });
   const payload = await response.json().catch(() => null) as { data?: T; errors?: Array<{ status?: number }> } | null;
+  if (!response.ok || payload?.errors?.length || !payload?.data) console.warn('[provider-sync]', { provider: 'anilist', operation: 'mutation', status: response.status, graphStatus: payload?.errors?.[0]?.status, remaining: response.headers.get('x-ratelimit-remaining'), retryAfter: response.headers.get('retry-after') });
   if (response.status === 429 || payload?.errors?.some((error) => error.status === 429)) throw new AniListChangeError("AniList alcanzó el límite de solicitudes. Podés reintentar más tarde.");
   if (response.status === 401 || payload?.errors?.some((error) => error.status === 401)) throw new AniListChangeError("Volvé a conectar AniList desde tu perfil.");
+  if (response.status >= 500 || payload?.errors?.some(error => (error.status ?? 0) >= 500)) throw new AniListMutationError('anilist', response.status >= 500 ? response.status : payload?.errors?.[0]?.status ?? 502);
   if (!response.ok || payload?.errors?.length || !payload?.data) throw new AniListChangeError("AniList no pudo aplicar el cambio. Intentá nuevamente más tarde.");
   return payload.data;
 }
@@ -45,10 +55,22 @@ async function save(token: string, media: ListMedia, status: string, progress: n
 async function connectedChange(userId: string, change: (token: string) => Promise<void>): Promise<ProviderSyncResult> {
   try {
     const token = await getValidAniListAccessToken(userId);
-    await change(token);
+    const started = Date.now();
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try { await change(token); break; }
+      catch (error) {
+        // Re-read the remote entry before another write. A timed-out write may
+        // already have succeeded; each change checks the current state first.
+        if (!(error instanceof AniListMutationError) || (error.status !== 0 && error.status < 500) || attempt === 3 || Date.now() - started > 20000) throw error;
+        console.warn('[provider-sync]', { provider: 'anilist', operation: 'reconcile-before-retry', attempt, status: error.status });
+        await new Promise(resolve => setTimeout(resolve, 400 * attempt));
+      }
+    }
     return { status: "synced" };
   } catch (error) {
     if (error instanceof AniListConnectionNotFoundError) return { status: "not_connected" };
+    if (error instanceof ProviderRequestError && error.status === 429) return { status: 'failed', message: `Se guardó en AniTrack, pero AniList limitó las solicitudes. Esperá ${Math.ceil(error.retryAfterMs / 1000)} segundos y retomá la sincronización desde tu biblioteca.` };
+    console.warn("[provider-sync]", { provider: "anilist", operation: "library-change", status: error instanceof ProviderRequestError ? error.status : undefined, error: error instanceof Error ? error.name : "unknown" });
     return { status: "failed", message: `Se guardó en AniTrack, pero no se pudo actualizar AniList. ${error instanceof Error && (error instanceof AniListChangeError || error.message.startsWith("Volvé a conectar")) ? error.message : "Intentá sincronizar nuevamente más tarde."}` };
   }
 }

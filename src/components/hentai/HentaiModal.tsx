@@ -36,24 +36,24 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
       onClick={onClose}
     >
       <div 
-        className="glass-card w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10 bg-slate-900/90 backdrop-blur-xl animate-in zoom-in-95 duration-300"
+        className="w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10 bg-card backdrop-blur-xl animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">security</span>
               New Vault Entry
             </h2>
-            <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold">
+            <p className="text-xs text-muted-foreground mt-1 uppercase tracking-widest font-semibold">
               Add private content to your collection
             </p>
           </div>
           <button type="button"
             aria-label="Cerrar formulario"
             onClick={onClose}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -65,28 +65,28 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
             {/* Basic Info Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label htmlFor="title" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Title</label>
+                <label htmlFor="title" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Title</label>
                 <input
                   name="title"
                   id="title"
                   required
-                  className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                  className="w-full bg-muted border border-white/5 rounded-xl p-4 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   placeholder="Enter title..."
                   type="text"
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="type" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Type</label>
+                <label htmlFor="type" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Type</label>
                 <div className="relative">
                   <select
                     id="type"
                     name="type"
-                    className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white appearance-none focus:ring-2 focus:ring-primary/50 outline-none transition-all cursor-pointer"
+                    className="w-full bg-muted border border-white/5 rounded-xl p-4 text-foreground appearance-none focus:ring-2 focus:ring-primary/50 outline-none transition-all cursor-pointer"
                   >
                     <option value="anime">Anime</option>
                     <option value="doujin">Doujin/Manga</option>
                   </select>
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
                     expand_more
                   </span>
                 </div>
@@ -95,15 +95,15 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
 
             {/* Image URL Section */}
             <div className="space-y-2">
-              <label htmlFor="image" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Image URL</label>
+              <label htmlFor="image" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Image URL</label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg">
                   link
                 </span>
                 <input
                   name="image"
                   id="image"
-                  className="w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 pl-12 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                  className="w-full bg-muted border border-white/5 rounded-xl p-4 pl-12 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   placeholder="https://image-host.com/cover.jpg"
                   type="text"
                 />
@@ -112,11 +112,11 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
 
             {/* Description Section */}
             <div className="space-y-2">
-              <label htmlFor="description" className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Description</label>
+              <label htmlFor="description" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Description</label>
               <textarea
                 name="description"
                 id="description"
-                className="custom-scrollbar w-full bg-slate-900/50 border border-white/5 rounded-xl p-4 text-white placeholder:text-slate-400 resize-none focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                className="custom-scrollbar w-full bg-muted border border-white/5 rounded-xl p-4 text-foreground placeholder:text-muted-foreground resize-none focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                 placeholder="Add a brief description..."
                 rows={4}
               ></textarea>
@@ -125,14 +125,14 @@ export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalPro
             {/* Form Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-end pt-6 gap-4">
               <button
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-8 py-3 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 type="button"
                 onClick={onClose}
               >
                 Cancel
               </button>
               <button
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 type="submit"
                 disabled={loading}
               >

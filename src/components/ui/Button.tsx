@@ -8,9 +8,9 @@ export default function Button({ variant = "primary", isLoading, className = "",
   
   const variants = {
     primary: "bg-primary text-primary-foreground shadow-xl shadow-primary/20 hover:shadow-primary/40",
-    secondary: "bg-slate-700/50 text-white hover:bg-slate-700 transition-colors",
-    outline: "bg-transparent border border-white/10 text-white hover:bg-white/5",
-    ghost: "bg-transparent text-slate-400 hover:text-white hover:bg-white/5 font-semibold py-2 px-4 rounded-lg",
+    secondary: "bg-muted text-foreground hover:bg-accent transition-colors",
+    outline: "bg-transparent border border-border text-foreground hover:bg-muted",
+    ghost: "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted font-semibold py-2 px-4 rounded-lg",
     social: "flex items-center justify-center gap-3 bg-white text-slate-900 hover:bg-slate-100 py-3 font-bold",
   };
 

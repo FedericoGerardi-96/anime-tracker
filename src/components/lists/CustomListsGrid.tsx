@@ -8,7 +8,7 @@ export default function CustomListsGrid({ lists }: CustomListsGridProps) {
         <Link
           href={`/lists?tab=custom_lists&list=${encodeURIComponent(list.id)}`}
           key={list.id}
-          className='group relative bg-slate-900/40 p-5 rounded-3xl border border-white/5 hover:border-primary/50 transition-all cursor-pointer shadow-xl overflow-hidden block'
+          className='group relative bg-card p-5 rounded-3xl border border-white/5 hover:border-primary/50 transition-all cursor-pointer shadow-xl overflow-hidden block'
         >
           <div className='absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-[50px] group-hover:bg-primary/20 transition-colors pointer-events-none' />
 
@@ -19,13 +19,13 @@ export default function CustomListsGrid({ lists }: CustomListsGridProps) {
             <span className='material-symbols-outlined text-text-muted'>more_horiz</span>
           </div>
 
-          <h3 className='font-black text-xl text-white mb-2 truncate relative z-10'>{list.name}</h3>
+          <h3 className='font-black text-xl text-foreground mb-2 truncate relative z-10'>{list.name}</h3>
           {list.description && (
-            <p className='text-sm text-slate-400 line-clamp-2 mb-4 h-10 relative z-10'>{list.description}</p>
+            <p className='text-sm text-muted-foreground line-clamp-2 mb-4 h-10 relative z-10'>{list.description}</p>
           )}
 
           <div className='pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold relative z-10'>
-            <span className='text-slate-300'>Colección personalizada</span>
+            <span className='text-muted-foreground'>Colección personalizada</span>
             <span className='text-primary hover:underline'>Ver elementos</span>
           </div>
         </Link>

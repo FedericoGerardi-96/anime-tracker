@@ -35,7 +35,7 @@ export default function HentaiSearch({ defaultValue }: Readonly<{ defaultValue?:
     <div className="relative group max-w-xl w-full">
       <span
         className={`absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-xl transition-colors ${
-          isPending ? "text-primary animate-pulse" : "text-slate-500 group-focus-within:text-primary"
+          isPending ? "text-primary animate-pulse" : "text-muted-foreground group-focus-within:text-primary"
         }`}
       >
         {isPending ? "sync" : "search"}

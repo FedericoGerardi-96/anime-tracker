@@ -158,7 +158,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-foreground placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
+                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
                   placeholder="name@example.com" 
                 />
               </div>
@@ -181,7 +181,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-foreground placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
+                  className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
                   placeholder="••••••••"
                 />
               </div>
