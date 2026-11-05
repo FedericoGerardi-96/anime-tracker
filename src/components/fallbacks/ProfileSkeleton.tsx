@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/fallbacks/PageSkeleton';
 
 export default function ProfileSkeleton() {
-  return <div role="status" aria-label="Cargando perfil…" className="flex-1 space-y-12 p-6 md:p-12">
+  return <div role="status" aria-label="Cargando perfil…" className="flex-1 space-y-12 py-6 md:py-12">
     <span className="sr-only">Cargando perfil…</span>
     <section className="pt-12 xl:pt-0">
       <div className="flex flex-col items-center gap-8 xl:flex-row xl:items-end">

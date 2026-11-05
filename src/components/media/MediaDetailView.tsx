@@ -1,3 +1,4 @@
+import AnimeSourceLinks from './AnimeSourceLinks';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,7 +18,7 @@ export default function MediaDetailView({ detail }: Readonly<MediaDetailViewProp
   const typeLabel = isAnime ? 'Anime' : 'Manga';
 
   return (
-    <div className="relative flex-1 px-4 pb-8 sm:px-8 lg:px-12">
+    <div className="relative flex-1 pb-8">
       <div className="detail-hero pointer-events-none absolute top-0 left-0 z-0 h-[600px] w-full overflow-hidden">
         <div
           className="h-full w-full scale-110 bg-cover bg-center blur-3xl"
@@ -64,6 +65,7 @@ export default function MediaDetailView({ detail }: Readonly<MediaDetailViewProp
             <h1 className="mb-6 text-5xl leading-none font-black text-foreground lg:text-7xl">
               {detail.displayTitle}
             </h1>
+            {isAnime && <Suspense fallback={null}><AnimeSourceLinks malId={detail.malId} /></Suspense>}
 
             <div className="mb-8 flex flex-wrap gap-8">
               <div className="flex items-center gap-2">

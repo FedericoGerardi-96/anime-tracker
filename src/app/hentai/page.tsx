@@ -52,7 +52,7 @@ export default async function HentaiPage({
   const isSearching = query.length > 0;
 
   return (
-    <div className="flex-1 relative px-4 sm:px-8 lg:px-12 pb-8">
+    <div className="flex-1 relative pb-8">
       {/* Background Accent Glow */}
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/10 blur-[130px] rounded-full -mr-48 -mt-48 pointer-events-none -z-10" />
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/5 blur-[110px] rounded-full -ml-32 -mb-32 pointer-events-none -z-10" />

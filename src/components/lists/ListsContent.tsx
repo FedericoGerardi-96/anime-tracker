@@ -30,7 +30,7 @@ export default async function ListsContent({
               placeholder="Buscar listas por nombre o descripción"
               className="min-w-0 flex-1 rounded-xl border border-border bg-card px-4 py-3"
             />
-            <button type="submit" className="rounded-xl bg-primary px-5 font-bold text-white">
+            <button type="submit" className="rounded-xl bg-primary px-5 font-bold text-primary-foreground">
               Buscar
             </button>
           </form>

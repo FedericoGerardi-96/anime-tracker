@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CatalogProvider } from '@/interfaces/anilist-catalog';
 
-export default function ProviderChoice({ provider, failed = false, retryAfterMs = 0 }: { provider: CatalogProvider; failed?: boolean; retryAfterMs?: number }) {
+export default function ProviderChoice({ provider, failed = false, retryAfterMs = 0, compact = false }: { provider: CatalogProvider; failed?: boolean; retryAfterMs?: number; compact?: boolean }) {
   const router = useRouter();
   const [wait, setWait] = useState(Math.ceil(retryAfterMs / 1000));
   useEffect(() => {
@@ -24,6 +24,14 @@ export default function ProviderChoice({ provider, failed = false, retryAfterMs 
       if (query) url.searchParams.set('q', query);
     }
     location.assign(url.toString());
+  }
+  if (compact && !failed) {
+    const alternative = provider === 'anilist' ? 'myanimelist' : 'anilist';
+    const alternativeName = alternative === 'anilist' ? 'AniList' : 'MyAnimeList';
+    return <div className="flex min-h-11 flex-wrap items-center justify-end gap-x-1 text-xs text-muted-foreground">
+      <span>Datos de <strong className="text-foreground">{name}</strong> ·</span>
+      <button type="button" onClick={() => choose(alternative)} className="min-h-11 cursor-pointer rounded-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-primary">cambiar a {alternativeName}</button>
+    </div>;
   }
   return <section className="rounded-xl border border-border bg-card p-4 space-y-3">
     {failed && <p role="alert" className="text-sm text-foreground">{retryAfterMs ? `${name} limitó las solicitudes. Esperá unos ${Math.ceil(retryAfterMs / 1000)} segundos antes de reintentar.` : `No pudimos completar esta consulta en ${name}. Puede ser un fallo temporal; no cambiamos de proveedor.`} ¿Querés consultar el otro catálogo?</p>}

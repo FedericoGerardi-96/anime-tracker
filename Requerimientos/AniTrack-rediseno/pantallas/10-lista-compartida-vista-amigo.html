@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista compartida · AniTrack</title>
+<link rel="stylesheet" href="anitrack.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#4BF2C5}a:hover{color:#8F7BFF}
+.num{position:absolute;left:10px;top:10px;z-index:2;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 7px;border-radius:6px;background:rgba(7,7,15,.75);border:1px solid rgba(190,180,255,.22);color:#F3F1FF}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="at" style="padding-bottom: 96px; position: relative">
+<header class="nav"><div class="wrap nav-in">
+<a href="#" class="logo" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><defs><linearGradient id="lgN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4BF2C5"></stop><stop offset="1" stop-color="#8F7BFF"></stop></linearGradient></defs><circle cx="18" cy="18" r="13" fill="none" stroke="rgba(243,241,255,.13)" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#lgN)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="#F3F1FF"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="#FF7AB8"></path></svg><span class="logo-word">Ani<b>Track</b></span></a>
+<nav class="links" aria-label="Principal"><a href="#">Inicio</a><a href="#">Anime</a><a href="#">Manga</a><a href="#">Calendario</a><a href="#">Listas</a><a href="#">Amigos</a></nav>
+<a href="#" class="avatar" style="margin-left: auto" aria-label="Tu perfil"><span>FG</span></a>
+</div></header>
+
+<main class="wrap" style="display: flex; flex-wrap: wrap; gap: 32px; padding-top: 40px">
+<section style="flex: 999 1 700px; min-width: 0; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-end">
+<div style="position: relative; width: 150px; height: 156px; flex: none" aria-hidden="true">
+<div class="poster p7" style="position: absolute; width: 92px; left: 0; top: 16px; transform: rotate(-8deg)"></div>
+<div class="poster p1" style="position: absolute; width: 92px; left: 58px; top: 16px; transform: rotate(7deg)"></div>
+<div class="poster p6" style="position: absolute; width: 100px; left: 25px; top: 0; box-shadow: 0 20px 40px -12px rgba(0,0,0,.8)"></div>
+</div>
+<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: inline-flex; align-items: center; gap: 8px; color: #BDB9DC" class="sm"><span class="avatar" style="width: 24px; height: 24px"><span style="font-size: 9px">RT</span></span>Lista de <b style="color: #F3F1FF">Rodri Torres</b> · Maratón</a>
+<h1 class="display" style="font-size: 42px">Maratón de invierno</h1>
+<p class="muted" style="margin: 0">Para las vacaciones, en este orden. Arranca tranqui y termina con todo.</p>
+<div class="sm muted" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center"><span class="mono">7 títulos</span><span class="mono">~41 h</span><span style="color: #4BF2C5; font-weight: 700">Ya viste 2 de 7</span><div class="bar" style="width: 140px"><i style="width: 29%"></i></div></div>
+</div>
+</div>
+
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+<sc-if value="{{ notFollowing }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-primary" onClick="{{ toggleFollow }}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Seguir lista</button></sc-if>
+<sc-if value="{{ following }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onClick="{{ toggleFollow }}" style="border-color: rgba(75,242,197,.45); color: #4BF2C5"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4 8-9"></path></svg>Siguiendo</button></sc-if>
+<button type="button" class="btn btn-secondary" onClick="{{ makeCopy }}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>Hacer una copia</button>
+<button type="button" class="btn btn-ghost btn-icon" aria-label="Compartir"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"></circle><circle cx="18" cy="6" r="2.5"></circle><circle cx="18" cy="18" r="2.5"></circle><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"></path></svg></button>
+<span class="xs faint" style="flex: 1 1 260px; min-width: 0"><b class="muted">Seguir:</b> la ves en Listas › De amigos y se actualiza cuando Rodri agrega títulos. <b class="muted">Copia:</b> pasa a ser tuya y la podés editar.</span>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(168px, 1fr))">
+<div class="card"><div class="poster p7"><span class="num">01</span><span class="pt">Delicious in Dungeon</span></div><div><p class="ttl">Delicious in Dungeon</p><p class="meta">Trigger · 24 eps</p></div><div class="row"><span class="st st-completado"><i></i>Ya la viste</span></div></div>
+<div class="card"><div class="poster p1"><span class="num">02</span><span class="pt">Frieren</span></div><div><p class="ttl">Frieren: Beyond Journey’s End</p><p class="meta">Madhouse · 28 eps</p></div><div class="row"><span class="st st-completado"><i></i>Ya la viste</span></div></div>
+<div class="card"><div class="poster p6"><span class="num">03</span><span class="pt">Ranking of Kings</span></div><div><p class="ttl">Ranking of Kings</p><p class="meta">Wit Studio · 23 eps</p></div><div class="row"><span class="st st-none"><i></i>Agregar</span></div></div>
+<div class="card"><div class="poster p8"><span class="num">04</span><span class="pt">Odd Taxi</span></div><div><p class="ttl">Odd Taxi</p><p class="meta">OLM · 13 eps</p></div><div class="row"><span class="st st-viendo"><i></i>Viendo</span><span class="ep">EP <b>4</b>/13 <button type="button" aria-label="Sumar un episodio">+1</button></span></div></div>
+<div class="card"><div class="poster p10"><span class="num">05</span><span class="pt">Mushishi</span></div><div><p class="ttl">Mushishi</p><p class="meta">Artland · 26 eps</p></div><div class="row"><span class="st st-pendiente"><i></i>Pendiente</span></div></div>
+<div class="card"><div class="poster p2"><span class="num">06</span><span class="pt">Witch Hat Atelier</span></div><div><p class="ttl">Witch Hat Atelier</p><p class="meta">Bug Films · 12 eps</p></div><div class="row"><span class="st st-none"><i></i>Agregar</span></div></div>
+<div class="card"><div class="poster p9"><span class="num">07</span><span class="pt">Vinland Saga</span></div><div><p class="ttl">Vinland Saga</p><p class="meta">Wit Studio · 24 eps</p></div><div class="row"><span class="st st-none"><i></i>Agregar</span></div></div>
+</div>
+<p class="xs faint" style="margin: 0">Los estados de cada card son los tuyos, no los de Rodri. Así ves enseguida qué te falta.</p>
+</section>
+
+<aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<p class="eyebrow" style="color: #9894BD">Si la abre alguien sin cuenta</p>
+<div class="panel" style="padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; gap: 10px; align-items: center"><span class="avatar" style="width: 32px; height: 32px"><span style="font-size: 11px">RT</span></span><span class="sm"><b>Rodri</b> <span class="muted">te compartió una lista</span></span></div>
+<b style="font-size: 17px">Maratón de invierno</b>
+<p class="sm muted" style="margin: 0">Puede ver toda la lista. Para guardarla y seguir su progreso necesita una cuenta.</p>
+<button type="button" class="btn btn-primary">Guardar lista</button>
+<span class="xs faint">Lleva a crear la cuenta y, al terminar, la lista queda guardada en Listas › De amigos.</span>
+</div>
+</aside>
+</main>
+
+<sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+<div style="position: sticky; bottom: 24px; display: flex; justify-content: center; padding-inline: 16px; margin-top: 24px">
+<div role="status" class="panel" style="display: flex; align-items: center; gap: 14px; padding: 12px 14px 12px 18px; border-color: rgba(75,242,197,.4); box-shadow: 0 24px 60px -16px rgba(0,0,0,.8)">
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color: #4BF2C5"><path d="M6 12.5l4 4 8-9"></path></svg>
+<span class="sm">{{ toast }}</span>
+<a href="#" class="link sm">Abrir</a>
+</div>
+</div>
+</sc-if>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { following: false, toast: '' }; }
+  renderVals() {
+    const { following, toast } = this.state;
+    return {
+      following, notFollowing: !following,
+      toastOn: toast !== '', toast,
+      toggleFollow: () => this.setState({ following: !following, toast: following ? '' : 'Siguiendo “Maratón de invierno”. La encontrás en Listas › De amigos.' }),
+      makeCopy: () => this.setState({ toast: 'Creaste “Maratón de invierno (copia)”, basada en la lista de Rodri.' })
+    };
+  }
+}
+
+window.__dcBoot(Component, {});
+</script>
+</body>
+</html>

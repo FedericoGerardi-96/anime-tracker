@@ -18,6 +18,7 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
   const [isOpen, setOpen] = useState(false);
   const [provider, setProvider] = useState<SyncProvider>("anilist");
   const [selection, setSelection] = useState({ anime: true, manga: true });
+  const [mode, setMode] = useState<"pending" | "full">("pending");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [connectionLost, setConnectionLost] = useState(false);
@@ -156,17 +157,19 @@ export function LibrarySyncProvider({ children }: { children: ReactNode }) {
     </button>}
     <dialog ref={dialog} onCancel={(event) => { event.preventDefault(); minimize(); }} onClose={minimize} onClick={(event) => { if (event.target === event.currentTarget) minimize(); }} aria-labelledby="library-sync-title" className="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-3xl border border-border bg-background p-0 text-foreground shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm">
       <div className="flex items-start justify-between gap-4 border-b border-border p-5 sm:p-6">
-        <div><h2 id="library-sync-title" className="text-xl font-bold">Sincronizaciones</h2><p className="mt-1 text-sm text-muted-foreground">{running ? "Podés minimizar este panel y seguir usando la app. Si cerrás o dejás esta pestaña, se pausa después de la tanda actual y retoma al volver." : "Elegí qué bibliotecas querés comparar y sincronizar."}</p></div>
+        <div><h2 id="library-sync-title" className="text-xl font-bold">Sincronizaciones</h2><p className="mt-1 text-sm text-muted-foreground">{running ? "Podés minimizar este panel y seguir usando la app. Si cerrás o dejás esta pestaña, se pausa después de la tanda actual y retoma al volver." : "Los cambios se guardan primero en AniTrack. Enviá los pendientes cuando quieras."}</p></div>
         <button type="button" onClick={minimize} aria-label="Minimizar panel de sincronización" className="cursor-pointer rounded-xl border border-border p-2 transition hover:bg-muted"><span className="material-symbols-outlined block">remove</span></button>
       </div>
       <div className="space-y-5 p-5 sm:p-6">
         <section className="rounded-2xl border border-border p-4">
           <h3 className="font-bold">Nueva sincronización</h3>
+          <label className="mt-3 block text-sm">Tipo de sincronización<select value={mode} onChange={event => setMode(event.target.value as "pending" | "full")} className="ml-2 rounded-lg border border-border bg-card p-2"><option value="pending">Enviar cambios pendientes</option><option value="full">Comparar e importar biblioteca completa</option></select></label>
+          <p className="mt-2 text-sm text-muted-foreground">Favoritos, eliminaciones y progreso se acumulan en Supabase. Enviar pendientes aplica solo el último estado de cada serie, por tandas mientras la app está visible. La comparación completa también importa series remotas.</p>
           <div className="mt-3 text-sm"><p className="mb-2">Plataforma</p><Dropdown ariaLabel="Plataforma de sincronización" value={provider} disabled={busy} onChange={(value) => { setProvider(value as SyncProvider); setError(""); }} options={[{ value: "anilist", label: "AniList" }, { value: "myanimelist", label: "MyAnimeList" }]} className="!w-full" buttonClassName="!w-full rounded-xl bg-card py-3" menuClassName="!w-full" /></div>
           <div className="my-4 flex gap-6">{(["anime", "manga"] as const).map((type) => <label key={type} className="flex cursor-pointer items-center gap-2 text-sm"><input type="checkbox" checked={selection[type]} disabled={busy} onChange={(event) => setSelection((current) => ({ ...current, [type]: event.target.checked }))} className="size-4 accent-primary" />{type === "anime" ? "Anime" : "Manga"}</label>)}</div>
           <p className="text-xs text-muted-foreground">Se comparan tus bibliotecas y se aplican solo las diferencias. No se eliminan favoritos. Mantené la app abierta y visible hasta terminar; el avance se guarda para retomarlo después.</p>
           {error && <p role="alert" className="mt-3 text-sm text-red-400">{error}</p>}
-          <div className="mt-4 flex justify-end"><button type="button" disabled={busy || running || (!selection.anime && !selection.manga)} onClick={() => void mutate("/api/library/sync", { provider, ...selection })} className="cursor-pointer rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50">{busy ? "Procesando…" : selectedJob?.status === "cancelled" || selectedJob?.status === "error" ? "Reevaluar y sincronizar" : `Sincronizar con ${names[provider]}`}</button></div>
+          <div className="mt-4 flex justify-end"><button type="button" disabled={busy || running || (!selection.anime && !selection.manga)} onClick={() => void mutate("/api/library/sync", { provider, mode, ...selection })} className="cursor-pointer rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50">{busy ? "Procesando…" : selectedJob?.status === "cancelled" || selectedJob?.status === "error" ? "Reevaluar y sincronizar" : `Sincronizar con ${names[provider]}`}</button></div>
           {running && <p className="mt-2 text-right text-xs text-muted-foreground">Esperá o cancelá el trabajo activo para iniciar otro.</p>}
         </section>
         {connectionLost && <p role="status" className="text-sm text-amber-500">No pudimos actualizar el estado. Mostramos el último avance conocido.</p>}

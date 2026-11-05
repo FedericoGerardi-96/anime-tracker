@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de anime · AniTrack</title>
+<link rel="stylesheet" href="anitrack.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#4BF2C5}a:hover{color:#8F7BFF}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(190,180,255,.13);font-size:14px}
+.kv span:first-child{color:#9894BD}
+.chk{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:14px;font-weight:600}
+.box{width:20px;height:20px;border-radius:6px;border:2px solid rgba(243,241,255,.5);display:grid;place-items:center;flex:none}
+.box.on{background:#4BF2C5;border-color:#4BF2C5;color:#062A22}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="at" style="padding-bottom: 96px">
+<header class="nav"><div class="wrap nav-in">
+<a href="#" class="logo" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><defs><linearGradient id="lgN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4BF2C5"></stop><stop offset="1" stop-color="#8F7BFF"></stop></linearGradient></defs><circle cx="18" cy="18" r="13" fill="none" stroke="rgba(243,241,255,.13)" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#lgN)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="#F3F1FF"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="#FF7AB8"></path></svg><span class="logo-word">Ani<b>Track</b></span></a>
+<nav class="links" aria-label="Principal"><a href="#">Inicio</a><a href="#" class="on">Anime</a><a href="#">Manga</a><a href="#">Calendario</a><a href="#">Listas</a><a href="#">Amigos</a></nav>
+<div class="nav-end"><label class="search" for="qf"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="qf" placeholder="Buscar" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"><span class="kbd">Ctrl K</span></label><a href="#" class="avatar" aria-label="Tu perfil"><span>RT</span></a></div>
+</div></header>
+
+<div style="position: relative; overflow: hidden; border-bottom: 1px solid rgba(190,180,255,.13)">
+<div class="p2" style="position: absolute; inset: -40px; filter: blur(60px); opacity: .45" aria-hidden="true"></div>
+<div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,7,15,.2), #07070F)" aria-hidden="true"></div>
+<div class="wrap" style="position: relative; display: flex; gap: 40px; flex-wrap: wrap; padding-top: 32px; padding-bottom: 40px; align-items: flex-end">
+<div class="poster p2" style="width: 230px; flex: none; box-shadow: 0 30px 60px -20px rgba(0,0,0,.8)"><span class="pt" style="font-size: 18px">Dandadan</span></div>
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<nav class="xs faint" aria-label="Ruta"><a href="#" style="color: #BDB9DC">Anime</a> / Dandadan 2nd Season</nav>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><span class="badge b-live"><i></i>En emisión</span><span class="badge b-fmt">TV</span></div>
+<h1 class="display" style="font-size: 56px">Dandadan 2nd Season</h1>
+<p class="muted" style="margin: 0">ダンダダン 第2期 · Science SARU · Julio 2025</p>
+<div style="display: flex; gap: 22px; flex-wrap: wrap" class="mono">
+<span><span style="color: #FFC566">★</span> 8.5</span><span>12 eps · 24 min</span><span class="muted">Acción · Comedia · Sobrenatural</span>
+</div>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; position: relative">
+<button type="button" class="st st-viendo" style="height: 44px; padding: 0 14px; font-size: 14px; border-radius: 12px"><i></i>Viendo<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<div style="display: inline-flex; align-items: center; height: 44px; border-radius: 12px; background: #17162B; border: 1px solid rgba(190,180,255,.22)">
+<button type="button" aria-label="Restar un episodio" style="width: 44px; height: 42px; border: 0; background: transparent; font-size: 18px">−</button>
+<span class="mono" style="min-width: 72px; text-align: center">EP <b>8</b>/12</span>
+<button type="button" aria-label="Sumar un episodio" style="width: 44px; height: 42px; border: 0; background: rgba(75,242,197,.14); color: #4BF2C5; border-radius: 0 11px 11px 0; font-size: 18px; font-weight: 800">+</button>
+</div>
+<button type="button" class="btn btn-love" aria-pressed="true"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="fill: #FF7AB8"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>Me encanta</button>
+<div style="position: relative">
+<button type="button" class="btn btn-secondary" aria-expanded="true"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"></path></svg>En 2 listas</button>
+<div class="menu" style="top: 52px; left: 0; width: 280px">
+<label class="search" for="qlist" style="min-width: 0; height: 38px; margin-bottom: 6px"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="qlist" placeholder="Buscar lista" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"></label>
+<div class="chk"><span class="box on"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4 8-9"></path></svg></span>Para ver con Mati</div>
+<div class="chk"><span class="box on"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4 8-9"></path></svg></span>Openings que me encantan</div>
+<div class="chk"><span class="box"></span>Maratón de invierno</div>
+<hr class="rule" style="margin: 6px 4px">
+<button type="button" style="color: #4BF2C5"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Nueva lista con este título</button>
+<p class="xs faint" style="margin: 4px 10px 6px">Se guarda al tocar. Sin botón “Guardar”.</p>
+</div>
+</div>
+<button type="button" class="btn btn-ghost"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"></path></svg>Recomendar a un amigo</button>
+</div>
+</div>
+</div>
+</div>
+
+<main class="wrap" style="display: flex; gap: 32px; flex-wrap: wrap; padding-top: 40px">
+<div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 32px">
+<div class="panel" style="display: flex; gap: 20px; align-items: center; padding: 18px 22px; flex-wrap: wrap">
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width: 28px; height: 28px; color: #4BF2C5"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>
+<div style="flex: 1; min-width: 0"><b>EP 9 salió hoy a las 11:00</b><div class="sm muted">El EP 10 sale el jueves 5 de noviembre a las 11:00 (hora de Buenos Aires)</div></div>
+<button type="button" class="btn btn-primary btn-sm">Vi el EP 9</button>
+</div>
+<section style="display: flex; flex-direction: column; gap: 12px; max-width: 70ch">
+<p class="eyebrow">Sinopsis</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.7">Momo y Okarun siguen enfrentando yokais y alienígenas mientras buscan las partes perdidas del cuerpo de Okarun. La nueva temporada arranca con la maldición de una familia en un pueblo aislado de montaña.</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><span class="tag">Acción</span><span class="tag">Comedia</span><span class="tag">Sobrenatural</span><span class="tag">Ciencia ficción</span></div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div class="sec-head"><h2 class="h2">Personajes</h2><a href="#" class="link">Ver todos</a></div>
+<div style="display: flex; gap: 24px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 96px"><div class="p4" style="width: 80px; height: 80px; border-radius: 50%"></div><b class="sm">Momo Ayase</b><span class="xs faint">Principal</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 96px"><div class="p6" style="width: 80px; height: 80px; border-radius: 50%"></div><b class="sm">Ken Takakura</b><span class="xs faint">Principal</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 96px"><div class="p9" style="width: 80px; height: 80px; border-radius: 50%"></div><b class="sm">Turbo Granny</b><span class="xs faint">Secundario</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 96px"><div class="p7" style="width: 80px; height: 80px; border-radius: 50%"></div><b class="sm">Vamola</b><span class="xs faint">Secundario</span></div>
+</div>
+</section>
+</div>
+<aside style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+<div class="panel" style="padding: 8px 22px 14px">
+<div class="kv"><span>Formato</span><b>Serie de TV</b></div>
+<div class="kv"><span>Episodios</span><b class="mono">12</b></div>
+<div class="kv"><span>Estreno</span><b>Julio 2025</b></div>
+<div class="kv"><span>Estudio</span><b>Science SARU</b></div>
+<div class="kv" style="border-bottom: 0"><span>Basado en</span><b>Manga</b></div>
+</div>
+<div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<span class="h3">De la misma historia</span>
+<div style="display: flex; gap: 12px; align-items: center"><div class="poster p2" style="width: 44px; border-radius: 6px"></div><div><b class="sm">Dandadan</b><div class="xs faint">Temporada 1 · Completado</div></div></div>
+<div style="display: flex; gap: 12px; align-items: center"><div class="poster p5" style="width: 44px; border-radius: 6px"></div><div><b class="sm">Dandadan (manga)</b><div class="xs faint">Obra original · Sin estado</div></div></div>
+</div>
+<div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px">
+<span class="h3">Amigos que la vieron</span>
+<div style="display: flex; gap: 10px; align-items: center"><span class="avatar" style="width: 28px; height: 28px"><span style="font-size: 10px">FG</span></span><span class="sm">Fede · <span class="mono">EP 12/12</span> · le puso ★ 9</span></div>
+<div style="display: flex; gap: 10px; align-items: center"><span class="avatar" style="width: 28px; height: 28px"><span style="font-size: 10px">MA</span></span><span class="sm">Mati · <span class="mono">EP 6/12</span></span></div>
+</div>
+</aside>
+</main>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+
+window.__dcBoot(Component, {});
+</script>
+</body>
+</html>

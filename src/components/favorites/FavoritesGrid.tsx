@@ -155,7 +155,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                       type="button"
                       onClick={() => handleRemove(media)}
                       disabled={isRemoving}
-                      className="w-10 h-10 rounded-full bg-primary hover:bg-red-600 flex items-center justify-center shadow-lg text-white transition-colors cursor-pointer disabled:opacity-50"
+                      className="w-10 h-10 rounded-full bg-primary hover:bg-red-600 flex items-center justify-center shadow-lg text-primary-foreground hover:text-white transition-colors cursor-pointer disabled:opacity-50"
                       title="Quitar de favoritos"
                     >
                       <span
@@ -165,14 +165,14 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                         {isRemoving ? 'sync' : 'favorite'}
                       </span>
                     </button>
-                    <button type="button" onClick={() => setViewingFavorite(fav)} className="w-10 h-10 rounded-full bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-lg text-white hover:bg-primary/80 transition-all opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 cursor-pointer border border-white/10" title="Ver información" aria-label={`Ver información de ${media.title}`}>
+                    <button type="button" onClick={() => setViewingFavorite(fav)} className="w-10 h-10 rounded-full bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-lg text-white hover:bg-primary hover:text-primary-foreground transition-all opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 cursor-pointer border border-white/10" title="Ver información" aria-label={`Ver información de ${media.title}`}>
                       <span className="material-symbols-outlined text-lg">visibility</span>
                     </button>
                     {/* Edit button */}
                     <button
                       type="button"
                       onClick={() => handleEdit(media, userMeta, progress)}
-                      className="w-10 h-10 rounded-full bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-lg text-white hover:bg-primary/80 transition-all opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 cursor-pointer border border-white/10"
+                      className="w-10 h-10 rounded-full bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-lg text-white hover:bg-primary hover:text-primary-foreground transition-all opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 cursor-pointer border border-white/10"
                       title="Editar datos personalizados"
                       aria-label={`Editar ${media.title}`}
                     >
@@ -191,7 +191,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                       href={userMeta.watch_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="absolute bottom-16 left-4 bg-primary/85 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-primary/30 hover:bg-primary transition-colors text-white text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 z-10"
+                      className="absolute bottom-16 left-4 bg-primary backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-primary/30 hover:bg-primary transition-colors text-primary-foreground text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 z-10"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="material-symbols-outlined text-xs">play_circle</span> {media.type === 'manga' ? 'Leer' : 'Ver'}
@@ -324,7 +324,7 @@ export default function FavoritesGrid({ favorites }: Readonly<FavoritesGridProps
                       href={userMeta.watch_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 bg-primary/20 hover:bg-primary text-primary hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold border border-primary/30 transition-colors uppercase tracking-wider cursor-pointer"
+                      className="flex items-center gap-1.5 bg-primary/20 hover:bg-primary text-primary hover:text-primary-foreground px-4 py-2.5 rounded-xl text-xs font-bold border border-primary/30 transition-colors uppercase tracking-wider cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-sm">play_circle</span>
                       {media.type === 'manga' ? 'Leer' : 'Ver'}

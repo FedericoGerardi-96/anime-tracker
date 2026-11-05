@@ -106,6 +106,7 @@ function getCatalogPagination(options: MalAnimeCatalogOptions) {
 function fetchSearchCatalog(query: string, limit: number, offset: number) {
   return malFetch<MalCatalogResponse>("/anime", {
     q: query,
+    nsfw: "true",
     limit,
     offset,
     fields: ANIME_LIST_FIELDS,

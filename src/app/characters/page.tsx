@@ -21,7 +21,7 @@ export default async function CharactersPage({ searchParams }: Readonly<{ search
     try { result = await searchCharacters(query, page); } catch { unavailable = true; }
   }
 
-  return <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+  return <div className="mx-auto max-w-7xl py-10">
     <div className="mb-10"><p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Directorio de {provider === 'anilist' ? 'AniList' : 'MyAnimeList'}</p><h1 className="mt-2 text-4xl font-black sm:text-6xl">Personajes</h1><p className="mt-3 text-muted-foreground">Buscá personajes por nombre y explorá sus perfiles, apariciones y seiyūs.</p></div>
     <form className="mb-10 flex max-w-2xl gap-3" action="/characters"><input aria-label="Buscar personajes" name="q" defaultValue={query} minLength={2} required placeholder="Ej.: Hinata Hyuuga" className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-card px-4 outline-none focus:border-primary"/><button type="submit" className="rounded-xl bg-primary px-6 font-bold text-primary-foreground">Buscar</button></form>
     <ProviderChoice provider={provider} failed={unavailable} />

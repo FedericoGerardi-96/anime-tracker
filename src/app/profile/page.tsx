@@ -1,3 +1,5 @@
+import CalendarZoneSetting from '@/components/profile/CalendarZoneSetting';
+import { validZone } from '@/lib/calendar-week';
 import { createClient } from "@/lib/supabase/server";
 import { Metadata } from 'next';
 import Link from "next/link";
@@ -106,7 +108,7 @@ export default async function ProfilePage({ searchParams }: Readonly<ProfilePage
       ];
 
   return (
-    <div className="flex-1 p-6 md:p-12 space-y-12">
+    <div className="flex-1 py-6 md:py-12 space-y-12">
       {/* Profile Header */}
       <section className="pt-12 xl:pt-0">
         <div className="flex flex-col xl:flex-row gap-8 items-center xl:items-end">
@@ -243,6 +245,7 @@ export default async function ProfilePage({ searchParams }: Readonly<ProfilePage
           <div className="max-w-lg">
             <HContentToggle enabled={profile.show_h_content} />
           </div>
+          <CalendarZoneSetting value={validZone(user.user_metadata.calendar_timezone) ? user.user_metadata.calendar_timezone : 'auto'} />
           <SocialProfileSettings username={profile.username} bio={profile.bio} discoverable={profile.discoverable} allowFriendRequests={profile.allow_friend_requests} />
           <PrivacySettings initialSettings={privacy} />
           <div>

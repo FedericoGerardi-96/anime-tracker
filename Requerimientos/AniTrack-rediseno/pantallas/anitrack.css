@@ -1,0 +1,128 @@
+/* AniTrack — sistema "Aurora nocturna"
+   Layout: superficies de tinta sobre un cielo con auroras; menta = acción, sakura = afecto, violeta = atmósfera */
+:root{
+  --ink-0:#07070F; --ink-1:#0F0E1D; --ink-2:#17162B; --ink-3:#221F3B;
+  --line:rgba(190,180,255,.13); --line-2:rgba(190,180,255,.22);
+  --fg:#F3F1FF; --fg-2:#BDB9DC; --fg-3:#9894BD;
+  --mint:#4BF2C5; --mint-ink:#062A22; --sakura:#FF7AB8; --violet:#8F7BFF; --sky:#74C7FF; --amber:#FFC566; --coral:#FF8A7A; --lav:#B3A6FF;
+  --f-display:'Unbounded', 'Arial Black', system-ui, sans-serif;
+  --f-body:'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --f-mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink-0)}
+.at{font-family:var(--f-body);color:var(--fg);font-size:15px;line-height:1.5;min-height:100%;
+  background:
+    radial-gradient(900px 520px at 8% -8%, rgba(143,123,255,.30), transparent 62%),
+    radial-gradient(760px 440px at 96% -4%, rgba(75,242,197,.17), transparent 60%),
+    radial-gradient(900px 700px at 55% 115%, rgba(255,122,184,.12), transparent 60%),
+    var(--ink-0);}
+.at button{font:inherit;cursor:pointer}
+:where(.at) button{color:inherit}
+.at a{color:inherit;text-decoration:none}
+.at :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:max(16px,3vw)}
+.ico{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ico.sm{width:14px;height:14px}
+
+/* Tipografía */
+.display{font-family:var(--f-display);font-weight:700;letter-spacing:-.02em;line-height:1.02;margin:0;text-wrap:balance}
+.h1{font-family:var(--f-display);font-weight:600;font-size:34px;letter-spacing:-.02em;line-height:1.1;margin:0;text-wrap:balance}
+.h2{font-family:var(--f-display);font-weight:600;font-size:21px;letter-spacing:-.01em;line-height:1.2;margin:0}
+.h3{font-weight:800;font-size:16px;margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--fg-2)} .faint{color:var(--fg-3)}
+.sm{font-size:13px} .xs{font-size:12px}
+
+/* Barra superior */
+.nav{position:relative;z-index:5;border-bottom:1px solid var(--line);background:rgba(7,7,15,.55);backdrop-filter:blur(14px)}
+.nav-in{display:flex;align-items:center;gap:28px;min-height:68px;flex-wrap:wrap;padding-block:10px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-word{font-family:var(--f-display);font-weight:700;font-size:19px;letter-spacing:-.03em}
+.logo-word b{color:var(--mint);font-weight:700}
+.links{display:flex;gap:4px;flex-wrap:wrap}
+.links a{padding:8px 12px;border-radius:10px;color:var(--fg-2);font-weight:600;font-size:14px}
+.links a.on{color:var(--fg);background:var(--ink-2);box-shadow:inset 0 -2px 0 var(--mint)}
+.nav-end{margin-left:auto;display:flex;align-items:center;gap:10px}
+.search{display:flex;align-items:center;gap:10px;min-width:260px;height:42px;padding:0 12px;border-radius:12px;background:var(--ink-1);border:1px solid var(--line);color:var(--fg-3);font-size:14px}
+.kbd{margin-left:auto;font-family:var(--f-mono);font-size:11px;padding:2px 6px;border-radius:6px;border:1px solid var(--line-2);color:var(--fg-2)}
+.avatar{width:38px;height:38px;border-radius:50%;background:conic-gradient(from 200deg,var(--violet),var(--mint),var(--sakura),var(--violet));padding:2px;flex:none}
+.avatar span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--ink-2);font-weight:800;font-size:13px}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:12px;border:1px solid transparent;font-weight:700;font-size:14px;white-space:nowrap}
+.btn-primary{background:var(--mint);color:var(--mint-ink);box-shadow:0 8px 24px -10px rgba(75,242,197,.7)}
+.btn-secondary{background:var(--ink-2);border-color:var(--line-2);color:var(--fg)}
+.btn-ghost{background:transparent;color:var(--fg-2)}
+.btn-love{background:rgba(255,122,184,.12);border-color:rgba(255,122,184,.35);color:var(--sakura)}
+.btn-icon{width:44px;padding:0}
+.btn-sm{min-height:34px;padding:0 12px;font-size:13px;border-radius:10px}
+
+/* Chips, badges, tags */
+.badge{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:6px;font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.b-live{background:rgba(75,242,197,.16);color:var(--mint)}
+.b-live i{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 3px rgba(75,242,197,.25)}
+.b-soon{background:rgba(143,123,255,.2);color:var(--lav)}
+.b-fmt{background:rgba(7,7,15,.7);color:var(--fg);border:1px solid var(--line-2)}
+.tag{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:999px;background:var(--ink-2);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--fg-2)}
+.tag.on{background:rgba(75,242,197,.12);border-color:rgba(75,242,197,.45);color:var(--mint)}
+.st{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 10px 0 9px;border-radius:9px;font-size:13px;font-weight:700;border:1px solid;background:transparent}
+.st i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.st-viendo{color:var(--mint);border-color:rgba(75,242,197,.4);background:rgba(75,242,197,.08)}
+.st-completado{color:var(--lav);border-color:rgba(179,166,255,.4);background:rgba(179,166,255,.08)}
+.st-pendiente{color:var(--sky);border-color:rgba(116,199,255,.4);background:rgba(116,199,255,.08)}
+.st-pausa{color:var(--amber);border-color:rgba(255,197,102,.4);background:rgba(255,197,102,.08)}
+.st-abandonado{color:var(--coral);border-color:rgba(255,138,122,.4);background:rgba(255,138,122,.08)}
+.st-none{color:var(--fg-2);border-color:var(--line-2);border-style:dashed}
+
+/* Superficies */
+.panel{background:linear-gradient(180deg,rgba(23,22,43,.85),rgba(15,14,29,.85));border:1px solid var(--line);border-radius:20px}
+.rule{height:1px;background:var(--line);border:0;margin:0}
+.bar{height:6px;border-radius:99px;background:rgba(243,241,255,.1);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--mint),var(--violet))}
+
+/* Pósters de muestra (en el sitio real va la portada) */
+.poster{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:var(--ink-3);max-width:100%}
+.poster::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(7,7,15,.85))}
+.poster .pt{position:absolute;left:12px;right:12px;bottom:12px;z-index:1;font-family:var(--f-display);font-weight:600;font-size:14px;line-height:1.15;letter-spacing:-.01em;text-wrap:balance}
+.p1{background:linear-gradient(165deg,#9fd6c3 0%,#3d7f7a 40%,#152b3d 100%)}
+.p2{background:linear-gradient(160deg,#ff5fae 0%,#7b2fd6 45%,#0d1d4a 100%)}
+.p3{background:linear-gradient(170deg,#f2c46b 0%,#b5532f 50%,#2a1320 100%)}
+.p4{background:linear-gradient(165deg,#ffb3d1 0%,#e85b8a 45%,#2b1636 100%)}
+.p5{background:linear-gradient(160deg,#ff4d4d 0%,#7a0f2a 50%,#120712 100%)}
+.p6{background:linear-gradient(165deg,#8be0ff 0%,#3a62c9 50%,#131a3f 100%)}
+.p7{background:linear-gradient(165deg,#c6f08a 0%,#3f8f4f 50%,#0f2418 100%)}
+.p8{background:linear-gradient(160deg,#d7c2ff 0%,#6a52c7 50%,#16123a 100%)}
+.p9{background:linear-gradient(165deg,#ffd9a0 0%,#d9822b 45%,#3a1a0c 100%)}
+.p10{background:linear-gradient(165deg,#a0f0e6 0%,#2b8c9a 45%,#0b2232 100%)}
+
+/* Card de anime */
+.card{display:flex;flex-direction:column;gap:10px;min-width:0;position:relative}
+.card .ttl{font-weight:800;font-size:14.5px;line-height:1.25;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .meta{font-size:12.5px;color:var(--fg-3);margin:0}
+.card .row{display:flex;gap:6px;align-items:center}
+.fav{position:absolute;top:10px;right:10px;z-index:2;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(7,7,15,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);color:var(--fg)}
+.fav.on{color:var(--sakura);background:rgba(255,122,184,.18);border-color:rgba(255,122,184,.5)}
+.fav.on svg{fill:var(--sakura)}
+.pbadge{position:absolute;top:10px;left:10px;z-index:2}
+.pprog{position:absolute;left:0;right:0;bottom:0;height:4px;z-index:2;background:rgba(255,255,255,.15)}
+.pprog i{display:block;height:100%;background:var(--mint)}
+.ep{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 4px 0 10px;border-radius:9px;background:var(--ink-2);border:1px solid var(--line);font-family:var(--f-mono);font-size:12px;color:var(--fg-2)}
+.ep b{color:var(--fg);font-weight:600}
+.ep button{width:24px;height:22px;border-radius:6px;border:0;background:rgba(75,242,197,.16);color:var(--mint);font-weight:800;display:grid;place-items:center}
+
+.menu{position:absolute;z-index:20;min-width:200px;padding:6px;border-radius:14px;background:var(--ink-2);border:1px solid var(--line-2);box-shadow:0 24px 50px -12px rgba(0,0,0,.7)}
+.menu button{display:flex;width:100%;align-items:center;gap:10px;padding:9px 10px;border:0;border-radius:9px;background:transparent;font-size:14px;font-weight:600;text-align:left}
+.menu button:hover{background:var(--ink-3)}
+.menu i{width:9px;height:9px;border-radius:50%}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:28px 20px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.link{color:var(--mint);font-weight:700;font-size:14px}
+
+/* Espacios de portada neutros: en el sitio real va la imagen de AniList/MAL */
+.p1,.p2,.p3,.p4,.p5,.p6,.p7,.p8,.p9,.p10{background:repeating-linear-gradient(135deg,#1C1A33 0 12px,#161529 12px 24px)}
+.poster{container-type:inline-size;border:1px solid var(--line)}
+.poster::before{content:"Portada";position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);z-index:1;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3);padding:5px 9px;border:1px dashed var(--line-2);border-radius:6px;white-space:nowrap}
+@container (max-width: 100px){.poster::before{content:none}}

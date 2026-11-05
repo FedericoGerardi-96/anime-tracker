@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perfil público · AniTrack</title>
+<link rel="stylesheet" href="anitrack.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#4BF2C5}a:hover{color:#8F7BFF}
+.tabs{display:flex;gap:4px;border-bottom:1px solid rgba(190,180,255,.13);flex-wrap:wrap}
+.tabs a{padding:12px 14px;font-weight:700;font-size:14px;color:#BDB9DC}
+.tabs a.on{color:#F3F1FF;box-shadow:inset 0 -2px 0 #4BF2C5}
+.rank{position:absolute;left:10px;top:10px;z-index:2;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#FF7AB8;color:#2A0716;font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="at" style="padding-bottom: 96px">
+<header class="nav"><div class="wrap nav-in">
+<a href="#" class="logo" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><defs><linearGradient id="lgN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4BF2C5"></stop><stop offset="1" stop-color="#8F7BFF"></stop></linearGradient></defs><circle cx="18" cy="18" r="13" fill="none" stroke="rgba(243,241,255,.13)" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#lgN)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="#F3F1FF"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="#FF7AB8"></path></svg><span class="logo-word">Ani<b>Track</b></span></a>
+<nav class="links" aria-label="Principal"><a href="#">Inicio</a><a href="#">Anime</a><a href="#">Manga</a><a href="#">Calendario</a><a href="#">Listas</a><a href="#">Amigos</a></nav>
+<div class="nav-end"><label class="search" for="qp"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="qp" placeholder="Buscar" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"><span class="kbd">Ctrl K</span></label><a href="#" class="avatar" aria-label="Tu perfil"><span>RT</span></a></div>
+</div></header>
+
+<div style="height: 180px; background: radial-gradient(600px 220px at 20% 30%, rgba(143,123,255,.55), transparent 70%), radial-gradient(500px 200px at 70% 10%, rgba(75,242,197,.35), transparent 70%), radial-gradient(500px 220px at 95% 80%, rgba(255,122,184,.35), transparent 70%), #0F0E1D" aria-hidden="true"></div>
+
+<main class="wrap" style="display: flex; flex-direction: column; gap: 32px; margin-top: -64px">
+<div style="display: flex; gap: 24px; align-items: flex-end; flex-wrap: wrap">
+<div class="avatar" style="width: 132px; height: 132px; padding: 4px"><span style="font-size: 38px; font-family: 'Unbounded', sans-serif">RT</span></div>
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+<h1 class="display" style="font-size: 40px">Rodri Torres</h1>
+<span class="mono sm muted">@rodri · se unió en octubre 2026</span>
+<p class="muted" style="margin: 0">Explorando el mundo del anime. Fan de las historias tranquilas que te pegan al final.</p>
+</div>
+<div style="display: flex; gap: 10px"><button type="button" class="btn btn-secondary">Editar perfil</button><button type="button" class="btn btn-secondary btn-icon" aria-label="Ajustes"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"></path></svg></button></div>
+</div>
+
+<nav class="tabs" aria-label="Secciones del perfil"><a href="#" class="on">Resumen</a><a href="#">Listas públicas</a><a href="#">Amigos · 4</a><a href="#">Actividad</a></nav>
+
+<div style="display: flex; gap: 32px; flex-wrap: wrap">
+<div style="flex: 999 1 620px; min-width: 0; display: flex; flex-direction: column; gap: 36px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px">
+<div><div class="mono" style="font-size: 34px">214</div><div class="sm faint">completadas</div></div>
+<div><div class="mono" style="font-size: 34px">1.820</div><div class="sm faint">horas vistas</div></div>
+<div><div class="mono" style="font-size: 34px">4.410</div><div class="sm faint">episodios</div></div>
+<div><div class="mono" style="font-size: 34px">7,9</div><div class="sm faint">puntaje promedio</div></div>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div class="sec-head"><div style="display: flex; flex-direction: column; gap: 4px"><p class="eyebrow" style="color: #FF7AB8">Me encanta</p><h2 class="h2">Mi top</h2></div><span class="sm faint">Sale de tus ♥ · arrastrá para ordenar</span></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px">
+<div class="poster p1"><span class="rank">1</span><span class="pt">Frieren</span></div>
+<div class="poster p10"><span class="rank">2</span><span class="pt">Mushishi</span></div>
+<div class="poster p2"><span class="rank">3</span><span class="pt">Dandadan</span></div>
+<div class="poster p9"><span class="rank">4</span><span class="pt">Vinland Saga</span></div>
+<div class="poster p4"><span class="rank">5</span><span class="pt">Bocchi the Rock!</span></div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px">
+<h2 class="h2">Lo que más mira</h2>
+<div style="display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 3px">
+<span style="flex: 32; background: #4BF2C5"></span><span style="flex: 24; background: #8F7BFF"></span><span style="flex: 18; background: #FF7AB8"></span><span style="flex: 14; background: #74C7FF"></span><span style="flex: 12; background: #FFC566"></span>
+</div>
+<div style="display: flex; gap: 18px; flex-wrap: wrap" class="sm muted">
+<span>Fantasía <span class="mono">32%</span></span><span>Drama <span class="mono">24%</span></span><span>Comedia <span class="mono">18%</span></span><span>Ciencia ficción <span class="mono">14%</span></span><span>Recuentos de la vida <span class="mono">12%</span></span>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div class="sec-head"><h2 class="h2">Listas públicas</h2><a href="#" class="link">Ver las 6</a></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+<div class="panel" style="padding: 16px; display: flex; gap: 14px; align-items: center"><div style="display: flex"><div class="poster p6" style="width: 40px; border-radius: 6px"></div><div class="poster p3" style="width: 40px; border-radius: 6px; margin-left: -14px"></div></div><div><b class="sm">Mecha de los 90</b><div class="xs faint">Inteligente · 18 títulos</div></div></div>
+<div class="panel" style="padding: 16px; display: flex; gap: 14px; align-items: center"><div style="display: flex"><div class="poster p4" style="width: 40px; border-radius: 6px"></div><div class="poster p8" style="width: 40px; border-radius: 6px; margin-left: -14px"></div></div><div><b class="sm">Openings que me encantan</b><div class="xs faint">Colección · 24 títulos</div></div></div>
+<div class="panel" style="padding: 16px; display: flex; gap: 14px; align-items: center"><div style="display: flex"><div class="poster p7" style="width: 40px; border-radius: 6px"></div><div class="poster p1" style="width: 40px; border-radius: 6px; margin-left: -14px"></div></div><div><b class="sm">Maratón de invierno</b><div class="xs faint">Maratón · 7 títulos</div></div></div>
+</div>
+</section>
+</div>
+
+<aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<div class="panel" style="padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span class="h3">Viendo ahora</span>
+<div style="display: flex; gap: 12px; align-items: center"><div class="poster p2" style="width: 40px; border-radius: 6px"></div><div style="flex: 1; min-width: 0"><b class="sm">Dandadan 2nd Season</b><div class="bar" style="margin-top: 6px"><i style="width: 66%"></i></div></div><span class="mono xs muted">8/12</span></div>
+<div style="display: flex; gap: 12px; align-items: center"><div class="poster p3" style="width: 40px; border-radius: 6px"></div><div style="flex: 1; min-width: 0"><b class="sm">The Apothecary Diaries</b><div class="bar" style="margin-top: 6px"><i style="width: 70%"></i></div></div><span class="mono xs muted">17/24</span></div>
+<div style="display: flex; gap: 12px; align-items: center"><div class="poster p8" style="width: 40px; border-radius: 6px"></div><div style="flex: 1; min-width: 0"><b class="sm">Odd Taxi</b><div class="bar" style="margin-top: 6px"><i style="width: 31%"></i></div></div><span class="mono xs muted">4/13</span></div>
+</div>
+<div class="panel" style="padding: 22px; display: flex; flex-direction: column; gap: 12px; border-color: rgba(75,242,197,.3)">
+<span class="h3">¿Venís de MyAnimeList o AniList?</span>
+<p class="sm muted" style="margin: 0">Importá tu biblioteca con estados y episodios. No hace falta cargar serie por serie.</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="btn btn-primary btn-sm">Importar de MAL</button><button type="button" class="btn btn-secondary btn-sm">Importar de AniList</button></div>
+</div>
+<div class="panel" style="padding: 22px; display: flex; flex-direction: column; gap: 8px">
+<span class="h3">En Ajustes</span>
+<p class="sm muted" style="margin: 0">Usuario y biografía, privacidad de cada sección, cuentas conectadas y contenido adulto. Fuera del perfil público.</p>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+
+window.__dcBoot(Component, {});
+</script>
+</body>
+</html>

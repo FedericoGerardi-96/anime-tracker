@@ -26,8 +26,7 @@ const SEARCH_OPTIONS = [
 
 const NAV_ITEMS = [
   { href: '/', label: 'Inicio' },
-  { href: '/anime', label: 'Anime' },
-  { href: '/manga', label: 'Manga' },
+  { href: '/anime', label: 'Catálogo' },
   { href: '/anime/schedule', label: 'Calendario' },
   { href: '/favorites', label: 'Favoritos', private: true },
   { href: '/lists', label: 'Mis listas', private: true },
@@ -68,7 +67,10 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const isDark = useSyncExternalStore(subscribeTheme, isDarkTheme, () => initialTheme === 'dark');
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const desktopSearchRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
   const accountMenuRef = useRef<HTMLDivElement>(null);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
   const accountCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -104,6 +106,28 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
     return () => document.removeEventListener('mousedown', closeSuggestions);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        if (window.matchMedia('(min-width: 640px)').matches) {
+          desktopSearchRef.current?.focus();
+        } else {
+          setIsMenuOpen(true);
+          window.requestAnimationFrame(() => mobileSearchRef.current?.focus());
+        }
+      } else if (event.key === 'Escape') {
+        setShowSuggestions(false);
+        if (isAccountMenuOpen) {
+          setIsAccountMenuOpen(false);
+          accountButtonRef.current?.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isAccountMenuOpen]);
+
 
   const handleSearchCommit = (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -130,7 +154,7 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
     && (!item.adult || Boolean(user && profile?.show_h_content))
   );
   const activeNavHref = visibleNavItems
-    .filter((item) => pathname === item.href || (item.href !== '/' && pathname.startsWith(`${item.href}/`)))
+    .filter((item) => pathname === item.href || (item.href !== '/' && pathname.startsWith(`${item.href}/`)) || (item.href === '/anime' && (pathname === '/manga' || pathname.startsWith('/manga/'))))
     .sort((first, second) => second.href.length - first.href.length)[0]?.href;
   const isActive = (href: string) => href === activeNavHref;
 
@@ -145,25 +169,32 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setIsMenuOpen(false)}>
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>movie_filter</span>
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="text-lg font-bold tracking-tight">AniTrack</span>
-              <span className="hidden text-[0.7rem] text-muted-foreground sm:block">Tu diario otaku</span>
-            </span>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
+        <div className="page-frame flex h-[68px] items-center gap-3">
+          <Link href="/" className="flex shrink-0 items-center gap-2" onClick={() => setIsMenuOpen(false)}>
+            <svg className="size-9 shrink-0" viewBox="-3 -3 42 42" aria-hidden="true">
+              <defs>
+                <linearGradient id="brand-progress" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="var(--brand-mint)" />
+                  <stop offset="1" stopColor="var(--brand-aurora)" />
+                </linearGradient>
+              </defs>
+              <circle cx="18" cy="18" r="13" fill="none" stroke="currentColor" strokeOpacity="0.16" strokeWidth="4" />
+              <path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#brand-progress)" strokeWidth="4" strokeLinecap="round" />
+              <path d="M15 12.6 L24 18 L15 23.4 Z" fill="currentColor" />
+              <path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="var(--brand-sakura)" />
+            </svg>
+            <span className="text-lg font-bold tracking-tight">Ani<span className="brand-accent">Track</span></span>
           </Link>
 
-          <nav className="ml-3 hidden items-center gap-0.5 xl:flex 2xl:gap-1">
+          <nav aria-label="Principal" className="ml-3 hidden items-center gap-0.5 xl:flex 2xl:gap-1">
             {visibleNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`whitespace-nowrap rounded-full px-2 py-2 text-sm font-medium transition-colors 2xl:px-3 ${
-                  isActive(item.href) ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                className={`whitespace-nowrap rounded-[10px] px-2 py-2.5 text-sm font-semibold transition-colors 2xl:px-3 ${
+                  isActive(item.href) ? 'bg-accent text-foreground shadow-[inset_0_-2px_0_var(--primary-color)]' : 'text-muted-foreground hover:bg-muted/60 hover:text-primary'
                 }`}
               >
                 {item.label}
@@ -173,28 +204,30 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
 
           <div className="ml-auto flex shrink-0 items-center gap-2">
             <div ref={searchContainerRef} className="relative hidden sm:block">
-              <form onSubmit={handleSearchCommit} className="flex h-9 w-64 items-center rounded-full border border-border bg-muted/60 transition focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 md:w-[28rem] xl:w-72 2xl:w-80">
+              <form onSubmit={handleSearchCommit} className="flex h-[42px] w-64 items-center gap-1 rounded-xl border border-border bg-card/70 px-2 transition-colors focus-within:border-primary! focus-within:ring-2 focus-within:ring-primary/20 md:w-80 xl:w-72 2xl:w-80">
+                <span aria-hidden="true" className={`material-symbols-outlined ml-1 text-lg text-muted-foreground ${isSearching ? 'animate-spin motion-reduce:animate-none' : ''}`}>
+                  {isSearching ? 'progress_activity' : 'search'}
+                </span>
+                <input
+                  ref={desktopSearchRef}
+                  aria-label="Buscar anime, manga o personajes"
+                  value={query}
+                  onChange={(event) => { setQuery(event.target.value); setShowSuggestions(event.target.value.trim().length >= 3); }}
+                  onFocus={() => query.length >= 3 && setShowSuggestions(true)}
+                  className="h-full min-w-0 flex-1 bg-transparent px-1 text-sm text-foreground focus-visible:outline-none! placeholder:text-muted-foreground"
+                  placeholder="Buscar"
+                  autoComplete="off"
+                />
                 <Dropdown
                   value={searchType}
                   onChange={(value) => { setSearchType(value as SearchType); setShowSuggestions(query.trim().length >= 3); }}
                   options={SEARCH_OPTIONS}
                   ariaLabel={`Tipo de búsqueda: ${selectedSearchLabel}`}
                   className="w-auto! shrink-0"
-                  buttonClassName="h-8 border-0! bg-transparent! px-3! py-0! text-xs! text-muted-foreground! hover:text-foreground! focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  buttonClassName="h-8 gap-1! border-0! bg-transparent! px-1! py-0! text-xs! text-muted-foreground! hover:text-foreground! focus-visible:ring-2 focus-visible:ring-primary/40"
                   menuClassName="min-w-36!"
                 />
-                <span className={`material-symbols-outlined ml-1 text-base text-muted-foreground ${isSearching ? 'animate-spin' : ''}`}>
-                  {isSearching ? 'progress_activity' : 'search'}
-                </span>
-                <input
-                  aria-label="Buscar anime, manga o personajes"
-                  value={query}
-                  onChange={(event) => { setQuery(event.target.value); setShowSuggestions(event.target.value.trim().length >= 3); }}
-                  onFocus={() => query.length >= 3 && setShowSuggestions(true)}
-                  className="h-full min-w-0 flex-1 bg-transparent px-2 text-sm text-foreground outline-none placeholder:text-muted-foreground"
-                  placeholder="Buscar..."
-                  autoComplete="off"
-                />
+                <kbd className="hidden shrink-0 rounded-md border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground md:inline">Ctrl K</kbd>
               </form>
 
               {showSuggestions && suggestions.length > 0 && (
@@ -252,13 +285,15 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
               >
                 <button
                   type="button"
+                  ref={accountButtonRef}
                   aria-label="Abrir menú de cuenta"
                   aria-haspopup="menu"
                   aria-expanded={isAccountMenuOpen}
                   onClick={() => setIsAccountMenuOpen((open) => !open)}
-                  className="block size-9 overflow-hidden rounded-full ring-2 ring-primary/20 transition hover:ring-primary/50"
+                  className="block size-11 rounded-full p-[2px] transition hover:brightness-110"
+                  style={{ background: 'conic-gradient(from 200deg, var(--brand-aurora), var(--brand-mint), var(--brand-sakura), var(--brand-aurora))' }}
                 >
-                  <span className="block size-full bg-cover bg-center" style={{ backgroundImage: profileAvatarBackground(getProfileAvatar(profile?.avatar, user.user_metadata?.avatar_url) ?? DEFAULT_PROFILE_AVATAR) }} />
+                  <span className="block size-full rounded-full border-2 border-background bg-cover bg-center" style={{ backgroundImage: profileAvatarBackground(getProfileAvatar(profile?.avatar, user.user_metadata?.avatar_url) ?? DEFAULT_PROFILE_AVATAR) }} />
                 </button>
                 {isAccountMenuOpen && (
                   <div className="absolute right-0 top-full w-40 pt-2" role="menu">
@@ -286,7 +321,11 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
 
         {isMenuOpen && (
           <div className="border-t border-border bg-background px-4 py-4 xl:hidden">
-            <form onSubmit={handleSearchCommit} className="mb-3 flex h-10 items-center rounded-full border border-border bg-muted/60 px-2 sm:hidden">
+            <form onSubmit={handleSearchCommit} className="mb-3 flex h-11 items-center rounded-xl border border-border bg-card/70 px-2 focus-within:border-primary! focus-within:ring-2 focus-within:ring-primary/20 sm:hidden">
+              <button type="submit" aria-label="Buscar" className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:text-primary">
+                <span className="material-symbols-outlined text-lg" aria-hidden="true">search</span>
+              </button>
+              <input ref={mobileSearchRef} aria-label={`Buscar ${selectedSearchLabel.toLowerCase()}`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar" className="min-w-0 flex-1 bg-transparent px-2 text-sm focus-visible:outline-none!" />
               <Dropdown
                 value={searchType}
                 onChange={(value) => setSearchType(value as SearchType)}
@@ -296,14 +335,10 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
                 buttonClassName="h-8 border-0! bg-transparent! px-2! py-0! text-xs! text-muted-foreground! hover:text-foreground!"
                 menuClassName="min-w-36!"
               />
-              <input aria-label={`Buscar ${selectedSearchLabel.toLowerCase()}`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Buscar ${searchType === 'character' ? 'personajes' : searchType}...`} className="min-w-0 flex-1 bg-transparent px-2 text-sm outline-none" />
-              <button type="submit" aria-label="Buscar" className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-foreground">
-                <span className="material-symbols-outlined text-lg" aria-hidden="true">search</span>
-              </button>
             </form>
-            <nav className="mx-auto grid max-w-7xl gap-1">
+            <nav aria-label="Principal" className="mx-auto grid max-w-7xl gap-1">
               {visibleNavItems.map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => setIsMenuOpen(false)} className={`rounded-xl px-3 py-2.5 text-sm font-medium ${isActive(item.href) ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-muted'}`}>
+                <Link key={item.href} href={item.href} aria-current={isActive(item.href) ? 'page' : undefined} onClick={() => setIsMenuOpen(false)} className={`rounded-[10px] px-3 py-2.5 text-sm font-semibold transition-colors ${isActive(item.href) ? 'bg-accent text-foreground shadow-[inset_0_-2px_0_var(--primary-color)]' : 'text-muted-foreground hover:bg-muted/60 hover:text-primary'}`}>
                   {item.label}
                 </Link>
               ))}

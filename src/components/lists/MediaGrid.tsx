@@ -23,7 +23,7 @@ export default function MediaGrid({ items, searchQuery, activeTabLabel, selected
         {!searchQuery && (
           <Link
             href='/anime'
-            className='inline-block px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all'
+            className='inline-block px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all'
           >
             Descubrir anime
           </Link>
@@ -59,7 +59,7 @@ export default function MediaGrid({ items, searchQuery, activeTabLabel, selected
             </div>
 
             {(item.current_episode ?? 0) > 0 && (
-              <div className='absolute top-2 right-2 px-2 py-0.5 rounded bg-primary text-white text-[10px] font-black border border-white/10 z-10 shadow-lg'>
+              <div className='absolute top-2 right-2 px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-black border border-white/10 z-10 shadow-lg'>
                 {item.media.type === 'manga' ? 'CH' : 'EP'} {item.current_episode}
               </div>
             )}

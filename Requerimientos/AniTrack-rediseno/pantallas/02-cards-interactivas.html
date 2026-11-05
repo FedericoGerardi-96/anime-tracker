@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cards de anime · AniTrack</title>
+<link rel="stylesheet" href="anitrack.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#4BF2C5}a:hover{color:#8F7BFF}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="at" style="padding-bottom: 120px">
+<div class="wrap" style="display: flex; flex-direction: column; gap: 36px; padding-top: 64px">
+
+<div class="sec-head">
+<div style="display: flex; flex-direction: column; gap: 8px; max-width: 760px">
+<p class="eyebrow">Card de anime · probá tocar los controles</p>
+<h1 class="h1">Estado y episodio sin entrar a la ficha</h1>
+<p class="muted" style="margin: 0">Debajo del póster vive siempre el estado (no depende del hover, así funciona en el celular). Un toque abre los cinco estados. Si está en Viendo aparece el contador con +1. El ♥ es solo “me encanta”. Para cargar muchas de golpe, “Seleccionar varias”.</p>
+</div>
+<div style="display: flex; gap: 10px; flex-wrap: wrap">
+<sc-if value="{{ batchOff }}" hint-placeholder-val="{{ true }}">
+<button type="button" class="btn btn-secondary" onClick="{{ toggleBatch }}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"></rect><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg>Seleccionar varias</button>
+</sc-if>
+<sc-if value="{{ batch }}" hint-placeholder-val="{{ false }}">
+<button type="button" class="btn btn-secondary" onClick="{{ selectAll }}">Seleccionar todas</button>
+<button type="button" class="btn btn-ghost" onClick="{{ toggleBatch }}">Salir</button>
+</sc-if>
+</div>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))">
+<sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+<div class="card">
+<div class="poster {{ c.poster }}" style="{{ c.ring }}">
+<sc-if value="{{ c.live }}" hint-placeholder-val="{{ false }}"><span class="pbadge badge b-live"><i></i>En emisión</span></sc-if>
+<sc-if value="{{ batch }}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{ c.toggleSel }}" aria-label="Seleccionar {{ c.title }}" aria-pressed="{{ c.selected }}" style="position: absolute; inset: 0; z-index: 3; border: 0; background: transparent; display: flex; align-items: flex-start; justify-content: flex-start; padding: 10px">
+<span style="{{ c.checkStyle }}"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4 8-9"></path></svg></span>
+</button>
+</sc-if>
+<button type="button" class="fav {{ c.favClass }}" onClick="{{ c.toggleFav }}" aria-label="Me encanta" aria-pressed="{{ c.fav }}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<span class="pt">{{ c.title }}</span>
+<sc-if value="{{ c.showProg }}" hint-placeholder-val="{{ false }}"><span class="pprog"><i style="{{ c.progStyle }}"></i></span></sc-if>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<p class="ttl">{{ c.title }}</p>
+<p class="meta">{{ c.meta }}</p>
+</div>
+<div class="row" style="position: relative; flex-wrap: wrap">
+<button type="button" class="st {{ c.stClass }}" onClick="{{ c.toggleMenu }}" aria-haspopup="menu" aria-expanded="{{ c.menuOpen }}"><i></i>{{ c.stLabel }}<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<sc-if value="{{ c.showEp }}" hint-placeholder-val="{{ false }}">
+<span class="ep">EP <b>{{ c.ep }}</b>/{{ c.total }} <button type="button" onClick="{{ c.plusOne }}" aria-label="Sumar un episodio a {{ c.title }}">+1</button></span>
+</sc-if>
+<sc-if value="{{ c.menuOpen }}" hint-placeholder-val="{{ false }}">
+<div class="menu" role="menu" style="top: 38px; left: 0">
+<sc-for list="{{ c.menu }}" as="m" hint-placeholder-count="5">
+<button type="button" role="menuitem" onClick="{{ m.pick }}"><i style="{{ m.dot }}"></i>{{ m.label }}<span class="xs faint" style="margin-left: auto">{{ m.mark }}</span></button>
+</sc-for>
+<hr class="rule" style="margin: 6px 4px">
+<button type="button" role="menuitem"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"></path></svg>Guardar en lista…</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
+<div class="panel" style="display: flex; flex-direction: column; gap: 8px; padding: 22px">
+<span class="h3">Una sola acción por zona</span>
+<p class="sm muted" style="margin: 0">Póster = abre la ficha. ♥ = me encanta. Pill de estado = biblioteca. +1 = progreso. “Guardar en lista” queda dentro del menú, no como botón más sobre el póster.</p>
+</div>
+<div class="panel" style="display: flex; flex-direction: column; gap: 8px; padding: 22px">
+<span class="h3">Sin estado = todavía no está en tu biblioteca</span>
+<p class="sm muted" style="margin: 0">La pill punteada “Agregar” reemplaza al botón +. Elegir cualquier estado lo agrega. Elegir Completado completa el contador automáticamente.</p>
+</div>
+<div class="panel" style="display: flex; flex-direction: column; gap: 8px; padding: 22px">
+<span class="h3">Para las 200 series</span>
+<p class="sm muted" style="margin: 0">Selección múltiple en Catálogo, Listas y búsqueda. Y antes que nada: importar desde MAL o AniList, que ya está programado y hoy queda escondido en el perfil.</p>
+</div>
+</div>
+</div>
+
+<sc-if value="{{ batch }}" hint-placeholder-val="{{ false }}">
+<div style="position: sticky; bottom: 24px; display: flex; justify-content: center; padding-inline: 16px; margin-top: 32px">
+<div class="panel" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px 10px 20px; border-radius: 18px; box-shadow: 0 24px 60px -16px rgba(0,0,0,.8); border-color: rgba(75,242,197,.35)">
+<span style="font-weight: 800">{{ selCount }} seleccionadas</span>
+<span class="faint sm" style="margin-right: 6px">Marcar como</span>
+<button type="button" class="st st-completado" onClick="{{ bulkCompletado }}"><i></i>Completado</button>
+<button type="button" class="st st-viendo" onClick="{{ bulkViendo }}"><i></i>Viendo</button>
+<button type="button" class="st st-pendiente" onClick="{{ bulkPendiente }}"><i></i>Pendiente</button>
+<button type="button" class="btn btn-secondary btn-sm"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"></path></svg>Guardar en lista</button>
+</div>
+</div>
+</sc-if>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      batch: false,
+      open: null,
+      cards: [
+        { id: 1, title: 'Frieren: Beyond Journey’s End', meta: 'Madhouse · 2023 · TV', poster: 'p1', st: 'completado', ep: 28, total: 28, fav: true, live: false, sel: false },
+        { id: 2, title: 'Dandadan 2nd Season', meta: 'Science SARU · 2025 · TV', poster: 'p2', st: 'viendo', ep: 8, total: 12, fav: true, live: true, sel: false },
+        { id: 3, title: 'The Apothecary Diaries', meta: 'OLM · 2025 · TV', poster: 'p3', st: 'viendo', ep: 17, total: 24, fav: false, live: true, sel: false },
+        { id: 4, title: 'Bocchi the Rock!', meta: 'CloverWorks · 2022 · TV', poster: 'p4', st: 'pendiente', ep: 0, total: 12, fav: false, live: false, sel: false },
+        { id: 5, title: 'Chainsaw Man', meta: 'MAPPA · 2022 · TV', poster: 'p5', st: 'pausa', ep: 5, total: 12, fav: false, live: false, sel: false },
+        { id: 6, title: 'Delicious in Dungeon', meta: 'Trigger · 2024 · TV', poster: 'p7', st: null, ep: 0, total: 24, fav: false, live: false, sel: false }
+      ]
+    };
+  }
+  upd(id, fn) { this.setState({ cards: this.state.cards.map(c => c.id === id ? fn(c) : c) }); }
+  setSt(c, st) { const ep = st === 'completado' ? c.total : (st === 'viendo' && c.ep === 0 ? 1 : c.ep); return { ...c, st, ep }; }
+  bulk(st) { this.setState({ cards: this.state.cards.map(c => c.sel ? { ...this.setSt(c, st), sel: false } : c) }); }
+  renderVals() {
+    const S = { viendo: ['Viendo', 'st-viendo', '#4BF2C5'], completado: ['Completado', 'st-completado', '#B3A6FF'], pendiente: ['Pendiente', 'st-pendiente', '#74C7FF'], pausa: ['En pausa', 'st-pausa', '#FFC566'], abandonado: ['Abandonado', 'st-abandonado', '#FF8A7A'] };
+    const { batch, open } = this.state;
+    const cards = this.state.cards.map(c => {
+      const s = c.st ? S[c.st] : ['Agregar', 'st-none', '#9894BD'];
+      return {
+        ...c,
+        stLabel: s[0], stClass: s[1],
+        selected: c.sel,
+        favClass: c.fav ? 'on' : '',
+        menuOpen: open === c.id && !batch,
+        showEp: c.st === 'viendo',
+        showProg: c.st === 'viendo' || c.st === 'pausa',
+        progStyle: 'width:' + Math.round((c.ep / c.total) * 100) + '%',
+        ring: batch && c.sel ? 'outline: 3px solid #4BF2C5; outline-offset: 3px' : '',
+        checkStyle: 'width:28px;height:28px;border-radius:8px;display:grid;place-items:center;' + (c.sel ? 'background:#4BF2C5;color:#062A22;border:0' : 'background:rgba(7,7,15,.6);color:transparent;border:2px solid rgba(255,255,255,.7)'),
+        toggleMenu: () => this.setState({ open: open === c.id ? null : c.id }),
+        toggleFav: () => this.upd(c.id, x => ({ ...x, fav: !x.fav })),
+        toggleSel: () => this.upd(c.id, x => ({ ...x, sel: !x.sel })),
+        plusOne: () => this.upd(c.id, x => x.ep + 1 >= x.total ? { ...x, ep: x.total, st: 'completado' } : { ...x, ep: x.ep + 1 }),
+        menu: Object.keys(S).map(k => ({ label: S[k][0], dot: 'background:' + S[k][2], mark: c.st === k ? 'actual' : '', pick: () => { this.upd(c.id, x => this.setSt(x, k)); this.setState({ open: null }); } }))
+      };
+    });
+    return {
+      cards, batch, batchOff: !batch,
+      selCount: this.state.cards.filter(c => c.sel).length,
+      toggleBatch: () => this.setState({ batch: !batch, open: null, cards: this.state.cards.map(c => ({ ...c, sel: false })) }),
+      selectAll: () => this.setState({ cards: this.state.cards.map(c => ({ ...c, sel: true })) }),
+      bulkCompletado: () => this.bulk('completado'),
+      bulkViendo: () => this.bulk('viendo'),
+      bulkPendiente: () => this.bulk('pendiente')
+    };
+  }
+}
+
+window.__dcBoot(Component, {});
+</script>
+</body>
+</html>

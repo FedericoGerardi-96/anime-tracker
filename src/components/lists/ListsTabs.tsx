@@ -11,7 +11,7 @@ export default function ListsTabs({ activeTab }: Readonly<ListsTabsProps>) {
           aria-current={tab.id === activeTab ? 'page' : undefined}
           className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
             tab.id === activeTab
-              ? 'bg-primary text-white shadow-lg shadow-primary/20'
+              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
               : 'text-muted-foreground dark:hover:bg-white/5 hover:bg-muted  dark:hover:text-white hover:text-primary'
           }`}
         >

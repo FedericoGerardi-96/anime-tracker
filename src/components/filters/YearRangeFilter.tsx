@@ -8,10 +8,11 @@ const MAX_YEAR = new Date().getFullYear() + 1;
 interface Props {
   from?: string | null;
   to?: string | null;
+  transparentInputs?: boolean;
   onApply: (from: string | null, to: string | null) => void;
 }
 
-export default function YearRangeFilter({ from, to, onApply }: Props) {
+export default function YearRangeFilter({ from, to, onApply, transparentInputs = false }: Props) {
   const clamp = (value: number) => Math.max(MIN_YEAR, Math.min(MAX_YEAR, value));
   const [start, setStart] = useState(clamp(Number(from) || MIN_YEAR));
   const [end, setEnd] = useState(clamp(Number(to) || MAX_YEAR));
@@ -34,8 +35,8 @@ export default function YearRangeFilter({ from, to, onApply }: Props) {
       <input type="range" aria-label="Año hasta" min={MIN_YEAR} max={MAX_YEAR} value={end} style={{ zIndex: start === MIN_YEAR ? 2 : 0 }} className={thumbClass} onChange={(event) => { const value = Math.max(Number(event.target.value), start); setEnd(value); setEndText(String(value)); }} onPointerUp={() => apply()} onKeyUp={() => apply()} />
     </div>
     <div className="grid grid-cols-2 gap-3">
-      <label className="space-y-1 text-xs text-text-muted">Desde<input type="number" aria-label="Desde el año" min={MIN_YEAR} max={end} value={startText} onChange={(event) => setStartText(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const value = Math.min(clamp(Number(startText) || MIN_YEAR), end); setStart(value); setStartText(String(value)); apply(value, end); }} className="h-9 w-full rounded-lg border border-primary/15 bg-background px-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/40" /></label>
-      <label className="space-y-1 text-xs text-text-muted">Hasta<input type="number" aria-label="Hasta el año" min={start} max={MAX_YEAR} value={endText} onChange={(event) => setEndText(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const value = Math.max(clamp(Number(endText) || MAX_YEAR), start); setEnd(value); setEndText(String(value)); apply(start, value); }} className="h-9 w-full rounded-lg border border-primary/15 bg-background px-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/40" /></label>
+      <label className="space-y-1 text-xs text-text-muted">Desde<input type="number" aria-label="Desde el año" min={MIN_YEAR} max={end} value={startText} onChange={(event) => setStartText(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const value = Math.min(clamp(Number(startText) || MIN_YEAR), end); setStart(value); setStartText(String(value)); apply(value, end); }} className={`h-9 w-full rounded-lg border border-primary/15 ${transparentInputs ? 'bg-transparent' : 'bg-background'} px-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/40`} /></label>
+      <label className="space-y-1 text-xs text-text-muted">Hasta<input type="number" aria-label="Hasta el año" min={start} max={MAX_YEAR} value={endText} onChange={(event) => setEndText(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} onBlur={() => { const value = Math.max(clamp(Number(endText) || MAX_YEAR), start); setEnd(value); setEndText(String(value)); apply(start, value); }} className={`h-9 w-full rounded-lg border border-primary/15 ${transparentInputs ? 'bg-transparent' : 'bg-background'} px-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/40`} /></label>
     </div>
   </div>;
 }

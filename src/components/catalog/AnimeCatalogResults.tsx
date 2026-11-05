@@ -8,7 +8,9 @@ import type { CatalogResultsProps } from '@/interfaces/page';
 
 
 import AnimeListContent from '@/components/anime/AnimeListContent';
-import AniListFilters from '@/components/filters/AniListFilters';
+import CatalogFilters from '@/components/catalog/CatalogFilters';
+import CatalogActiveFilters from '@/components/catalog/CatalogActiveFilters';
+import CatalogSort from '@/components/catalog/CatalogSort';
 import MalFilters from '@/components/filters/MalFilters';
 import Pagination from '@/components/ui/Pagination';
 import { getAnimeListWithFavorites } from '@/services/anime';
@@ -49,22 +51,18 @@ export default async function AnimeCatalogResults({ params }: Readonly<CatalogRe
 
   return (
     <CatalogInteraction>
-    <ProviderChoice provider={provider} />
-    <div className={provider === 'anilist' ? 'grid items-start gap-6 lg:grid-cols-[276px_minmax(0,1fr)]' : 'space-y-8'}>
+    <ProviderChoice provider={provider} compact />
+    <div className={provider === 'anilist' ? 'grid items-start gap-6 min-[1400px]:grid-cols-[276px_minmax(0,1fr)]' : 'space-y-8'}>
       {/* Filters Bar */}
-      <div className={provider === 'anilist' ? 'relative z-30 min-w-0 space-y-3 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 lg:[scrollbar-gutter:stable] lg:[scrollbar-width:thin] lg:[scrollbar-color:var(--color-primary)_transparent]' : 'glass relative z-30 rounded-xl p-4 space-y-4'}>
-        <div className="flex items-center gap-2 px-3 py-2 bg-background-light dark:bg-background-dark/50 rounded-lg border border-primary/10">
-          <span className="material-symbols-outlined text-primary text-xl">filter_list</span>
-          <span className="text-sm font-semibold">Catálogo de {provider === 'anilist' ? 'AniList' : 'MyAnimeList'}</span>
-        </div>
-        
-        <Suspense fallback={<div className="h-10 w-full sm:w-[500px] bg-slate-200 dark:bg-slate-800/50 rounded-lg animate-pulse" />}>
-          {provider === 'anilist' ? <AniListFilters mediaType='anime' /> : <MalFilters yearOptions={yearOptions} />}
+      <div className={provider === 'anilist' ? 'relative z-30 min-w-0 min-[1400px]:sticky min-[1400px]:top-20 min-[1400px]:max-h-[calc(100dvh-6rem)] min-[1400px]:overflow-y-auto min-[1400px]:overscroll-contain min-[1400px]:rounded-l-2xl min-[1400px]:border min-[1400px]:border-border min-[1400px]:bg-card min-[1400px]:[scrollbar-width:thin] min-[1400px]:[scrollbar-color:var(--muted-foreground)_transparent]' : 'relative z-30 space-y-4 rounded-2xl border border-border bg-card p-4'}>
+        <Suspense fallback={<div className="h-10 w-full rounded-lg bg-muted motion-safe:animate-pulse" />}>
+          {provider === 'anilist' ? <CatalogFilters mediaType='anime' /> : <MalFilters key={stringParam(params.sort) ?? 'popularity'} yearOptions={yearOptions} showSort={false} />}
         </Suspense>
       </div>
 
       <CatalogResultsArea>
       <div className="catalog-results min-w-0 space-y-8">
+      <div className="flex flex-wrap items-center gap-3"><CatalogActiveFilters /><CatalogSort provider={provider} /></div>
       {/* Pagination (Top) - Optional, but helpful for long lists */}
       {(currentPage > 1 || hasNextPage) && (
         <div className="flex justify-between items-center sm:px-4">
@@ -88,7 +86,7 @@ export default async function AnimeCatalogResults({ params }: Readonly<CatalogRe
           </p>
           <Link 
             href="/anime"
-            className="mt-6 inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-all cursor-pointer"
+            className="mt-6 inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg font-bold hover:bg-primary hover:text-primary-foreground transition-all cursor-pointer"
           >
             Limpiar filtros
           </Link>

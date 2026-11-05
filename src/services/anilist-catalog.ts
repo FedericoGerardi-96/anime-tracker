@@ -10,14 +10,14 @@ const QUERY = `
     $page: Int, $perPage: Int, $type: MediaType, $search: String,
     $genre: [String], $excludedGenre: [String], $format: [MediaFormat],
     $status: [MediaStatus], $season: MediaSeason, $seasonYear: Int, $year: String, $startDate: FuzzyDateInt, $endDate: FuzzyDateInt,
-    $minimumScore: Int, $maximumScore: Int, $sort: [MediaSort]
+    $minimumScore: Int, $maximumScore: Int, $sort: [MediaSort], $isAdult: Boolean
   ) {
     Page(page: $page, perPage: $perPage) {
       pageInfo { currentPage lastPage hasNextPage total }
       media(
         type: $type, search: $search, genre_in: $genre, genre_not_in: $excludedGenre,
         format_in: $format, status_in: $status, season: $season, seasonYear: $seasonYear, startDate_like: $year, startDate_greater: $startDate, startDate_lesser: $endDate,
-        averageScore_greater: $minimumScore, averageScore_lesser: $maximumScore, sort: $sort, isAdult: false
+        averageScore_greater: $minimumScore, averageScore_lesser: $maximumScore, sort: $sort, isAdult: $isAdult
       ) {
         id
         idMal
@@ -90,6 +90,8 @@ function variables(type: CatalogMediaType, options: AniListCatalogOptions, maxim
     perPage: Math.min(options.perPage ?? 24, 50),
     type: type.toUpperCase(),
     search: options.q || undefined,
+    // Explicit anime searches can find adult-rated titles; browsing remains unchanged.
+    isAdult: type === 'anime' && options.q?.trim() ? undefined : false,
     genre: options.genre ? options.genre.split(',').filter(Boolean) : undefined,
     excludedGenre: options.excludeGenre ? options.excludeGenre.split(',').filter(Boolean) : undefined,
     format: options.format ? options.format.split(',').filter(Boolean) : undefined,

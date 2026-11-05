@@ -71,7 +71,7 @@ export default async function FavoritesPage({
   const hasActiveFilters = query.length > 0 || Boolean(mediaType || status || selectedTags.length || params.genre || params.catalogStatus || params.year || params.season || params.format || params.minScore || params.excludeGenre || params.yearFrom || params.yearTo || params.scoreBands);
 
   return (
-    <div className="flex-1 relative px-4 sm:px-8 lg:px-12 py-8">
+    <div className="flex-1 relative py-8">
       {/* Hero Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
@@ -147,7 +147,7 @@ export default async function FavoritesPage({
           {!hasActiveFilters && (
             <Link
               href="/anime"
-              className="mt-6 bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-xl font-bold transition-all"
+              className="mt-6 bg-primary hover:bg-primary/80 text-primary-foreground px-6 py-3 rounded-xl font-bold transition-all"
             >
               Explorar anime
             </Link>

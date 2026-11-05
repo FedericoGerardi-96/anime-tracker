@@ -1,4 +1,5 @@
 import "server-only";
+import { advancePending } from "@/services/pending-library-sync";
 import { claimUserSyncStep } from "@/services/sync-lease";
 import { randomUUID } from "node:crypto";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -87,6 +88,9 @@ async function importEntry(db: DB, job: AniListSyncJob, entry: RemoteListEntry, 
     warning(state, `${media.title.romaji}: sin ID de MAL o estado compatible; no se modificó.`);
     return;
   }
+  const queued = await db.from('library_sync_pending').select('revision').eq('user_id', job.user_id).eq('media_type', type).eq('mal_id', media.idMal).limit(1);
+  check(queued.error, 'proteger cambios locales pendientes');
+  if (queued.data?.length) return;
   let mediaId = existingMediaId;
   if (mediaId) {
     const favorite = await db.from("favorites").select("id").eq("user_id", job.user_id).eq("media_id", mediaId).maybeSingle();
@@ -188,6 +192,7 @@ async function compareLibraries(db: DB, job: AniListSyncJob) {
 }
 
 async function advance(db: DB, job: AniListSyncJob, auth: Awaited<ReturnType<typeof connection>>, budget: { delay: number }) {
+  if (job.state.mode === "pending") return advancePending(db, job, auth.token, (query, variables) => graph(auth.token, query, variables, budget));
   const state = job.state;
   const type = state.types[state.typeIndex];
   const mal = job.provider === "myanimelist";
@@ -335,6 +340,7 @@ export async function processAniListSyncStep(userId: string) {
     } else {
     // Replay a failed step, never advance past an unconfirmed write.
     job.state = originalState;
+    if (job.state.mode === "pending") job.state.pendingChange = undefined; // Reconcile a possibly applied write before retrying.
     const malStatus = error instanceof Error && "status" in error ? Number(error.status) : 0;
     const failure = error instanceof SyncError ? error : malStatus ? new SyncError(
       malStatus === 401 || malStatus === 403 ? "MyAnimeList requiere que vuelvas a conectar tu cuenta." : `MyAnimeList respondió ${malStatus}.`,

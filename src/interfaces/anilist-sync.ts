@@ -1,3 +1,9 @@
+export interface PendingChange {
+  user_id: string; provider: 'anilist' | 'myanimelist'; account_id: number;
+  media_type: 'anime' | 'manga'; mal_id: number; operation: 'upsert' | 'delete';
+  status: string; progress: number; favorite_only: boolean; revision: string;
+  resolved?: { mediaId: number; entryId?: number; status: string; progress: number };
+}
 export type SyncMediaType = "anime" | "manga";
 export type SyncProvider = "anilist" | "myanimelist";
 export interface SyncProgress { status: string; current_episode: number; updated_at: string | null }
@@ -11,6 +17,8 @@ export interface RemoteListEntry {
   };
 }
 export interface SyncState {
+  mode?: "pending" | "full";
+  pendingChange?: PendingChange;
   accountId: number;
   types: SyncMediaType[];
   typeIndex: number;

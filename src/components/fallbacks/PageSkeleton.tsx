@@ -18,7 +18,7 @@ export function CatalogSkeleton() {
 }
 
 export function DetailSkeleton() {
-  return <div role="status" aria-label="Cargando ficha…" className="mx-auto max-w-7xl space-y-10 px-8 py-8">
+  return <div role="status" aria-label="Cargando ficha…" className="mx-auto max-w-7xl space-y-10 py-8">
     <span className="sr-only">Cargando ficha…</span>
     <Skeleton className="h-4 w-48" />
     <div className="flex flex-col items-end gap-8 lg:flex-row lg:gap-12">
@@ -34,5 +34,5 @@ export function ActionsSkeleton() {
 }
 
 export default function PageSkeleton() {
-  return <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-8"><Skeleton className="h-10 w-60" /><Skeleton className="h-5 w-3/5" /><CatalogSkeleton /></div>;
+  return <div className="mx-auto max-w-7xl space-y-8 py-8"><Skeleton className="h-10 w-60" /><Skeleton className="h-5 w-3/5" /><CatalogSkeleton /></div>;
 }

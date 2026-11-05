@@ -11,7 +11,7 @@ export default async function SocialProfilePage({ params }: Readonly<{ params: P
   const profile = await getSocialProfile(decodeURIComponent(username));
   if (!profile) notFound();
   if (profile.relationship === 'self') {
-    return <main className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8"><div className="rounded-3xl border border-border bg-card p-10 text-center"><p className="text-muted-foreground">Este es tu perfil.</p><Link href="/profile" className="mt-4 inline-block rounded-xl bg-primary px-5 py-3 font-bold text-primary-foreground">Ir a mi perfil</Link></div></main>;
+    return <main className="mx-auto w-full py-10"><div className="rounded-3xl border border-border bg-card p-10 text-center"><p className="text-muted-foreground">Este es tu perfil.</p><Link href="/profile" className="mt-4 inline-block rounded-xl bg-primary px-5 py-3 font-bold text-primary-foreground">Ir a mi perfil</Link></div></main>;
   }
 
   const [highlights, favoritesResult] = await Promise.all([
@@ -20,7 +20,7 @@ export default async function SocialProfilePage({ params }: Readonly<{ params: P
   ]);
   const avatar = getProfileAvatar(profile.avatar) ?? DEFAULT_PROFILE_AVATAR;
 
-  return <main className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8">
+  return <main className="mx-auto w-full max-w-7xl py-10">
     <section className="mb-12 flex flex-col items-center gap-6 rounded-4xl border border-border bg-card p-7 text-center sm:flex-row sm:text-left">
       <div role="img" aria-label={`Imagen de perfil de ${profile.full_name || profile.username}`} className="size-28 shrink-0 rounded-3xl bg-primary/15 bg-cover bg-center" style={{ backgroundImage: profileAvatarBackground(avatar) }} />
       <div className="min-w-0 flex-1"><p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Perfil de AniTrack</p><h1 className="mt-1 truncate text-3xl font-black sm:text-5xl">{profile.full_name || profile.username}</h1><p className="mt-1 text-sm font-semibold text-muted-foreground">@{profile.username}</p>{profile.bio && <p className="mt-4 max-w-2xl text-muted-foreground">{profile.bio}</p>}</div>

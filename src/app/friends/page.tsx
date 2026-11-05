@@ -12,7 +12,7 @@ export default async function FriendsPage() {
   const { data, error } = await supabase.rpc("get_my_social_connections");
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8">
+    <main className="mx-auto w-full py-10">
       <div className="mb-9">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">
           Comunidad

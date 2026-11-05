@@ -135,3 +135,8 @@ export async function setMalMangaProgress(
     body,
   });
 }
+
+export async function deleteMalSyncEntry(token: string, type: 'anime' | 'manga', id: number) {
+  try { await malAuthorizedFetch(`${MAL_API_BASE}/${type}/${id}/my_list_status`, token, { method: 'DELETE' }); }
+  catch (error) { if (!(error instanceof MalLibraryError) || error.status !== 404) throw error; }
+}

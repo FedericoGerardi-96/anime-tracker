@@ -5,13 +5,11 @@ import { readAllPages, readInBatches } from '@/lib/read-all-pages'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/services/supabase'
 import { revalidatePath } from 'next/cache'
-import { syncMediaProgressWithProviders } from '@/services/media-provider-sync'
-import { getCanonicalMediaInput } from '@/services/canonical-media'
 
 const PROGRESS_STATUSES = ['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch'] as const
 type ProgressStatus = typeof PROGRESS_STATUSES[number]
 
-export async function updatePersonalProgress(input: { mediaId: string; malId: number; mediaType: 'anime' | 'manga'; status: ProgressStatus; currentEpisode?: number }) {
+export async function updatePersonalProgress(input: { mediaId: string; malId: number; mediaType: 'anime' | 'manga'; status: ProgressStatus; currentEpisode?: number; previous?: { episode: number; status: string } }) {
   const supabase = await createClient()
   const user = await getAuthenticatedUser()
   if (!user) return { error: 'No autorizado' }
@@ -19,18 +17,36 @@ export async function updatePersonalProgress(input: { mediaId: string; malId: nu
   const { data: media, error: mediaError } = await supabase.from('media').select('mal_id,type,total_units').eq('id', input.mediaId).single()
   if (mediaError || !media || Number(media.mal_id) !== input.malId || media.type !== input.mediaType) return { error: 'No se pudo verificar la identidad de la serie' }
 
+  const queueSchema = await supabase.from('library_sync_pending').select('revision').limit(0)
+  if (queueSchema.error) return { error: 'Falta preparar la cola de sincronización en Supabase.' }
   let currentEpisode = input.currentEpisode ?? 0
   if (input.status === 'completed') {
     if (media?.total_units) currentEpisode = media.total_units
   }
-  const { error } = await supabase.from('user_media_progress').upsert({ user_id: user.id, media_id: input.mediaId, status: input.status, current_episode: currentEpisode, updated_at: new Date().toISOString() }, { onConflict: 'user_id,media_id' })
-  if (error) return { error: error.message }
+  const progress = { user_id: user.id, media_id: input.mediaId, status: input.status, current_episode: currentEpisode, updated_at: new Date().toISOString() }
+  if (input.previous) {
+    // The calendar increments the displayed episode. Do not overwrite a newer edit from another tab.
+    if (currentEpisode !== input.previous.episode + 1 || input.previous.episode < 0 || input.status !== 'watching') return { error: 'Episodio inválido' }
+    const result = await supabase.from('user_media_progress').update(progress)
+      .eq('user_id', user.id).eq('media_id', input.mediaId)
+      .eq('current_episode', input.previous.episode).eq('status', input.previous.status).select('id').maybeSingle()
+    if (result.error) return { error: 'No pudimos guardar el episodio.' }
+    if (!result.data) {
+      const stale = { error: 'El progreso cambió. Actualizá el calendario antes de marcar otro episodio.' }
+      if (input.previous.episode !== 0) return stale
+      // Older library entries can lack a progress row. Only initialize a missing row.
+      const initial = await supabase.from('user_media_progress').upsert(progress, { onConflict: 'user_id,media_id', ignoreDuplicates: true }).select('id').maybeSingle()
+      if (initial.error || !initial.data) return stale
+    }
+  } else {
+    const { error } = await supabase.from('user_media_progress').upsert(progress, { onConflict: 'user_id,media_id' })
+    if (error) return { error: error.message }
+  }
 
-  const { warning } = await syncMediaProgressWithProviders(user.id, { malId: Number(media.mal_id), mediaType: media.type, status: input.status, progress: currentEpisode })
   revalidatePath('/favorites')
   revalidatePath('/lists')
   revalidatePath('/profile')
-  return { success: true, warning }
+  return { success: true, warning: undefined }
 }
 
 export async function getLists() {
@@ -208,6 +224,8 @@ export async function addMediaToLists(mediaData: {
     return { error: 'Not authenticated' }
   }
   if (!Number.isInteger(mediaData.mal_id) || mediaData.mal_id <= 0 || (mediaData.type !== 'anime' && mediaData.type !== 'manga')) return { error: 'Serie inválida' }
+  const queueSchema = await supabase.from('library_sync_pending').select('revision').limit(0)
+  if (queueSchema.error) return { error: 'Falta preparar la cola de sincronización en Supabase. Aplicá la migración de cambios pendientes.' }
 
   // 1. Ensure media exists
   let mediaId: string;
@@ -221,7 +239,7 @@ export async function addMediaToLists(mediaData: {
   if (existingMedia) {
     mediaId = existingMedia.id;
   } else {
-    const canonical = await getCanonicalMediaInput(mediaData)
+    const canonical = mediaData
     const { data: newMedia, error: mediaError } = await supabase
       .from('media')
       .insert({
@@ -241,7 +259,6 @@ export async function addMediaToLists(mediaData: {
     mediaId = newMedia.id;
   }
 
-  let warning: string | undefined
   // 2. Update Progress if provided
   if (progressData) {
     const previous = await supabase.from('user_media_progress').select('status,current_episode').eq('user_id', user.id).eq('media_id', mediaId).maybeSingle()
@@ -274,8 +291,6 @@ export async function addMediaToLists(mediaData: {
       console.error('Error updating progress:', progressError)
       return { error: 'No se pudo guardar el progreso' }
     }
-    const result = await syncMediaProgressWithProviders(user.id, { malId: mediaData.mal_id, mediaType: mediaData.type, status: status as ProgressStatus, progress: currentEpisode })
-    warning = result.warning
   }
 
   // 3. Update associations
@@ -307,12 +322,10 @@ export async function addMediaToLists(mediaData: {
   }
 
   revalidatePath('/lists')
-  revalidatePath('/anime')
-  revalidatePath('/manga')
   revalidatePath('/favorites')
   revalidatePath('/profile')
   
-  return { success: true, warning }
+  return { success: true, warning: undefined }
 }
 
 export async function getProgressStats(): Promise<Record<string, number> | null> {

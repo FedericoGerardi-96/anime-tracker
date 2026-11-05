@@ -52,11 +52,18 @@ export async function startSyncJob(request: Request, fixedProvider?: SyncProvide
   const db = createSupabaseAdminClient();
   const schema = await db.from("anilist_sync_jobs").select("provider,cancel_requested").limit(0);
   if (schema.error) return Response.json({ error: "Falta aplicar la migración 202610220004_library_sync_cancel.sql en Supabase." }, { status: 503, headers });
+  const mode = body?.mode === 'full' ? 'full' : 'pending';
+  const pending = await db.from('library_sync_pending').select('mal_id').eq('user_id', user.id).eq('provider', provider).limit(1);
+  if (pending.error) return Response.json({ error: 'Falta aplicar la migración 202610280001_library_sync_pending.sql en Supabase.' }, { status: 503, headers });
+  if (mode === 'full' && pending.data?.length) return Response.json({ error: 'Primero enviá los cambios pendientes para no reimportar series que eliminaste.' }, { status: 409, headers });
   const isMal = provider === "myanimelist";
   const auth = await db.from(isMal ? "mal_connections" : "anilist_connections").select(isMal ? "mal_user_id" : "anilist_user_id,token_expires_at").eq("user_id", user.id).maybeSingle();
   const account = auth.data as unknown as { mal_user_id?: number; anilist_user_id?: number; token_expires_at?: string } | null;
   if (auth.error || !account || (!isMal && Date.parse(account.token_expires_at ?? "") <= Date.now())) return Response.json({ error: `Volvé a conectar ${isMal ? "MyAnimeList" : "AniList"} desde tu perfil.` }, { status: 409, headers });
-  const state: SyncState = { accountId: Number(isMal ? account.mal_user_id : account.anilist_user_id), types, typeIndex: 0, phase: "fetch", page: 1, remote: [], cursor: 0, exportOffset: 0, imported: 0, exported: 0, updated: 0, skipped: 0, warnings: [] };
+  const stale = await db.from('library_sync_pending').select('mal_id').eq('user_id', user.id).eq('provider', provider).neq('account_id', Number(isMal ? account.mal_user_id : account.anilist_user_id)).limit(1);
+  if (stale.error) return Response.json({ error: 'No se pudo verificar la cuenta de los cambios pendientes.' }, { status: 503, headers });
+  if (stale.data?.length) return Response.json({ error: 'Hay cambios pendientes de otra cuenta vinculada. Reconectá esa cuenta antes de enviarlos; no se aplicarán a una cuenta diferente.' }, { status: 409, headers });
+  const state: SyncState = { mode, accountId: Number(isMal ? account.mal_user_id : account.anilist_user_id), types, typeIndex: 0, phase: "fetch", page: 1, remote: [], cursor: 0, exportOffset: 0, imported: 0, exported: 0, updated: 0, skipped: 0, warnings: [] };
   const result = await db.from("anilist_sync_jobs").insert({ user_id: user.id, provider, state }).select("*").single();
   if (result.error?.code === "23505") {
     const existing = await db.from("anilist_sync_jobs").select("*").eq("user_id", user.id).in("status", ["queued", "running"]).single();

@@ -4,17 +4,7 @@ import { getAuthenticatedUser } from "@/services/supabase"
 import { getFavoritesWithMedia as fetchFavoritesWithMedia, getFavoriteMalIds as fetchFavoriteMalIds, getAllFavoritesFull } from "@/services/favorites"
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { syncMediaFavoriteWithProviders } from "@/services/media-provider-sync"
-import { getCanonicalMediaInput } from '@/services/canonical-media'
 
-async function syncFavoriteIfApplicable(
-  userId: string,
-  mediaData: { mal_id: number; type?: 'anime' | 'manga' },
-  isFavorite: boolean,
-) {
-  const result = await syncMediaFavoriteWithProviders(userId, mediaData.mal_id, mediaData.type ?? 'anime', isFavorite);
-  return result.warning;
-}
 
 export async function getFavoritesWithMedia() {
   const user = await getAuthenticatedUser()
@@ -55,6 +45,8 @@ export async function toggleFavorite(mediaData: {
     return { error: 'Not authenticated' }
   }
   if (!Number.isInteger(mediaData.mal_id) || mediaData.mal_id <= 0 || (mediaData.type && mediaData.type !== 'anime' && mediaData.type !== 'manga')) return { error: 'Serie inválida' }
+  const queueSchema = await supabase.from('library_sync_pending').select('revision').limit(0)
+  if (queueSchema.error) return { error: 'Falta preparar la cola de sincronización en Supabase. Aplicá la migración de cambios pendientes.' }
 
   // 0. Check if media is Hentai
   const isHentai = mediaData.tags?.some(tag => tag.toLowerCase() === 'hentai');
@@ -71,9 +63,8 @@ export async function toggleFavorite(mediaData: {
     if (existingHentai) {
       const { error } = await supabase.from('hentai').delete().eq('id', existingHentai.id);
       if (error) return { error: 'No se pudo quitar el favorito' };
-      const warning = await syncFavoriteIfApplicable(user.id, mediaData, false);
       revalidatePath('/hentai');
-      return { success: true, isFavorite: false, warning };
+      return { success: true, isFavorite: false };
     } else {
       const { error } = await supabase.from('hentai').insert({
         user_id: user.id,
@@ -84,9 +75,8 @@ export async function toggleFavorite(mediaData: {
         type: mediaData.type === 'manga' ? 'doujin' : 'anime'
       });
       if (error) return { error: 'No se pudo agregar el favorito' };
-      const warning = await syncFavoriteIfApplicable(user.id, mediaData, true);
       revalidatePath('/hentai');
-      return { success: true, isFavorite: true, warning };
+      return { success: true, isFavorite: true, warning: undefined };
     }
   }
 
@@ -102,7 +92,7 @@ export async function toggleFavorite(mediaData: {
   if (existingMedia) {
     mediaId = existingMedia.id;
   } else {
-    const canonical = await getCanonicalMediaInput(mediaData)
+    const canonical = mediaData
     // Insert media
     const { data: newMedia, error: mediaError } = await supabase
       .from('media')
@@ -162,14 +152,10 @@ export async function toggleFavorite(mediaData: {
     }
   }
 
-  revalidatePath('/anime')
-  revalidatePath('/manga')
   revalidatePath('/favorites')
   revalidatePath('/profile')
-
-  const warning = await syncFavoriteIfApplicable(user.id, mediaData, !existingFav);
   
-  return { success: true, isFavorite: !existingFav, warning }
+  return { success: true, isFavorite: !existingFav, warning: undefined }
 }
 
 export async function exportFavoritesAction() {

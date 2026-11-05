@@ -7,7 +7,8 @@ import HomeSectionUnavailable from "./HomeSectionUnavailable";
 
 function AnimePoster({
   anime,
-}: Readonly<HomeAnimePosterProps>) {
+  position,
+}: Readonly<HomeAnimePosterProps & { position: number }>) {
   const title = anime.title_english || anime.title;
   const image =
     anime.images.webp.large_image_url || anime.images.jpg.large_image_url;
@@ -15,31 +16,34 @@ function AnimePoster({
   return (
     <Link
       href={`/anime/${anime.mal_id}-${slugify(title)}`}
-      className="group block min-w-0"
+      className="group flex min-w-0 items-end gap-1 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
     >
-      <div className="relative mb-3 aspect-2/3 overflow-hidden rounded-2xl bg-muted">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          sizes="(max-width: 639px) 44vw, (max-width: 767px) 29vw, (max-width: 1023px) 17vw, (max-width: 1279px) 8vw, 114px"
-          className="object-cover transition duration-500 group-hover:scale-105"
-        />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/70 to-transparent" />
-        {anime.score && (
-          <span className="absolute bottom-2 left-2 rounded-full bg-black/65 px-2 py-1 text-[11px] font-bold text-amber-300 backdrop-blur-sm">
-            ★ {anime.score.toFixed(1)}
-          </span>
-        )}
+      <span className="sr-only">Puesto {position}: </span>
+      <span aria-hidden="true" className="shrink-0 pb-6 text-4xl font-black leading-none text-transparent sm:text-5xl" style={{ WebkitTextStroke: "1px var(--brand-aurora)" }}>
+        {position}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="relative aspect-2/3 overflow-hidden rounded-xl border border-border bg-muted">
+          {image && (
+            <Image
+              src={image}
+              alt=""
+              fill
+              sizes="(max-width: 639px) calc((100vw - 7rem) / 2), (max-width: 767px) calc((100vw - 10rem) / 3), (max-width: 1279px) calc((100vw - 16rem) / 5), 190px"
+              className="object-cover transition-transform duration-500 motion-reduce:transition-none motion-safe:group-hover:scale-105"
+            />
+          )}
+          <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black via-black/80 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-2.5">
+            <h3 className="line-clamp-3 text-sm font-bold leading-snug text-white">{title}</h3>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {[anime.score ? `★ ${anime.score.toFixed(1)}` : null, anime.type, anime.episodes ? `${anime.episodes} episodios` : null]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
       </div>
-      <h3 className="truncate text-sm font-semibold transition-colors group-hover:text-primary">
-        {title}
-      </h3>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {[anime.type, anime.episodes ? `${anime.episodes} eps` : null]
-          .filter(Boolean)
-          .join(" · ")}
-      </p>
     </Link>
   );
 }
@@ -68,11 +72,12 @@ export default async function HomeTopAnime() {
           Ver todo
         </Link>
       </div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10">
-        {topAnime.map((anime) => (
+      <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-5">
+        {topAnime.map((anime, index) => (
           <AnimePoster
             key={anime.mal_id}
             anime={anime}
+            position={index + 1}
           />
         ))}
       </div>

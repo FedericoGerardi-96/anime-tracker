@@ -121,7 +121,7 @@ export default function AnimeCard({
         </Link>
         
         {isAiring && (
-          <div className="absolute top-2 left-2 px-2 py-1 rounded bg-primary/80 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider pointer-events-none">
+          <div className="absolute top-2 left-2 px-2 py-1 rounded bg-primary backdrop-blur-md text-[10px] font-bold text-primary-foreground uppercase tracking-wider pointer-events-none">
             Airing
           </div>
         )}
@@ -133,7 +133,7 @@ export default function AnimeCard({
               e.preventDefault();
               onAddClick?.({ id, title, image, score, studio, year, isAiring, synopsis, season, genres, tags, format, status, episodes, totalUnits: totalUnits ?? episodes, type });
             }}
-            className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer"
+            className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer"
           >
             <span className="material-symbols-outlined text-lg">add</span>
           </button>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo de anime · AniTrack</title>
+<link rel="stylesheet" href="anitrack.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#4BF2C5}a:hover{color:#8F7BFF}
+.dd{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px 0 14px;border-radius:11px;background:#0F0E1D;border:1px solid rgba(190,180,255,.13);font-size:14px;font-weight:600;color:#F3F1FF}
+.dd.on{border-color:rgba(75,242,197,.45);color:#4BF2C5}
+.x{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 6px 0 12px;border-radius:999px;background:rgba(75,242,197,.12);border:1px solid rgba(75,242,197,.35);color:#4BF2C5;font-size:13px;font-weight:700}
+.x button{width:20px;height:20px;border:0;border-radius:50%;background:rgba(75,242,197,.2);color:#4BF2C5;display:grid;place-items:center;padding:0}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="at" style="padding-bottom: 96px">
+<header class="nav"><div class="wrap nav-in">
+<a href="#" class="logo" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><defs><linearGradient id="lgN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4BF2C5"></stop><stop offset="1" stop-color="#8F7BFF"></stop></linearGradient></defs><circle cx="18" cy="18" r="13" fill="none" stroke="rgba(243,241,255,.13)" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#lgN)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="#F3F1FF"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="#FF7AB8"></path></svg><span class="logo-word">Ani<b>Track</b></span></a>
+<nav class="links" aria-label="Principal"><a href="#">Inicio</a><a href="#" class="on">Anime</a><a href="#">Manga</a><a href="#">Calendario</a><a href="#">Listas</a><a href="#">Amigos</a></nav>
+<div class="nav-end"><label class="search" for="qc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="qc" placeholder="Buscar" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"><span class="kbd">Ctrl K</span></label><a href="#" class="avatar" aria-label="Tu perfil"><span>RT</span></a></div>
+</div></header>
+
+<main class="wrap" style="display: flex; flex-direction: column; gap: 22px; padding-top: 40px">
+<div class="sec-head">
+<div style="display: flex; flex-direction: column; gap: 6px"><p class="eyebrow">Catálogo</p><h1 class="display" style="font-size: 44px">Anime</h1></div>
+<span class="sm faint">Datos de <b class="muted">AniList</b> · cambiar a MyAnimeList</span>
+</div>
+
+<div class="panel" style="display: flex; flex-direction: column; gap: 14px; padding: 16px; border-radius: 18px">
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+<label class="search" for="qt" style="flex: 1 1 260px; min-width: 0"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="qt" placeholder="Filtrar por título" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"></label>
+<button type="button" class="dd on">Género · 1<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<button type="button" class="dd on">Año · 2020–2025<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<button type="button" class="dd">Temporada<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<button type="button" class="dd">Formato<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<button type="button" class="dd">Estado<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<button type="button" class="dd"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>Más filtros</button>
+<button type="button" class="dd" style="margin-left: auto">Orden: Popularidad<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<span class="x">Fantasía<button type="button" aria-label="Quitar Fantasía"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"></path></svg></button></span>
+<span class="x">2020–2025<button type="button" aria-label="Quitar rango de años"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"></path></svg></button></span>
+<button type="button" class="btn btn-ghost btn-sm">Limpiar</button>
+<span style="margin-left: auto; display: inline-flex; align-items: center; gap: 10px" class="sm muted"><span style="width: 38px; height: 22px; border-radius: 99px; background: #4BF2C5; position: relative; display: inline-block"><span style="position: absolute; right: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #062A22"></span></span>Ocultar los que ya están en mi biblioteca</span>
+</div>
+</div>
+
+<div class="sec-head"><span class="mono sm faint">1.284 resultados</span><button type="button" class="btn btn-ghost btn-sm"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"></rect><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg>Seleccionar varias</button></div>
+
+<div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(176px, 1fr))">
+<div class="card"><div class="poster p1"><button type="button" class="fav on" aria-label="Me encanta" aria-pressed="true"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Frieren</span></div><div><p class="ttl">Frieren: Beyond Journey’s End</p><p class="meta">Madhouse · 2023 · <span class="mono">★ 9.2</span></p></div><div class="row"><span class="st st-completado"><i></i>Completado</span></div></div>
+<div class="card"><div class="poster p7"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Delicious in Dungeon</span></div><div><p class="ttl">Delicious in Dungeon</p><p class="meta">Trigger · 2024 · <span class="mono">★ 8.6</span></p></div><div class="row"><span class="st st-none"><i></i>Agregar</span></div></div>
+<div class="card"><div class="poster p3"><span class="pbadge badge b-live"><i></i>En emisión</span><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">The Apothecary Diaries</span><span class="pprog"><i style="width: 70%"></i></span></div><div><p class="ttl">The Apothecary Diaries S2</p><p class="meta">OLM · 2025 · <span class="mono">★ 8.8</span></p></div><div class="row"><span class="st st-viendo"><i></i>Viendo</span><span class="ep">EP <b>17</b>/24 <button type="button" aria-label="Sumar un episodio">+1</button></span></div></div>
+<div class="card"><div class="poster p8"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Mushoku Tensei II</span></div><div><p class="ttl">Mushoku Tensei II</p><p class="meta">Studio Bind · 2023 · <span class="mono">★ 8.3</span></p></div><div class="row"><span class="st st-pendiente"><i></i>Pendiente</span></div></div>
+<div class="card"><div class="poster p6"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Solo Leveling</span></div><div><p class="ttl">Solo Leveling</p><p class="meta">A-1 Pictures · 2024 · <span class="mono">★ 8.2</span></p></div><div class="row"><span class="st st-none"><i></i>Agregar</span></div></div>
+<div class="card"><div class="poster p5"><button type="button" class="fav on" aria-label="Me encanta" aria-pressed="true"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Jujutsu Kaisen</span></div><div><p class="ttl">Jujutsu Kaisen</p><p class="meta">MAPPA · 2020 · <span class="mono">★ 8.5</span></p></div><div class="row"><span class="st st-completado"><i></i>Completado</span></div></div>
+<div class="card"><div class="poster p10"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Spy x Family</span></div><div><p class="ttl">Spy x Family</p><p class="meta">Wit · CloverWorks · 2022 · <span class="mono">★ 8.4</span></p></div><div class="row"><span class="st st-pausa"><i></i>En pausa</span></div></div>
+<div class="card"><div class="poster p9"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Ranking of Kings</span></div><div><p class="ttl">Ranking of Kings</p><p class="meta">Wit Studio · 2021 · <span class="mono">★ 8.5</span></p></div><div class="row"><span class="st st-none"><i></i>Agregar</span></div></div>
+<div class="card"><div class="poster p2"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Witch Hat Atelier</span></div><div><p class="ttl">Witch Hat Atelier</p><p class="meta">Bug Films · 2025 · <span class="mono">★ 8.7</span></p></div><div class="row"><span class="st st-pendiente"><i></i>Pendiente</span></div></div>
+<div class="card"><div class="poster p4"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">The Dangers in My Heart</span></div><div><p class="ttl">The Dangers in My Heart</p><p class="meta">Shin-Ei · 2023 · <span class="mono">★ 8.4</span></p></div><div class="row"><span class="st st-none"><i></i>Agregar</span></div></div>
+<div class="card"><div class="poster p1"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Mob Psycho 100 III</span></div><div><p class="ttl">Mob Psycho 100 III</p><p class="meta">Bones · 2022 · <span class="mono">★ 8.9</span></p></div><div class="row"><span class="st st-viendo"><i></i>Viendo</span><span class="ep">EP <b>8</b>/12 <button type="button" aria-label="Sumar un episodio">+1</button></span></div></div>
+<div class="card"><div class="poster p3"><button type="button" class="fav" aria-label="Me encanta" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button><span class="pt">Made in Abyss</span></div><div><p class="ttl">Made in Abyss: Golden City</p><p class="meta">Kinema Citrus · 2022 · <span class="mono">★ 8.6</span></p></div><div class="row"><span class="st st-abandonado"><i></i>Abandonado</span></div></div>
+</div>
+</main>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+
+window.__dcBoot(Component, {});
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendario semanal · AniTrack</title>
+<link rel="stylesheet" href="anitrack.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#4BF2C5}a:hover{color:#8F7BFF}
+.day{display:flex;flex-direction:column;gap:10px;padding:14px 10px;border-radius:16px;min-height:520px}
+.day.today{background:linear-gradient(180deg,rgba(75,242,197,.10),rgba(15,14,29,.4));border:1px solid rgba(75,242,197,.3)}
+.dh{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 8px;border-bottom:1px solid rgba(190,180,255,.13)}
+.ev{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:12px;background:#0F0E1D;border:1px solid rgba(190,180,255,.13);position:relative;overflow:hidden}
+.ev::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+.ev.v::before{background:#4BF2C5}.ev.p::before{background:#74C7FF}.ev.z::before{background:#FFC566}
+.ev .t{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600}
+.ev b{font-size:13.5px;line-height:1.25}
+.seg{display:inline-flex;padding:4px;border-radius:12px;background:#0F0E1D;border:1px solid rgba(190,180,255,.13)}
+.seg button{height:36px;padding:0 14px;border:0;border-radius:9px;background:transparent;font-weight:700;font-size:14px;color:#BDB9DC}
+.seg button.on{background:#17162B;color:#F3F1FF}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="at" style="padding-bottom: 96px">
+<header class="nav"><div class="wrap nav-in">
+<a href="#" class="logo" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><defs><linearGradient id="lgN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4BF2C5"></stop><stop offset="1" stop-color="#8F7BFF"></stop></linearGradient></defs><circle cx="18" cy="18" r="13" fill="none" stroke="rgba(243,241,255,.13)" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#lgN)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="#F3F1FF"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="#FF7AB8"></path></svg><span class="logo-word">Ani<b>Track</b></span></a>
+<nav class="links" aria-label="Principal"><a href="#">Inicio</a><a href="#">Anime</a><a href="#">Manga</a><a href="#" class="on">Calendario</a><a href="#">Listas</a><a href="#">Amigos</a></nav>
+<div class="nav-end"><label class="search" for="qk"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="qk" placeholder="Buscar" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"><span class="kbd">Ctrl K</span></label><a href="#" class="avatar" aria-label="Tu perfil"><span>RT</span></a></div>
+</div></header>
+
+<main class="wrap" style="display: flex; flex-direction: column; gap: 24px; padding-top: 40px">
+<div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: stretch">
+<div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 8px; justify-content: flex-end">
+<p class="eyebrow">Otoño 2026 · semana del 26 oct al 1 nov</p>
+<h1 class="display" style="font-size: 44px">Calendario</h1>
+</div>
+<div class="panel" style="flex: 0 1 460px; display: flex; gap: 16px; align-items: center; padding: 16px 20px">
+<div class="poster p3" style="width: 52px; flex: none; border-radius: 8px"></div>
+<div style="flex: 1; min-width: 0">
+<p class="eyebrow">Próximo episodio</p>
+<b>The Apothecary Diaries · EP 18</b>
+<div class="sm muted">Hoy a las 13:30</div>
+</div>
+<div style="text-align: right"><div class="mono" style="font-size: 28px; color: #4BF2C5">2:10</div><div class="xs faint">h : min</div></div>
+</div>
+</div>
+
+<div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+<div class="seg" role="group" aria-label="Qué mostrar"><button type="button" class="on">Lo que sigo</button><button type="button">Toda la temporada · 98</button></div>
+<div style="display: flex; gap: 6px"><button type="button" class="btn btn-secondary btn-icon btn-sm" aria-label="Semana anterior"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><button type="button" class="btn btn-secondary btn-sm">Esta semana</button><button type="button" class="btn btn-secondary btn-icon btn-sm" aria-label="Semana siguiente"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></div>
+<span class="sm faint" style="margin-left: auto; display: inline-flex; gap: 8px; align-items: center"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>Horarios en hora de Buenos Aires (UTC−3), convertidos desde Japón</span>
+</div>
+
+<div style="overflow-x: auto">
+<div style="display: grid; grid-template-columns: repeat(7, minmax(150px, 1fr)); gap: 8px; min-width: 1100px">
+<div class="day"><div class="dh"><b>Lun</b><span class="mono sm faint">26</span></div>
+<div class="ev z"><span class="t">17:00</span><b>Spy x Family S3</b><span class="xs faint">EP 6 · en pausa</span></div>
+</div>
+<div class="day"><div class="dh"><b>Mar</b><span class="mono sm faint">27</span></div>
+<div class="ev p"><span class="t">12:30</span><b>Witch Hat Atelier</b><span class="xs faint">EP 4 · pendiente</span></div>
+<div class="ev v"><span class="t">21:00</span><b>Kaiju No. 8 S2</b><span class="xs faint">EP 7 · visto</span></div>
+</div>
+<div class="day"><div class="dh"><b>Mié</b><span class="mono sm faint">28</span></div>
+<div class="ev v"><span class="t">14:00</span><b>Sakamoto Days</b><span class="xs faint">EP 15 · visto</span></div>
+</div>
+<div class="day today"><div class="dh"><b style="color: #4BF2C5">Jue · Hoy</b><span class="mono sm" style="color: #4BF2C5">29</span></div>
+<div class="ev v"><span class="t">11:00</span><b>Dandadan 2nd Season</b><span class="xs" style="color: #4BF2C5">EP 9 · ya salió, sin ver</span><button type="button" class="btn btn-primary btn-sm" style="margin-top: 4px">Marcar visto</button></div>
+<div style="display: flex; align-items: center; gap: 8px"><span class="mono xs" style="color: #4BF2C5">11:20</span><span style="flex: 1; height: 2px; background: #4BF2C5; border-radius: 2px"></span></div>
+<div class="ev v"><span class="t">13:30</span><b>The Apothecary Diaries</b><span class="xs faint">EP 18 · en 2 h 10 min</span></div>
+</div>
+<div class="day"><div class="dh"><b>Vie</b><span class="mono sm faint">30</span></div>
+<div class="ev p"><span class="t">10:30</span><b>The Ramparts of Ice S2</b><span class="xs faint">EP 5 · pendiente</span></div>
+<div class="ev v"><span class="t">23:30</span><b>Reincarnated as a Sword II</b><span class="xs faint">EP 5</span></div>
+</div>
+<div class="day"><div class="dh"><b>Sáb</b><span class="mono sm faint">31</span></div>
+<div class="ev v"><span class="t">09:30</span><b>Blue Lock S3</b><span class="xs faint">EP 4</span></div>
+<div class="ev p"><span class="t">12:00</span><b>Ranking of Kings S2</b><span class="xs faint">EP 3 · pendiente</span></div>
+</div>
+<div class="day"><div class="dh"><b>Dom</b><span class="mono sm faint">1</span></div>
+<div class="ev v"><span class="t">11:15</span><b>One Piece</b><span class="xs faint">EP 1149</span></div>
+</div>
+</div>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap" class="sm muted">
+<span style="display: inline-flex; gap: 8px; align-items: center"><span style="width: 10px; height: 10px; border-radius: 3px; background: #4BF2C5"></span>Viendo</span>
+<span style="display: inline-flex; gap: 8px; align-items: center"><span style="width: 10px; height: 10px; border-radius: 3px; background: #74C7FF"></span>Pendiente</span>
+<span style="display: inline-flex; gap: 8px; align-items: center"><span style="width: 10px; height: 10px; border-radius: 3px; background: #FFC566"></span>En pausa</span>
+<span class="faint">“Lo que sigo” muestra tu biblioteca con estado Viendo, Pendiente o En pausa que esté en emisión.</span>
+</div>
+</main>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+
+window.__dcBoot(Component, {});
+</script>
+</body>
+</html>

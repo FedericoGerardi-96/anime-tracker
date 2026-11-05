@@ -13,7 +13,7 @@ export default async function ListsPage({ searchParams }: Readonly<CatalogPagePr
   const [user, params] = await Promise.all([getAuthenticatedUser(), searchParams]);
   if (!user) redirect('/login');
   const options = parseListsOptions(params);
-  return <div className="relative w-full space-y-8 px-4 py-8 sm:px-8 lg:px-12">
+  return <div className="relative w-full space-y-8 py-8">
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 className="text-3xl font-extrabold">Mis listas</h1>

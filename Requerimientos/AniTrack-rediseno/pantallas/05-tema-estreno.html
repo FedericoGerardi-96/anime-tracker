@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ajustes de apariencia · AniTrack</title>
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit}
+/* Temas: cada uno redefine los mismos tokens */
+.th-night{--bg:#07070F;--bgimg:radial-gradient(900px 520px at 8% -8%,rgba(143,123,255,.30),transparent 62%),radial-gradient(760px 440px at 96% -4%,rgba(75,242,197,.17),transparent 60%),radial-gradient(900px 700px at 55% 115%,rgba(255,122,184,.12),transparent 60%);--surf:#12112A;--surf2:#1C1A33;--line:rgba(190,180,255,.15);--fg:#F3F1FF;--fg2:#BDB9DC;--fg3:#9894BD;--acc:#4BF2C5;--accInk:#062A22;--love:#FF7AB8;--sv:#4BF2C5;--sc:#B3A6FF;--sp:#74C7FF;--sz:#FFC566;--r:18px;--rs:10px;--fd:'Unbounded','Arial Black',sans-serif;--fdw:600;--fdt:none;--fdls:-.02em;--fds:1;--btt:none;--navbg:rgba(7,7,15,.6);color-scheme:dark}
+.th-day{--bg:#F5F3FD;--bgimg:radial-gradient(900px 520px at 8% -8%,rgba(143,123,255,.22),transparent 62%),radial-gradient(760px 440px at 96% -4%,rgba(75,242,197,.26),transparent 60%),radial-gradient(900px 700px at 55% 115%,rgba(255,122,184,.16),transparent 60%);--surf:#FFFFFF;--surf2:#EEEBFA;--line:rgba(50,30,120,.13);--fg:#16132A;--fg2:#4B4767;--fg3:#5F5B7D;--acc:#087A63;--accInk:#FFFFFF;--love:#C2306F;--sv:#087A63;--sc:#5B47D6;--sp:#1D68B0;--sz:#8F5A00;--r:18px;--rs:10px;--fd:'Unbounded','Arial Black',sans-serif;--fdw:600;--fdt:none;--fdls:-.02em;--fds:1;--btt:none;--navbg:rgba(255,255,255,.72);color-scheme:light}
+.th-estreno{--bg:#000000;--bgimg:none;--surf:#141414;--surf2:#232323;--line:rgba(255,255,255,.11);--fg:#FFFFFF;--fg2:#B8B8B8;--fg3:#9C9C9C;--acc:#FF5B3A;--accInk:#1A0600;--love:#5AAEFF;--sv:#FF7A5C;--sc:#C3B2FF;--sp:#D0D0D0;--sz:#FFD24D;--r:4px;--rs:3px;--fd:'Barlow Condensed','Arial Narrow',sans-serif;--fdw:700;--fdt:uppercase;--fdls:.01em;--fds:1.18;--btt:uppercase;--navbg:#000000;color-scheme:dark}
+
+.tp{min-height:100%;font-family:'Manrope','Segoe UI',system-ui,sans-serif;font-size:15px;line-height:1.5;color:var(--fg);background:var(--bgimg),var(--bg);background-color:var(--bg);transition:background-color .3s,color .3s}
+.tp *{box-sizing:border-box}
+.tp button{font:inherit;color:inherit;cursor:pointer}
+.tp :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.w{max-width:1320px;margin:0 auto;padding-inline:max(16px,3vw)}
+.ico{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.disp{font-family:var(--fd);font-weight:var(--fdw);text-transform:var(--fdt);letter-spacing:var(--fdls);line-height:1.05;margin:0;text-wrap:balance}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.c2{color:var(--fg2)}.c3{color:var(--fg3)}
+.eb{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0}
+.nv{border-bottom:1px solid var(--line);background:var(--navbg);backdrop-filter:blur(14px)}
+.nvi{display:flex;align-items:center;gap:28px;min-height:68px;flex-wrap:wrap;padding-block:10px}
+.lw{font-family:var(--fd);font-weight:700;font-size:calc(19px * var(--fds));letter-spacing:var(--fdls);text-transform:var(--fdt)}
+.lw b{color:var(--acc)}
+.lk{display:flex;gap:4px;flex-wrap:wrap}
+.lk a{padding:8px 12px;border-radius:var(--rs);color:var(--fg2);font-weight:600;font-size:14px;text-decoration:none}
+.lk a.on{color:var(--fg);background:var(--surf2);box-shadow:inset 0 -2px 0 var(--acc)}
+.av{width:38px;height:38px;border-radius:50%;background:conic-gradient(from 200deg,#8F7BFF,var(--acc),var(--love),#8F7BFF);padding:2px;flex:none;display:block}
+.av span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--surf2);font-weight:800;font-size:13px}
+.pn{background:var(--surf);border:1px solid var(--line);border-radius:var(--r)}
+.side a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rs);font-weight:600;font-size:14px;color:var(--fg2);text-decoration:none}
+.side a.on{background:var(--surf2);color:var(--fg);box-shadow:inset 3px 0 0 var(--acc)}
+.opt{display:flex;flex-direction:column;gap:14px;padding:14px;text-align:left;border-radius:var(--r);background:var(--surf);border:2px solid var(--line)}
+.opt.on{border-color:var(--acc)}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--fg3);display:grid;place-items:center;flex:none}
+.opt.on .radio{border-color:var(--acc)}
+.opt.on .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:calc(var(--rs) + 2px);border:1px solid transparent;font-weight:800;font-size:14px;white-space:nowrap;text-transform:var(--btt);letter-spacing:.02em}
+.bp{background:var(--acc);color:var(--accInk)}
+.bs{background:var(--surf2);border-color:var(--line);color:var(--fg)}
+.bl{background:color-mix(in srgb,var(--love) 12%,transparent);border-color:color-mix(in srgb,var(--love) 45%,transparent);color:var(--love)}
+.st{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 10px 0 9px;border-radius:var(--rs);font-size:13px;font-weight:700;border:1px solid}
+.st i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.sv{color:var(--sv);border-color:color-mix(in srgb,var(--sv) 45%,transparent);background:color-mix(in srgb,var(--sv) 10%,transparent)}
+.sc{color:var(--sc);border-color:color-mix(in srgb,var(--sc) 45%,transparent);background:color-mix(in srgb,var(--sc) 10%,transparent)}
+.sp{color:var(--sp);border-color:color-mix(in srgb,var(--sp) 45%,transparent);background:color-mix(in srgb,var(--sp) 10%,transparent)}
+.sz{color:var(--sz);border-color:color-mix(in srgb,var(--sz) 45%,transparent);background:color-mix(in srgb,var(--sz) 10%,transparent)}
+.ps{position:relative;aspect-ratio:2/3;border-radius:calc(var(--rs) + 4px);overflow:hidden;border:1px solid var(--line);background:repeating-linear-gradient(135deg,var(--surf2) 0 12px,var(--surf) 12px 24px);container-type:inline-size;max-width:100%}
+.ps::before{content:"Portada";position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg3);padding:5px 9px;border:1px dashed var(--line);border-radius:6px;white-space:nowrap}
+@container (max-width: 100px){.ps::before{content:none}}
+.hrt{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--surf);border:1px solid var(--line);color:var(--fg2)}
+.hrt.on{color:var(--love)}.hrt.on svg{fill:var(--love)}
+.bar{height:6px;border-radius:99px;background:var(--surf2);overflow:hidden}
+.bar i{display:block;height:100%;width:66%;background:var(--acc);border-radius:inherit}
+.ep{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 4px 0 10px;border-radius:var(--rs);background:var(--surf2);border:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--fg2)}
+.ep b{color:var(--fg)}
+.ep span{width:24px;height:22px;border-radius:calc(var(--rs) - 2px);background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc);font-weight:800;display:grid;place-items:center}
+.tg{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:999px;background:var(--surf2);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--fg2)}
+.th-estreno .tg{border-radius:var(--rs)}
+.tg.on{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 45%,transparent);background:color-mix(in srgb,var(--acc) 10%,transparent)}
+.sw{width:44px;height:26px;border-radius:99px;border:0;padding:3px;display:flex;background:var(--surf2);box-shadow:inset 0 0 0 1px var(--line)}
+.sw i{width:20px;height:20px;border-radius:50%;background:var(--fg3);transition:transform .2s}
+.sw.on{background:var(--acc)}.sw.on i{background:var(--accInk);transform:translateX(18px)}
+@media (prefers-reduced-motion: reduce){.tp,.sw i{transition:none}}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="tp {{ themeClass }}" style="padding-bottom: 80px">
+<header class="nv"><div class="w nvi">
+<a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><circle cx="18" cy="18" r="13" fill="none" stroke="currentColor" stroke-opacity=".14" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" style="stroke: var(--acc)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="currentColor"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" style="fill: var(--love)"></path></svg><span class="lw">Ani<b>Track</b></span></a>
+<nav class="lk" aria-label="Principal"><a href="#">Inicio</a><a href="#">Anime</a><a href="#">Manga</a><a href="#">Calendario</a><a href="#">Listas</a><a href="#">Amigos</a></nav>
+<a href="#" class="av" style="margin-left: auto" aria-label="Tu perfil"><span>RT</span></a>
+</div></header>
+
+<main class="w" style="display: flex; flex-wrap: wrap; gap: 40px; padding-top: 44px">
+<aside style="flex: 1 1 220px; max-width: 260px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<h1 class="disp" style="font-size: calc(30px * var(--fds))">Ajustes</h1>
+<nav class="side" aria-label="Secciones de ajustes" style="display: flex; flex-direction: column; gap: 2px">
+<a href="#">Perfil y biografía</a>
+<a href="#" class="on">Apariencia</a>
+<a href="#">Privacidad</a>
+<a href="#">Cuentas conectadas</a>
+<a href="#">Contenido adulto</a>
+</nav>
+</aside>
+
+<section style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<p class="eb">Apariencia</p>
+<h2 class="disp" style="font-size: calc(36px * var(--fds))">Elegí tu tema</h2>
+<p class="c2" style="margin: 0; max-width: 62ch">Se guarda en tu cuenta y se aplica en todos tus dispositivos. Cambia colores, superficies y tipografía de títulos; la distribución del sitio es la misma.</p>
+</div>
+
+<div role="radiogroup" aria-label="Tema" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+<sc-for list="{{ options }}" as="o" hint-placeholder-count="3">
+<button type="button" role="radio" aria-checked="{{ o.on }}" class="opt {{ o.cls }}" onClick="{{ o.pick }}">
+<div style="{{ o.thumb }}">
+<div style="display: flex; gap: 6px; align-items: center"><span style="{{ o.dotA }}"></span><span style="{{ o.line }}"></span></div>
+<div style="display: flex; gap: 8px; margin-top: 12px">
+<span style="{{ o.card }}"></span><span style="{{ o.card }}"></span><span style="{{ o.card }}"></span>
+</div>
+<div style="display: flex; gap: 6px; margin-top: 12px"><span style="{{ o.btn }}"></span><span style="{{ o.btnLove }}"></span></div>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<span class="radio" aria-hidden="true"></span>
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<b style="font-size: 15px">{{ o.name }}</b>
+<span class="c2" style="font-size: 13px">{{ o.desc }}</span>
+</div>
+</div>
+</button>
+</sc-for>
+</div>
+
+<div class="pn" style="display: flex; align-items: center; gap: 16px; padding: 16px 20px; flex-wrap: wrap">
+<div style="flex: 1 1 300px; min-width: 0"><b>Automático según el sistema</b><div class="c2" style="font-size: 13px">Aurora clara de día y Aurora nocturna de noche, siguiendo la configuración de tu teléfono o computadora.</div></div>
+<button type="button" class="sw {{ autoCls }}" role="switch" aria-checked="{{ auto }}" aria-label="Tema automático" onClick="{{ toggleAuto }}"><i></i></button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap"><p class="eb" style="color: var(--fg3)">Vista previa · {{ currentName }}</p><span class="c3" style="font-size: 13px">Así se ven las piezas principales</span></div>
+<div class="pn" style="padding: 24px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; gap: 18px; align-items: center; flex-wrap: wrap; padding: 14px; border-radius: var(--r); background: var(--surf2)">
+<div class="ps" style="width: 76px; flex: none"></div>
+<div style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<span class="mono c3" style="font-size: 12px">EP 9 salió hoy a las 11:00</span>
+<span class="disp" style="font-size: calc(19px * var(--fds))">Dandadan 2nd Season</span>
+<div style="display: flex; align-items: center; gap: 12px"><div class="bar" style="flex: 1; max-width: 280px"><i></i></div><span class="mono c2" style="font-size: 12px">8 / 12</span></div>
+</div>
+<span class="bt bp"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l11 7-11 7z"></path></svg>Vi el EP 9</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 10px; min-width: 0"><div class="ps"><span class="hrt on" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></span></div><b style="font-size: 14px">Frieren</b><span class="st sc" style="align-self: flex-start"><i></i>Completado</span></div>
+<div style="display: flex; flex-direction: column; gap: 10px; min-width: 0"><div class="ps"><span class="hrt" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></span></div><b style="font-size: 14px">The Apothecary Diaries</b><div style="display: flex; gap: 6px; flex-wrap: wrap"><span class="st sv"><i></i>Viendo</span><span class="ep">EP <b>17</b>/24 <span>+1</span></span></div></div>
+<div style="display: flex; flex-direction: column; gap: 10px; min-width: 0"><div class="ps"><span class="hrt" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></span></div><b style="font-size: 14px">Bocchi the Rock!</b><span class="st sp" style="align-self: flex-start"><i></i>Pendiente</span></div>
+<div style="display: flex; flex-direction: column; gap: 10px; min-width: 0"><div class="ps"><span class="hrt" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></span></div><b style="font-size: 14px">Chainsaw Man</b><span class="st sz" style="align-self: flex-start"><i></i>En pausa</span></div>
+</div>
+
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+<span class="bt bp">Agregar a mi biblioteca</span>
+<span class="bt bs">Guardar en lista</span>
+<span class="bt bl">Me encanta</span>
+<span class="tg on">Fantasía</span><span class="tg">Drama</span><span class="tg">Comedia</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: props.theme || 'night', auto: false };
+  }
+  renderVals() {
+    const T = [
+      { id: 'night', name: 'Aurora nocturna', desc: 'El tema base: tinta oscura con auroras de menta, violeta y sakura.', bg: '#07070F', img: 'radial-gradient(120px 80px at 15% 0%, rgba(143,123,255,.55), transparent 70%), radial-gradient(120px 80px at 100% 0%, rgba(75,242,197,.35), transparent 70%)', surf: '#1C1A33', line: 'rgba(243,241,255,.25)', acc: '#4BF2C5', love: '#FF7AB8', r: 6 },
+      { id: 'day', name: 'Aurora clara', desc: 'Fondo lavanda muy claro con las mismas auroras, más suaves. Ideal de día.', bg: '#F5F3FD', img: 'radial-gradient(120px 80px at 15% 0%, rgba(143,123,255,.35), transparent 70%), radial-gradient(120px 80px at 100% 0%, rgba(75,242,197,.4), transparent 70%)', surf: '#FFFFFF', line: 'rgba(22,19,42,.2)', acc: '#087A63', love: '#C2306F', r: 6 },
+      { id: 'estreno', name: 'Estreno', desc: 'Estilo plataforma de streaming: negro plano, acento naranja brasa, “me encanta” en azul, títulos condensados y esquinas rectas.', bg: '#000000', img: 'none', surf: '#232323', line: 'rgba(255,255,255,.3)', acc: '#FF5B3A', love: '#5AAEFF', r: 2 }
+    ];
+    const { theme, auto } = this.state;
+    const options = T.map(t => ({
+      name: t.name, desc: t.desc,
+      on: theme === t.id,
+      cls: theme === t.id ? 'on' : '',
+      pick: () => this.setState({ theme: t.id, auto: false }),
+      thumb: 'display:block;padding:14px;border-radius:' + (t.r + 6) + 'px;background:' + t.img + ',' + t.bg + ';background-color:' + t.bg + ';border:1px solid ' + t.line,
+      dotA: 'width:14px;height:14px;border-radius:50%;background:' + t.acc,
+      line: 'height:6px;width:60px;border-radius:3px;background:' + t.line,
+      card: 'flex:1;aspect-ratio:2/3;border-radius:' + t.r + 'px;background:' + t.surf + ';border:1px solid ' + t.line,
+      btn: 'height:14px;width:56px;border-radius:' + t.r + 'px;background:' + t.acc,
+      btnLove: 'height:14px;width:34px;border-radius:' + t.r + 'px;background:' + t.love
+    }));
+    const cur = T.find(t => t.id === theme);
+    return {
+      options,
+      themeClass: 'th-' + theme,
+      currentName: auto ? 'Automático (' + cur.name + ')' : cur.name,
+      auto, autoCls: auto ? 'on' : '',
+      toggleAuto: () => this.setState(auto ? { auto: false } : { auto: true, theme: theme === 'estreno' ? 'night' : theme })
+    };
+  }
+}
+
+window.__dcBoot(Component, {"theme":"estreno"});
+</script>
+</body>
+</html>

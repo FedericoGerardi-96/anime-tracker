@@ -1,7 +1,7 @@
 import { materialSymbolNames } from "@/lib/material-symbols";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import { cookies } from "next/headers";
 
 import "./globals.css";
@@ -9,8 +9,8 @@ import "./globals.css";
 import Topbar from "@/components/shared/Topbar";
 import { parseTheme, THEME_COOKIE } from "@/lib/theme";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -43,13 +43,13 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href={`https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&icon_names=${materialSymbolNames}&display=block`} rel="stylesheet"/>
       </head>
-      <body className={`${inter.variable} font-display antialiased bg-background text-foreground`}>
+      <body className={`${manrope.variable} font-display antialiased bg-background text-foreground`}>
         <ToastProvider>
           <LibrarySyncProvider>
           <Suspense fallback={<TopbarFallback />}>
             <Topbar initialTheme={theme} />
           </Suspense>
-          <main className="min-h-[calc(100vh-4rem)] pb-16">
+          <main className="page-frame min-h-[calc(100vh-4rem)] pb-16">
             {children}
           </main>
           </LibrarySyncProvider>

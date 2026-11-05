@@ -11,10 +11,7 @@ export const metadata: Metadata = {
 
 export default async function AnimeListPage({ searchParams }: Readonly<CatalogPageProps>) {
   const params = await searchParams;
-  return <div className="flex-1 space-y-8 p-4 sm:p-8 lg:p-12">
-    <h1 className="text-3xl font-black">Catálogo de anime</h1>
-    <Suspense fallback={<CatalogSkeleton />}>
+  return <Suspense fallback={<CatalogSkeleton />}>
       <AnimeCatalogResults params={params} />
-    </Suspense>
-  </div>;
+    </Suspense>;
 }

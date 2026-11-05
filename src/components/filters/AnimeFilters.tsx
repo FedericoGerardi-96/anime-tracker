@@ -11,9 +11,10 @@ interface AnimeFiltersProps {
   hideSeason?: boolean;
   officialMal?: boolean;
   mediaType?: 'anime' | 'manga';
+  showSort?: boolean;
 }
 
-export default function AnimeFilters({ yearOptions = [], hideSeason = false, officialMal = false, mediaType = 'anime' }: Readonly<AnimeFiltersProps>) {
+export default function AnimeFilters({ yearOptions = [], hideSeason = false, officialMal = false, mediaType = 'anime', showSort = true }: Readonly<AnimeFiltersProps>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -143,7 +144,7 @@ export default function AnimeFilters({ yearOptions = [], hideSeason = false, off
             onChange={(event) => handleSearchChange(event.target.value)}
             placeholder={mediaType === 'manga' ? 'Buscar manga en MyAnimeList…' : 'Buscar anime en MyAnimeList…'}
             aria-label={mediaType === 'manga' ? 'Buscar manga' : 'Buscar anime'}
-            className="h-11 w-full rounded-lg border border-primary/10 bg-background/50 py-2 pl-10 pr-4 text-sm text-foreground outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15"
+            className="h-11 w-full rounded-lg border border-primary/10 bg-transparent py-2 pl-10 pr-4 text-sm text-foreground outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15"
           />
         </div>
       )}
@@ -164,12 +165,13 @@ export default function AnimeFilters({ yearOptions = [], hideSeason = false, off
         />
       )}
       <Dropdown
-        label="Status"
+        label="Estado"
+        buttonClassName={officialMal ? 'min-h-11 bg-card!' : ''}
         value={selectedStatus}
         onChange={(val) => handleFilterChange('status', val)}
         options={[
           { label: 'Todos los estados', value: 'all' },
-          { label: 'En emisión', value: 'airing' },
+          { label: mediaType === 'manga' ? 'Publicándose' : 'En emisión', value: 'airing' },
           ...(officialMal
             ? [{ label: 'Próximamente', value: 'upcoming' }]
             : [{ label: 'Finalizados', value: 'completed' }]),
@@ -178,15 +180,17 @@ export default function AnimeFilters({ yearOptions = [], hideSeason = false, off
       
       {/* Season Filter - Only if not hidden */}
       {!hideSeason && officialMal && (
-        <div className={`flex w-full flex-col gap-2 rounded-xl border p-2 sm:w-auto sm:flex-row ${seasonPairIncomplete ? 'border-primary/50 bg-primary/5' : 'border-primary/10 bg-background/40'}`}>
+        <div className={`flex w-full flex-col gap-2 rounded-xl border p-2 sm:w-auto sm:flex-row ${seasonPairIncomplete ? 'border-primary/50 bg-primary/5' : 'border-primary/10 bg-transparent'}`}>
           <Dropdown
             label="Año"
+            buttonClassName="min-h-11 bg-card!"
             value={selectedYear}
             onChange={(val) => handleSeasonChange('year', val)}
             options={[{ label: 'Todos los años', value: 'all' }, ...yearOptions]}
           />
           <Dropdown
             label="Temporada"
+            buttonClassName="min-h-11 bg-card!"
             value={selectedSeason}
             onChange={(val) => handleSeasonChange('season', val)}
             options={[
@@ -212,9 +216,9 @@ export default function AnimeFilters({ yearOptions = [], hideSeason = false, off
         />
       )}
 
-      {(!officialMal || selectedStatus === 'all') && (
+      {showSort && (!officialMal || selectedStatus === 'all') && (
         <Dropdown
-          label="Sort"
+          label="Orden"
           value={selectedSort}
           onChange={(val) => handleFilterChange('sort', val)}
           options={[

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listas · AniTrack</title>
+<link rel="stylesheet" href="anitrack.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#4BF2C5}a:hover{color:#8F7BFF}
+.rl a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;font-weight:600;font-size:14px;color:#BDB9DC}
+.rl a.on{background:#17162B;color:#F3F1FF;box-shadow:inset 3px 0 0 #FF7AB8}
+.rl .n{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:#9894BD}
+.rl .d{width:8px;height:8px;border-radius:50%;flex:none}
+.lrow{display:grid;grid-template-columns:28px 52px minmax(0,1.4fr) minmax(0,1.6fr) 130px 110px;gap:16px;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(190,180,255,.13)}
+</style>
+
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+<div class="at" style="padding-bottom: 96px">
+<header class="nav"><div class="wrap nav-in">
+<a href="#" class="logo" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><defs><linearGradient id="lgN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4BF2C5"></stop><stop offset="1" stop-color="#8F7BFF"></stop></linearGradient></defs><circle cx="18" cy="18" r="13" fill="none" stroke="rgba(243,241,255,.13)" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#lgN)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="#F3F1FF"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="#FF7AB8"></path></svg><span class="logo-word">Ani<b>Track</b></span></a>
+<nav class="links" aria-label="Principal"><a href="#">Inicio</a><a href="#">Anime</a><a href="#">Manga</a><a href="#">Calendario</a><a href="#" class="on">Listas</a><a href="#">Amigos</a></nav>
+<div class="nav-end"><label class="search" for="ql"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="ql" placeholder="Buscar" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"><span class="kbd">Ctrl K</span></label><a href="#" class="avatar" aria-label="Tu perfil"><span>RT</span></a></div>
+</div></header>
+
+<main class="wrap" style="display: flex; flex-wrap: wrap; gap: 32px; padding-top: 40px">
+
+<aside class="rl" style="flex: 1 1 260px; max-width: 300px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+<button type="button" class="btn btn-primary" style="width: 100%"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Nueva lista</button>
+<nav aria-label="Biblioteca" style="display: flex; flex-direction: column; gap: 2px">
+<p class="eyebrow" style="color: #9894BD; padding: 0 10px 6px">Biblioteca</p>
+<a href="#"><span class="d" style="background: #4BF2C5"></span>Viendo<span class="n">6</span></a>
+<a href="#"><span class="d" style="background: #74C7FF"></span>Pendientes<span class="n">48</span></a>
+<a href="#"><span class="d" style="background: #B3A6FF"></span>Completadas<span class="n">214</span></a>
+<a href="#"><span class="d" style="background: #FFC566"></span>En pausa<span class="n">3</span></a>
+<a href="#"><span class="d" style="background: #FF8A7A"></span>Abandonadas<span class="n">5</span></a>
+</nav>
+<nav aria-label="Mis listas" style="display: flex; flex-direction: column; gap: 2px">
+<p class="eyebrow" style="color: #9894BD; padding: 0 10px 6px">Mis listas</p>
+<a href="#"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true" style="color: #FF7AB8; fill: #FF7AB8"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>Me encanta<span class="n">12</span></a>
+<a href="#"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h8"></path><path d="M17 16l3 2-3 2z"></path></svg>Maratón de invierno<span class="n">7</span></a>
+<a href="#"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true" style="color: #8F7BFF"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>Mecha de los 90<span class="n">18</span></a>
+<a href="#"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3"></circle><circle cx="16" cy="10" r="2.5"></circle><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M14 15c2.5-.6 5 .6 6 3.5"></path></svg>Para ver con Mati<span class="n">9</span></a>
+</nav>
+<nav aria-label="De amigos" style="display: flex; flex-direction: column; gap: 2px">
+<p class="eyebrow" style="color: #9894BD; padding: 0 10px 6px">De amigos</p>
+<a href="#" class="on"><span class="avatar" style="width: 22px; height: 22px"><span style="font-size: 9px">FG</span></span>Recomendados por Fede<span class="n">14</span></a>
+<a href="#"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13l2-7h12l2 7v5H4z"></path><path d="M4 13h5l1 2h4l1-2h5"></path></svg>Bandeja<span class="badge" style="margin-left: auto; background: #FF7AB8; color: #2A0716">3 nuevas</span></a>
+</nav>
+</aside>
+
+<section style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-end">
+<div style="position: relative; width: 168px; height: 172px; flex: none" aria-hidden="true">
+<div class="poster p10" style="position: absolute; width: 104px; left: 0; top: 18px; transform: rotate(-8deg)"></div>
+<div class="poster p9" style="position: absolute; width: 104px; left: 64px; top: 18px; transform: rotate(7deg)"></div>
+<div class="poster p8" style="position: absolute; width: 112px; left: 28px; top: 0; box-shadow: 0 20px 40px -12px rgba(0,0,0,.8)"></div>
+</div>
+<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<p class="eyebrow" style="color: #FF7AB8">Lista de recomendaciones · Fede agrega, vos ordenás</p>
+<h1 class="display" style="font-size: 44px">Recomendados por Fede</h1>
+<div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: center" class="sm muted">
+<span class="mono">14 títulos</span><span class="mono">3 vistos</span><span class="mono">~86 h por ver</span>
+<div class="bar" style="width: 160px"><i style="width: 21%"></i></div>
+</div>
+</div>
+<div style="display: flex; gap: 10px; flex-wrap: wrap">
+<button type="button" class="btn btn-primary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3c4 0 6 10 10 10h3M17 14l3 3-3 3M4 17h3c1.5 0 2.7-1.3 3.7-3M14 9.5C15 8 16 7 17 7h3M17 4l3 3-3 3"></path></svg>¿Qué veo hoy?</button>
+<button type="button" class="btn btn-secondary btn-icon" aria-label="Compartir lista"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"></circle><circle cx="18" cy="6" r="2.5"></circle><circle cx="18" cy="18" r="2.5"></circle><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"></path></svg></button>
+<button type="button" class="btn btn-secondary btn-icon" aria-label="Más opciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle></svg></button>
+</div>
+</div>
+
+<div class="panel" style="display: flex; gap: 18px; align-items: center; padding: 16px 18px; flex-wrap: wrap; border-color: rgba(75,242,197,.35); background: linear-gradient(100deg, rgba(75,242,197,.10), rgba(143,123,255,.08) 60%, rgba(15,14,29,.9))">
+<div class="poster p10" style="width: 56px; flex: none; border-radius: 8px"></div>
+<div style="flex: 1 1 280px; min-width: 0">
+<p class="eyebrow">Salió en la ruleta</p>
+<b style="font-size: 17px">Mushishi</b>
+<div class="sm muted">26 episodios de 24 min · elegido entre tus 11 pendientes de esta lista</div>
+</div>
+<button type="button" class="btn btn-primary btn-sm">Empezar EP 1</button>
+<button type="button" class="btn btn-ghost btn-sm">Tirar de nuevo</button>
+</div>
+
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+<span class="tag on">Pendientes</span><span class="tag">Viendo</span><span class="tag">Vistos</span>
+<span class="faint sm" style="margin-left: auto">Orden</span>
+<span class="tag">Prioridad (arrastrar) <svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true" style="margin-left: 6px"><path d="M6 9l6 6 6-6"></path></svg></span>
+</div>
+
+<div class="panel" style="overflow-x: auto; padding: 4px 0">
+<div style="min-width: 820px">
+<div class="lrow xs faint mono" style="text-transform: uppercase; letter-spacing: .1em; padding-block: 10px">
+<span>#</span><span></span><span>Título</span><span>Nota de Fede</span><span>Estado</span><span>Duración</span>
+</div>
+<div class="lrow"><span class="mono faint">01</span><div class="poster p10" style="width: 52px; border-radius: 8px"></div><div style="min-width: 0"><b>Mushishi</b><div class="xs faint">Artland · 2005 · 26 eps</div></div><p class="sm" style="margin: 0; color: #FFB3D4">“Mirala de noche, un capítulo por vez.”</p><span class="st st-pendiente" style="justify-self: start"><i></i>Pendiente</span><span class="mono sm muted">10 h 24 m</span></div>
+<div class="lrow"><span class="mono faint">02</span><div class="poster p8" style="width: 52px; border-radius: 8px"></div><div style="min-width: 0"><b>Odd Taxi</b><div class="xs faint">OLM · 2021 · 13 eps</div></div><p class="sm" style="margin: 0; color: #FFB3D4">“Parece tranqui y no lo es. No leas nada antes.”</p><span class="st st-viendo" style="justify-self: start"><i></i>EP 4/13</span><span class="mono sm muted">3 h 36 m</span></div>
+<div class="lrow"><span class="mono faint">03</span><div class="poster p9" style="width: 52px; border-radius: 8px"></div><div style="min-width: 0"><b>Vinland Saga</b><div class="xs faint">Wit Studio · 2019 · 24 eps</div></div><p class="sm" style="margin: 0; color: #FFB3D4">“Aguantá los primeros cinco.”</p><span class="st st-pendiente" style="justify-self: start"><i></i>Pendiente</span><span class="mono sm muted">9 h 36 m</span></div>
+<div class="lrow"><span class="mono faint">04</span><div class="poster p6" style="width: 52px; border-radius: 8px"></div><div style="min-width: 0"><b>Ping Pong the Animation</b><div class="xs faint">Tatsunoko · 2014 · 11 eps</div></div><p class="sm" style="margin: 0; color: #9894BD">Sin nota</p><span class="st st-pendiente" style="justify-self: start"><i></i>Pendiente</span><span class="mono sm muted">4 h 24 m</span></div>
+<div class="lrow" style="border-bottom: 0"><span class="mono faint">05</span><div class="poster p1" style="width: 52px; border-radius: 8px"></div><div style="min-width: 0"><b>Natsume’s Book of Friends</b><div class="xs faint">Brain’s Base · 2008 · 13 eps</div></div><p class="sm" style="margin: 0; color: #FFB3D4">“Para cuando estés bajón.”</p><span class="st st-completado" style="justify-self: start"><i></i>Completado</span><span class="mono sm muted">Visto</span></div>
+</div>
+</div>
+</section>
+
+<section style="flex: 1 1 100%; display: flex; flex-direction: column; gap: 18px; padding-top: 24px">
+<div class="sec-head"><div style="display: flex; flex-direction: column; gap: 6px"><p class="eyebrow">Al crear una lista</p><h2 class="h2">Cinco tipos, cada uno con su comportamiento</h2></div></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
+<div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg><b>Colección</b><p class="sm muted" style="margin: 0">La lista libre de siempre: “Para regalar a mi primo”, “Openings que me encantan”.</p></div>
+<div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h8"></path><path d="M17 16l3 2-3 2z"></path></svg><b>Maratón</b><p class="sm muted" style="margin: 0">Ordenada. Muestra “lo próximo” en Inicio y el tiempo total restante. Al completar uno, sube el siguiente.</p></div>
+<div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color: #8F7BFF"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg><b>Inteligente</b><p class="sm muted" style="margin: 0">Se llena sola con reglas: <span class="mono xs">Mecha · antes de 2000 · Pendiente</span>. Usa los mismos filtros del catálogo.</p></div>
+<div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3"></circle><circle cx="16" cy="10" r="2.5"></circle><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M14 15c2.5-.6 5 .6 6 3.5"></path></svg><b>Compartida</b><p class="sm muted" style="margin: 0">Dos o más amigos agregan y ordenan. Ideal para lo que miran juntos por Discord.</p></div>
+<div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px; border-color: rgba(255,122,184,.35)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color: #FF7AB8"><path d="M4 13l2-7h12l2 7v5H4z"></path><path d="M4 13h5l1 2h4l1-2h5"></path></svg><b>Recomendaciones</b><p class="sm muted" style="margin: 0">Un amigo te manda títulos con una nota. Llegan a tu Bandeja y los guardás en esta lista con un toque.</p></div>
+</div>
+<p class="sm faint" style="margin: 0">En todas: ruleta “¿Qué veo hoy?”, notas por título, horas restantes, portada automática con los tres primeros pósters y link para compartir.</p>
+</section>
+
+</main>
+</div>
+</template>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+
+window.__dcBoot(Component, {});
+</script>
+</body>
+</html>

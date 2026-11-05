@@ -3,6 +3,7 @@ import type { HomeSectionSkeletonProps } from "@/interfaces/home";
 
 const TITLES = {
   today: "En emisión hoy",
+  watching: "Inicio",
   upcoming: "Lo que viene en anime",
   recommendations: "También te puede interesar",
   stats: "Mi progreso",
@@ -11,6 +12,19 @@ const TITLES = {
 
 export default function HomeSectionSkeleton({ section }: Readonly<HomeSectionSkeletonProps>) {
   const title = TITLES[section];
+  if (section === "watching") {
+    return (
+      <section role="status" aria-label="Cargando series…" className="space-y-3">
+        <Skeleton className="mb-5 h-8 w-48" />
+        {Array.from({ length: 3 }, (_, index) => (
+          <div key={index} className="flex gap-4 rounded-2xl border border-border bg-card p-3">
+            <Skeleton className="h-24 w-16 shrink-0" />
+            <div className="flex-1 space-y-3 py-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-5 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
+          </div>
+        ))}
+      </section>
+    );
+  }
   if (section === "stats") {
     return (
       <section role="status" aria-label="Cargando estadísticas…" className="rounded-2xl border border-border bg-card p-6">
@@ -33,9 +47,9 @@ export default function HomeSectionSkeleton({ section }: Readonly<HomeSectionSke
   }
 
   const grid = section === "top"
-    ? "grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10"
+    ? "grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-5"
     : section === "upcoming"
-      ? "gap-3 sm:grid-cols-2"
+      ? "grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
       : section === "today"
         ? "grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4"
         : "grid-cols-2 gap-4 sm:grid-cols-4";
@@ -60,12 +74,16 @@ export default function HomeSectionSkeleton({ section }: Readonly<HomeSectionSke
       <div aria-hidden="true" className={`grid ${grid}`}>
         {Array.from({ length: count }, (_, index) => (
           section === "upcoming" ? (
-            <div key={index} className="flex gap-4 rounded-2xl border border-border bg-card p-3">
-              <Skeleton className="h-32 w-22 shrink-0" />
-              <div className="flex-1 space-y-3 py-1">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4" />
-                <Skeleton className="h-10" />
+            <div key={index} className="space-y-2">
+              <Skeleton className="aspect-2/3 rounded-xl" />
+              <Skeleton className="h-3 w-3/4" />
+            </div>
+          ) : section === "top" ? (
+            <div key={index} className="flex items-end gap-1">
+              <Skeleton className="mb-6 h-10 w-6 shrink-0 sm:h-12 sm:w-8" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="aspect-2/3 rounded-xl" />
+                <Skeleton className="h-3 w-3/4" />
               </div>
             </div>
           ) : (

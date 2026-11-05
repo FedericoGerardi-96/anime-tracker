@@ -1,0 +1,118 @@
+/*
+  AniTrack · Temas
+  Pensado para reemplazar los bloques :root y .dark de src/app/globals.css.
+  Usa los mismos nombres de variables que ya tiene el proyecto (--background, --card,
+  --primary-color, etc.), así @theme inline y las clases de Tailwind siguen funcionando.
+  Variables nuevas: --love, --status-*, --font-display, --radius-base.
+
+  El tema se aplica con <html data-theme="aurora-nocturna | aurora-clara | estreno">.
+  Guardar la elección en el perfil del usuario y ponerla en el <html> desde el layout
+  del servidor, así no hay parpadeo al cargar.
+
+  Fuentes (Google Fonts): Unbounded 500-700, Manrope 400-800, JetBrains Mono 400-600,
+  Barlow Condensed 600-700 (solo para Estreno). Con next/font/google.
+*/
+
+:root,
+[data-theme="aurora-nocturna"] {
+  color-scheme: dark;
+  --background: #07070F;
+  --foreground: #F3F1FF;
+  --card: #12112A;
+  --card-foreground: #F3F1FF;
+  --popover: #17162B;
+  --muted: #1C1A33;
+  --muted-foreground: #BDB9DC;
+  --primary-color: #4BF2C5;      /* menta: acción principal */
+  --primary-foreground: #062A22;  /* texto oscuro sobre menta, nunca blanco */
+  --accent: #221F3B;
+  --accent-foreground: #F3F1FF;
+  --border: rgba(190, 180, 255, 0.14);
+  --ring: #4BF2C5;
+
+  --love: #FF7AB8;               /* sakura: me encanta y lo social */
+  --aurora: #8F7BFF;             /* violeta: solo atmósfera */
+  --status-viendo: #4BF2C5;
+  --status-completado: #B3A6FF;
+  --status-pendiente: #74C7FF;
+  --status-pausa: #FFC566;
+  --status-abandonado: #FF8A7A;
+
+  --font-display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
+  --display-transform: none;
+  --radius-base: 14px;
+  --page-glow:
+    radial-gradient(900px 520px at 8% -8%, rgba(143, 123, 255, .30), transparent 62%),
+    radial-gradient(760px 440px at 96% -4%, rgba(75, 242, 197, .17), transparent 60%),
+    radial-gradient(900px 700px at 55% 115%, rgba(255, 122, 184, .12), transparent 60%);
+}
+
+[data-theme="aurora-clara"] {
+  color-scheme: light;
+  --background: #F5F3FD;
+  --foreground: #16132A;
+  --card: #FFFFFF;
+  --card-foreground: #16132A;
+  --popover: #FFFFFF;
+  --muted: #EEEBFA;
+  --muted-foreground: #4B4767;
+  --primary-color: #087A63;      /* menta oscurecida para leerse sobre claro */
+  --primary-foreground: #FFFFFF;
+  --accent: #E6E1FA;
+  --accent-foreground: #16132A;
+  --border: rgba(50, 30, 120, 0.13);
+  --ring: #087A63;
+
+  --love: #C2306F;
+  --aurora: #6A52C7;
+  --status-viendo: #087A63;
+  --status-completado: #5B47D6;
+  --status-pendiente: #1D68B0;
+  --status-pausa: #8F5A00;
+  --status-abandonado: #B83A2B;
+
+  --font-display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
+  --display-transform: none;
+  --radius-base: 14px;
+  --page-glow:
+    radial-gradient(900px 520px at 8% -8%, rgba(143, 123, 255, .22), transparent 62%),
+    radial-gradient(760px 440px at 96% -4%, rgba(75, 242, 197, .26), transparent 60%),
+    radial-gradient(900px 700px at 55% 115%, rgba(255, 122, 184, .16), transparent 60%);
+}
+
+[data-theme="estreno"] {
+  color-scheme: dark;
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --card: #141414;
+  --card-foreground: #FFFFFF;
+  --popover: #1A1A1A;
+  --muted: #232323;
+  --muted-foreground: #B8B8B8;
+  --primary-color: #FF5B3A;      /* naranja brasa */
+  --primary-foreground: #1A0600;
+  --accent: #232323;
+  --accent-foreground: #FFFFFF;
+  --border: rgba(255, 255, 255, 0.11);
+  --ring: #FF5B3A;
+
+  --love: #5AAEFF;
+  --aurora: #FF5B3A;
+  --status-viendo: #FF7A5C;
+  --status-completado: #C3B2FF;
+  --status-pendiente: #D0D0D0;
+  --status-pausa: #FFD24D;
+  --status-abandonado: #FF6B6B;
+
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --display-transform: uppercase;
+  --radius-base: 4px;
+  --page-glow: none;
+}
+
+body {
+  background: var(--page-glow), var(--background);
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+}
