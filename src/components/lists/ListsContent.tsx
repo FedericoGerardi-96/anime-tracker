@@ -1,23 +1,33 @@
+import LibraryTableSkeleton from '@/components/fallbacks/LibraryTableSkeleton';
+import { hydrateLibraryRows } from '@/services/library-table';
 import Link from "next/link";
+import ListHero from "./ListHero";
 import { CatalogInteraction, CatalogResultsArea } from "@/components/catalog/CatalogInteraction";
 import { notFound } from "next/navigation";
 
 import { getListsPageData } from "@/services/lists-page";
 import type { ListsContentProps } from "@/interfaces/lists";
 import { LIST_TABS } from "@/lib/lists-navigation";
-import LibraryFilterBar from "@/components/library/LibraryFilterBar";
+import LibraryToolbar from "./LibraryToolbar";
+import LibraryTable from "./LibraryTable";
+import { listTableRows } from "@/lib/library-table-data";
 import Pagination from "@/components/ui/Pagination";
-import MediaGrid from "./MediaGrid";
 import CustomListsGrid from "./CustomListsGrid";
 export default async function ListsContent({
   options,
 }: Readonly<ListsContentProps>) {
   const data = await getListsPageData(options);
+  const tableRows = await hydrateLibraryRows(listTableRows(data.items));
   const folders = options.tab === "custom_lists" && !options.listId;
   if (options.listId && !data.selectedList) notFound();
   return (
     <CatalogInteraction>
     <div className="min-h-[50vh] space-y-6">
+      {folders ? <header>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">Mis listas · {folders || data.selectedList ? 'Colecciones' : 'Biblioteca'}</p>
+        <h1 className="break-words text-3xl font-extrabold sm:text-4xl">{data.selectedList?.name ?? LIST_TABS.find(tab => tab.id === options.tab)?.label}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">{data.selectedList?.description || (folders ? 'Organizá tus historias en colecciones propias.' : 'Tus historias y tu progreso, en un mismo lugar.')}</p>
+      </header> : <ListHero tab={options.tab} listId={options.listId} title={data.selectedList?.name ?? LIST_TABS.find(tab => tab.id === options.tab)?.label ?? "Biblioteca"} description={data.selectedList?.description} />}
       {folders ? (
         <>
           <form action="/lists" className="flex gap-3">
@@ -55,30 +65,14 @@ export default async function ListsContent({
               >
                 arrow_back
               </Link>
-              <h2 className="text-xl font-bold">{data.selectedList.name}</h2>
+              <span className="text-sm font-semibold">Todas mis colecciones</span>
             </div>
           )}
-          <div className="grid items-start gap-6 lg:grid-cols-[276px_minmax(0,1fr)]">
-          <LibraryFilterBar
-            availableTags={data.facets.tags}
-            availableGenres={data.facets.genres}
-            availableYears={data.facets.years}
-            availableFormats={data.facets.formats}
-            defaultQuery={options.query}
-            showStatus={Boolean(options.listId)}
-          />
-          <CatalogResultsArea>
+          <div className="space-y-6">
+          <LibraryToolbar />
+          <CatalogResultsArea fallback={<LibraryTableSkeleton />}>
           <h2 className="sr-only">{data.selectedList?.name ?? LIST_TABS.find((tab) => tab.id === options.tab)?.label ?? "Elementos de la lista"}</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-            <MediaGrid
-              items={data.items}
-              searchQuery={options.query ?? ""}
-              activeTabLabel={
-                LIST_TABS.find((tab) => tab.id === options.tab)?.label ?? ""
-              }
-              selectedListName={data.selectedList?.name}
-            />
-          </div>
+          <LibraryTable rows={tableRows} />
           <p className="mt-4 text-sm text-muted-foreground">{data.totalCount} elementos</p>
           <Pagination currentPage={options.page} totalPages={data.totalPages} />
           </CatalogResultsArea>

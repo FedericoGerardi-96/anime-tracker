@@ -40,7 +40,7 @@ export async function getListsPageData(options: ListsOptions): Promise<ListsPage
   });
   const filtered = items.filter(item => {
     const m = item.media;
-    return matchesLibrarySearch(options.query ?? '', [m.title, item.custom_description, m.genres ?? [], item.custom_tags ?? []])
+    return matchesLibrarySearch(options.query ?? '', [m.title, item.custom_description, item.custom_tags ?? []])
       && (!options.tags?.length || options.tags.some((tag) => item.custom_tags?.includes(tag)))
       && matchesLibraryFilters(m, options, item.status);
   });

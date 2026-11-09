@@ -1,0 +1,14 @@
+.panel {
+  max-height: calc(100dvh - 2rem);
+  border-color: color-mix(in srgb, var(--foreground) 20%, var(--border));
+}
+
+.option:has(input:checked) {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 6%, var(--card));
+}
+
+.option:focus-within {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}

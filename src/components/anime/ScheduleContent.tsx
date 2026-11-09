@@ -15,6 +15,7 @@ import {
 } from '@/lib/calendar-week';
 import { resolveSchedulePeriod, scheduleYears, SCHEDULE_SEASONS } from '@/lib/schedule-filters';
 import { readAllPages } from '@/lib/read-all-pages';
+import { getCalendarNext } from '@/services/calendar-next';
 import ScheduleCalendar from './ScheduleCalendar';
 import SeasonCards from './ScheduleSeasonCards';
 
@@ -96,8 +97,16 @@ export default async function ScheduleContent({
       return fallback;
     }
   };
-  const [library, anime, ani, mal, maze] = await Promise.all([
-    user ? safely('Biblioteca', readLibrary(user.id), []) : [],
+  const libraryPromise = user ? safely('Biblioteca', readLibrary(user.id), []) : Promise.resolve([]);
+  const upcomingPromise = libraryPromise.then((library) => {
+    if (followed && warnings.includes('Biblioteca')) return { events: [], unavailable: true };
+    const ids = followed
+      ? library.filter((item) => ['watching', 'plan_to_watch', 'on_hold'].includes(item.status)).map((item) => item.malId)
+      : null;
+    return getCalendarNext(now, ids).catch(() => ({ events: [], unavailable: true }));
+  });
+  const [library, anime, ani, mal, maze, upcoming] = await Promise.all([
+    libraryPromise,
     seasonal ? safely('Catálogo de temporada', getSeasonAnime(year, season), []) : [],
     seasonal ? [] : safely('AniList', aniWeek(week), []),
     !seasonal && currentSeason && week === monday(today)
@@ -106,6 +115,7 @@ export default async function ScheduleContent({
     !seasonal && currentSeason
       ? safely('TVmaze', mazeWeek(week), { events: [], partial: true })
       : { events: [], partial: false },
+    upcomingPromise,
   ]);
   if (maze.partial && !warnings.includes('TVmaze')) warnings.push('TVmaze');
   const mappings = maze.events.length ? await getCalendarMappings().catch(() => null) : null;
@@ -127,9 +137,11 @@ export default async function ScheduleContent({
         zone,
         now,
         events,
+        nextEvents: upcoming.events,
+        nextUnavailable: upcoming.unavailable,
         followed,
         seasonal,
-        library: following,
+        library,
         warnings,
       }}
       signedIn={Boolean(user)}

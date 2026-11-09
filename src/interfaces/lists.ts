@@ -4,8 +4,9 @@ export interface CustomList { id: string; name: string; description?: string | n
 export interface ListMediaItem {
   id: string; current_episode?: number | null; status?: string | null;
   updated_at?: string | null; created_at?: string | null;
+  watch_link?: string | null;
   custom_description?: string | null; custom_tags?: string[] | null;
-  media: { id: string; mal_id: number; title: string; image: string; type: string; genres?: string[] | null; year?: number | null; season?: string | null; format?: string | null; status?: string | null; score?: number | null };
+  media: { total_units?: number | null; id: string; mal_id: number; title: string; image: string; type: string; genres?: string[] | null; year?: number | null; season?: string | null; format?: string | null; status?: string | null; score?: number | null };
 }
 export interface ListsOptions extends GetFavoritesOptions { tab: ListTab; listId?: string; page: number; pageSize: number }
 export interface ListsPageData { items: ListMediaItem[]; lists: CustomList[]; selectedList: CustomList | null; totalCount: number; totalPages: number; facets: FavoriteFacets }

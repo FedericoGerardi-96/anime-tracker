@@ -11,6 +11,11 @@ export type CalendarEvent = {
   matchedById?: boolean;
 };
 export type CalendarLibrary = { id: string; malId: number; status: string; progress: number };
+export function selectNextCalendarEvent(events: ReadonlyArray<CalendarEvent>, now: number) {
+  return events
+    .filter((event) => event.at > now && event.source !== 'MAL' && event.episode !== null)
+    .reduce<CalendarEvent | null>((next, event) => !next || event.at < next.at ? event : next, null);
+}
 export function validZone(value: unknown): value is string {
   if (typeof value !== 'string' || !value || value.length > 100) return false;
   try {

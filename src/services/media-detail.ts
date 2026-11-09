@@ -2,6 +2,7 @@ import 'server-only';
 import { providerRead, ProviderRequestError } from '@/services/provider-request';
 import { getCatalogProvider } from '@/services/catalog-provider';
 import { cache } from 'react';
+import { parseAnimeRelations } from '@/lib/anime-relations';
 
 import type { CatalogAnime, CatalogManga } from '@/interfaces/media-catalog';
 import { getMalAnimeById, getMalMangaById } from '@/lib/myanimelist-service';
@@ -9,12 +10,13 @@ import { getMalAnimeById, getMalMangaById } from '@/lib/myanimelist-service';
 const ENDPOINT = 'https://graphql.anilist.co';
 const QUERY = `query Detail($idMal: Int, $type: MediaType) {
   Media(idMal: $idMal, type: $type) {
-    idMal title { romaji english native } coverImage { extraLarge large medium }
+    id idMal bannerImage title { romaji english native } coverImage { extraLarge large medium }
     averageScore meanScore popularity favourites status format season seasonYear startDate { year month day } endDate { year month day } source duration synonyms
     episodes chapters volumes description(asHtml: false) genres
     studios(isMain: true) { nodes { id name } }
     staff(sort: RELEVANCE, perPage: 5) { edges { role node { id name { full } } } }
     rankings { rank type allTime context }
+    relations { edges { relationType node { idMal type format title { romaji english } coverImage { large } } } }
   }
 }`;
 
@@ -39,6 +41,9 @@ function detailMetadata(media: DetailMedia) {
 }
 
 interface DetailMedia {
+  relations?: unknown;
+  id?: number;
+  bannerImage?: string | null;
   idMal: number; title: { romaji: string; english?: string | null; native?: string | null };
   coverImage?: { extraLarge?: string; large?: string; medium?: string };
   averageScore?: number | null; popularity?: number | null; favourites?: number | null;
@@ -55,7 +60,7 @@ interface DetailMedia {
   rankings?: Array<{ rank: number; type: string; allTime?: boolean; context?: string }>;
 }
 
-async function fetchDetail(idMal: number, type: 'ANIME' | 'MANGA'): Promise<DetailMedia> {
+const fetchDetail = cache(async (idMal: number, type: 'ANIME' | 'MANGA'): Promise<DetailMedia> => {
   const payload = await providerRead<{ data?: { Media?: DetailMedia }; errors?: Array<{ message: string }> }>('anilist', 'detail', ENDPOINT, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ query: QUERY, variables: { idMal, type } }),
@@ -63,7 +68,29 @@ async function fetchDetail(idMal: number, type: 'ANIME' | 'MANGA'): Promise<Deta
   });
   if (!payload.data?.Media || payload.errors?.length) throw new ProviderRequestError('anilist', 404);
   return payload.data.Media;
+});
+
+export async function getAnimeRelations(malId: number) {
+  const media = await fetchDetail(malId, 'ANIME');
+  return parseAnimeRelations(media.relations, malId);
 }
+
+// Optional enrichment must never prevent reading the selected provider's detail.
+export const getAnimePresentation = cache(async (malId: number) => {
+  const provider = await getCatalogProvider();
+  const [ani, mal] = await Promise.all([
+    fetchDetail(malId, 'ANIME').catch(() => null),
+    provider === 'myanimelist' ? Promise.resolve(null) : getMalAnimeById(malId).catch(() => null),
+  ]);
+  let banner: string | null = null;
+  try {
+    const url = new URL(ani?.bannerImage ?? '');
+    if (url.protocol === 'https:' && url.hostname === 's4.anilist.co') banner = url.href;
+  } catch { /* Missing or invalid artwork uses the typographic background. */ }
+  const score = (value: unknown) => typeof value === 'number' && Number.isFinite(value) && value > 0 && value <= 10 ? value : null;
+  return { banner, anilistId: Number.isSafeInteger(ani?.id) ? ani?.id : undefined,
+    anilistScore: score(ani?.averageScore ? ani.averageScore / 10 : null), malScore: score(mal?.score) };
+});
 
 function images(media: DetailMedia) {
   const large = media.coverImage?.extraLarge || media.coverImage?.large || media.coverImage?.medium || '';

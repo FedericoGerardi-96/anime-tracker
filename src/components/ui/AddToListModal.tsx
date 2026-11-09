@@ -41,8 +41,8 @@ function ResolvedListDialog({ dataPromise, renderError, ...props }: Readonly<Res
 }
 
 function ListDialogForm({
-  isOpen, 
-  onClose, 
+  isOpen,
+  onClose,
   onListCreated,
   mode = 'add-anime',
   animeData,
@@ -53,20 +53,20 @@ function ListDialogForm({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedLists, setSelectedLists] = useState<Set<string>>(new Set(initialData.listIds))
   const [isSaving, setIsSaving] = useState(false)
-  
+
   // Progress & Status states
   const [status, setStatus] = useState(initialData.progress?.status ?? '')
   const [episode, setEpisode] = useState<number | ''>(initialData.progress?.current_episode ?? '')
 
   const [error, setError] = useState<string | null>(null)
-  
+
   // New list form
   const [newName, setNewName] = useState('')
   const [newDescription, setNewDescription] = useState('')
   const [isCreating, setIsCreating] = useState(false)
 
   const filteredLists = useMemo(() => {
-    return lists.filter(list => 
+    return lists.filter(list =>
       list.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
   }, [lists, searchQuery])
@@ -121,7 +121,7 @@ function ListDialogForm({
 
     setIsSaving(true)
     setError(null)
-    
+
     const progressData = (status || episode !== '') ? {
       status: status || undefined,
       current_episode: episode === '' ? 0 : Number(episode)
@@ -139,7 +139,7 @@ function ListDialogForm({
         onClose()
         if (onListCreated) onListCreated() // Trigger refresh if needed
       } else {
-        setError(result.error || 'Failed to save selection')
+        setError(result.error || 'Error en guardar la seleccion')
       }
     } catch {
       setError("No se pudieron guardar los cambios. Revisá tu conexión e intentá nuevamente.")
@@ -153,11 +153,11 @@ function ListDialogForm({
       return filteredLists.map((list) => {
         const isSelected = selectedLists.has(list.id)
         return (
-          <label 
+          <label
             key={list.id}
             className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors group ${
-              isSelected 
-                ? "bg-primary/20 border border-primary/30" 
+              isSelected
+                ? "bg-primary/20 border border-primary/30"
                 : "hover:bg-primary/10"
             }`}
           >
@@ -169,7 +169,7 @@ function ListDialogForm({
                 <span className="text-[10px] text-text-muted line-clamp-1">{list.description}</span>
               )}
             </div>
-            <input 
+            <input
               type="checkbox"
               checked={isSelected}
               onChange={() => toggleList(list.id)}
@@ -192,12 +192,12 @@ function ListDialogForm({
   if (!isOpen) return null
 
   return (
-    <div 
+    <div
       className="w-full max-w-md"
     >
       {/* Modal Content */}
-      <div 
-        className="glass-card w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+      <div
+        className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -230,7 +230,7 @@ function ListDialogForm({
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors">
                   search
                 </span>
-                <input 
+                <input
                   aria-label="Buscar listas existentes"
                   className="w-full bg-muted border border-primary/20 rounded-lg py-2.5 pl-10 pr-4 text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted"
                   placeholder="Search existing lists"
@@ -253,7 +253,7 @@ function ListDialogForm({
           {mode === 'add-anime' && (
             <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Create New List</p>
           )}
-          
+
           {error && (
             <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
               <p className="text-xs text-red-400 font-medium">{error}</p>
@@ -262,7 +262,7 @@ function ListDialogForm({
 
           <form onSubmit={handleCreateList} className="flex flex-col gap-3">
             <div className="flex gap-2">
-              <input 
+              <input
                 aria-label="Nombre de la lista"
                 className="flex-1 bg-muted border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm"
                 placeholder="Enter list name..."
@@ -272,7 +272,7 @@ function ListDialogForm({
                 required
               />
               {mode === 'create' && (
-                <button 
+                <button
                   type="submit"
                   disabled={!newName.trim() || isCreating}
                   className="bg-primary/20 text-primary hover:bg-primary hover:text-primary-foreground p-2 rounded-lg transition-all flex items-center justify-center disabled:opacity-50"
@@ -282,7 +282,7 @@ function ListDialogForm({
               )}
             </div>
             {mode === 'create' && (
-              <input 
+              <input
                 aria-label="Descripción de la lista"
                 className="w-full bg-muted border border-primary/20 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground text-sm"
                 placeholder="Enter list description..."
@@ -292,7 +292,7 @@ function ListDialogForm({
               />
             )}
             {mode === 'add-anime' && (
-              <button 
+              <button
                 type="submit"
                 disabled={!newName.trim() || isCreating}
                 className="w-full bg-primary/20 text-primary hover:bg-primary hover:text-primary-foreground py-2 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm"
@@ -313,12 +313,12 @@ function ListDialogForm({
               <div className="space-y-2">
                 <label htmlFor="episode" className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Progress</label>
                 <div className="relative flex items-center">
-                  <input 
+                  <input
                     id="episode"
                     className="w-full bg-muted border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground transition-all text-sm"
-                    min="0" 
-                    placeholder="Ep #" 
-                    type="number" 
+                    min="0"
+                    placeholder="Ep #"
+                    type="number"
                     value={episode}
                     onChange={(e) => setEpisode(e.target.value === '' ? '' : Number(e.target.value))}
                   />
@@ -330,7 +330,7 @@ function ListDialogForm({
               <div className="space-y-2">
                 <label htmlFor="status" className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Status</label>
                 <div className="relative">
-                  <select 
+                  <select
                     id="status"
                     className="w-full bg-muted border border-primary/20 rounded-lg py-2 px-3 text-text-primary focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-sm"
                     value={status}
@@ -364,7 +364,7 @@ function ListDialogForm({
                 <span className="material-symbols-outlined font-bold">
                   {isSaving ? 'sync' : 'save'}
                 </span>
-                {isSaving ? 'Saving...' : 'Save Selection'}
+                {isSaving ? 'Guardando...' : 'Guardar selección'}
               </button>
             </div>
           </>

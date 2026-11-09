@@ -40,6 +40,7 @@
   --muted: #1c1a33;
   --muted-foreground: #bdb9dc;
   --primary-color: #4bf2c5;
+  --secondary-color: #FF7AB8;
   --primary-foreground: #062a22;
   --accent: #221f3b;
   --accent-foreground: #f3f1ff;
@@ -53,6 +54,36 @@
     radial-gradient(900px 700px at 55% 115%, rgba(255, 122, 184, 0.12), transparent 60%);
 }
 
+/* Appearance tokens also keep legacy dark utilities working. */
+:root {
+  --love: #c2306f; --secondary-color: #c2306f;
+  --status-viendo: #087a63; --status-completado: #5b47d6;
+  --status-pendiente: #1d68b0; --status-pausa: #8f5a00;
+  --radius-panel: 18px; --radius-control: 10px;
+  --display-transform: none;
+}
+.dark {
+  --love: #ff7ab8; --status-viendo: #4bf2c5; --status-completado: #b3a6ff;
+  --status-pendiente: #74c7ff; --status-pausa: #ffc566;
+}
+html[data-theme="estreno"] {
+  color-scheme: dark;
+  --background: #000; --foreground: #fff; --card: #141414; --card-foreground: #fff;
+  --popover: #1a1a1a; --muted: #232323; --muted-foreground: #b8b8b8;
+  --primary-color: #ff5b3a; --primary-foreground: #1a0600;
+  --accent: #232323; --accent-foreground: #fff; --border: rgb(255 255 255 / .11);
+  --ring: #ff5b3a; --love: #5aaeff; --secondary-color: #5aaeff;
+  --brand-mint: #ff5b3a; --brand-aurora: #ff5b3a; --brand-sakura: #5aaeff;
+  --status-viendo: #ff7a5c; --status-completado: #c3b2ff;
+  --status-pendiente: #d0d0d0; --status-pausa: #ffd24d;
+  --radius-panel: 4px; --radius-control: 3px; --display-transform: uppercase;
+  --page-glow: none;
+}
+html[data-theme="estreno"] :is(h1, h2, h3) {
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
+  text-transform: uppercase;
+}
+
 .brand-accent {
   color: var(--brand-mint);
 }
@@ -60,8 +91,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
+
   --color-primary: var(--primary-color);
+   --color-secondary: var(--secondary-color);
   --color-primary-foreground: var(--primary-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -75,9 +107,10 @@
   --color-deep-navy: var(--background);
   --color-slate-dark: var(--card);
   --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--foreground);
   --color-text-muted: var(--muted-foreground);
   --color-accent-gold: #eab308;
-  
+
   --font-display: var(--font-manrope), system-ui, sans-serif;
   --font-sans: var(--font-manrope), system-ui, sans-serif;
 
@@ -135,7 +168,7 @@ body {
     opacity: 0.2;
     mask-image: none;
   }
-  
+
   .glass-panel {
     background: rgba(2, 6, 23, 0.5);
     backdrop-filter: blur(20px);

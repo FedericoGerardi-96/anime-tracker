@@ -2,17 +2,22 @@
 'use client'
 
 import { useId, useState } from 'react'
+import Link from 'next/link'
 import Modal from '@/components/ui/Modal'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { sharedListReturnPath } from '@/lib/list-sharing'
+import { signupConfirmationMessage, signupErrorMessage } from '@/lib/auth-signup'
 
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
   initialMode?: 'login' | 'signup'
+  returnTo?: string
+  onAuthenticated?: () => void
 }
 
-export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Readonly<AuthModalProps>) {
+export default function AuthModal({ isOpen, onClose, initialMode = 'login', returnTo, onAuthenticated }: Readonly<AuthModalProps>) {
   const formId = useId()
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
   const [email, setEmail] = useState('')
@@ -20,11 +25,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  
+
   const supabase = createClient()
   const router = useRouter()
 
   if (!isOpen) return null
+
+  const callbackUrl = () => {
+    const url = new URL('/auth/callback', globalThis.location.origin)
+    const next = sharedListReturnPath(returnTo)
+    if (next) url.searchParams.set('next', next)
+    return url.href
+  }
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,26 +46,33 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
 
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${globalThis.location.origin}/auth/callback`,
+            emailRedirectTo: callbackUrl(),
           },
         })
-        if (error) throw error
-        setSuccess('Check your email to confirm your account!')
+        if (error) {
+          setError(signupErrorMessage(error.code))
+          return
+        }
+        if (!data.session) {
+          setSuccess(signupConfirmationMessage)
+          return
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
         if (error) throw error
-        onClose()
-        router.refresh()
       }
+      if (onAuthenticated) onAuthenticated()
+      else onClose()
+      router.refresh()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión.')
+      setError(mode === 'signup' ? signupErrorMessage(undefined) : err instanceof Error ? err.message : 'No se pudo iniciar sesión.')
     } finally {
       setLoading(false)
     }
@@ -64,7 +83,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${globalThis.location.origin}/auth/callback`,
+          redirectTo: callbackUrl(),
         },
       })
       if (error) throw error
@@ -77,7 +96,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
     <Modal open={isOpen} onClose={onClose} label={mode === "login" ? "Iniciar sesión" : "Crear cuenta"}>
       {/* Modal Container */}
       <div className="border border-border bg-card w-full max-w-md rounded-3xl shadow-2xl relative animate-in zoom-in-95 duration-300 pointer-events-auto max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
-        
+
         {/* Decorative Top Section */}
         <div className="h-32 bg-gradient-to-br from-primary/30 to-purple-900/30 relative flex items-center justify-center">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
@@ -102,10 +121,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
         <div className="p-8 pt-6">
           <div className="text-center mb-8">
             <h3 className="text-xl font-bold text-foreground">
-              {mode === 'login' ? 'Welcome Back' : 'Create Account'}
+              {mode === 'login' ? 'Bienvenido de vuelta' : 'Crear Cuenta'}
             </h3>
             <p className="text-text-muted text-sm mt-1">
-              {mode === 'login' ? 'Sign in to sync your watch list' : 'Join us to track your favorite anime'}
+              {mode === 'login' ? 'Inicia sesión para sincronizar tus listas' : 'Únete para encontrar tu anime favorito'}
             </p>
           </div>
 
@@ -126,19 +145,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
           {/* Divider */}
           <div className="relative flex items-center mb-6">
             <div className="flex-grow border-t border-white/10"></div>
-            <span className="flex-shrink mx-4 text-[10px] text-text-muted font-black uppercase tracking-widest">or email</span>
+            <span className="flex-shrink mx-4 text-[10px] text-text-muted font-black uppercase tracking-widest">o Email</span>
             <div className="flex-grow border-t border-white/10"></div>
           </div>
 
           {/* Success/Error Messages */}
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold flex items-center gap-2 animate-in slide-in-from-top-2">
+            <div role="alert" className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-foreground text-xs font-bold flex items-center gap-2 motion-safe:animate-in motion-safe:slide-in-from-top-2">
               <span className="material-symbols-outlined text-lg">error</span>
               {error}
             </div>
           )}
           {success && (
-            <div className="mb-4 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-xs font-bold flex items-center gap-2 animate-in slide-in-from-top-2">
+            <div role="status" className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20 text-foreground text-xs font-bold flex items-center gap-2 motion-safe:animate-in motion-safe:slide-in-from-top-2">
               <span className="material-symbols-outlined text-lg">check_circle</span>
               {success}
             </div>
@@ -147,35 +166,35 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
           {/* Email Form */}
           <form className="space-y-4" onSubmit={handleAuth}>
             <div className="space-y-1.5">
-              <label htmlFor={`${formId}-email`} className="text-[10px] font-black text-text-muted uppercase ml-1 tracking-wider">Email Address</label>
+              <label htmlFor={`${formId}-email`} className="text-[10px] font-black text-text-muted uppercase ml-1 tracking-wider">Email</label>
               <div className="relative group">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-text-muted text-lg group-focus-within:text-primary transition-colors">
                   mail
                 </span>
-                <input 
+                <input
                   id={`${formId}-email`} name="email" autoComplete="email"
                   required
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 transition-all outline-none"
-                  placeholder="name@example.com" 
+                  placeholder="name@example.com"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center ml-1">
-                <label htmlFor={`${formId}-password`} className="text-[10px] font-black text-text-muted uppercase tracking-wider">Password</label>
+                <label htmlFor={`${formId}-password`} className="text-[10px] font-black text-text-muted uppercase tracking-wider">Contraseña</label>
                 {mode === 'login' && (
-                  <button type="button" className="text-[10px] text-primary font-black hover:underline uppercase tracking-wider">Forgot?</button>
+                  <Link href="/forgot-password" onClick={onClose} className="inline-flex min-h-11 items-center text-xs font-bold text-primary  ">¿Olvidaste tu contraseña?</Link>
                 )}
               </div>
               <div className="relative group">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-text-muted text-lg group-focus-within:text-primary transition-colors">
                   lock
                 </span>
-                <input 
+                <input
                   id={`${formId}-password`} name="password" autoComplete={mode === "login" ? "current-password" : "new-password"}
                   required
                   type="password"
@@ -198,7 +217,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
                   <span className="material-symbols-outlined text-lg">
                     {mode === 'login' ? 'login' : 'person_add'}
                   </span>
-                  {mode === 'login' ? 'Login to AniTrack' : 'Create Account'}
+                  {mode === 'login' ? 'Iniciar sesión en AniTrack' : 'Crear cuenta'}
                 </>
               )}
             </button>
@@ -207,26 +226,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Re
           {/* Toggle Footer */}
           <div className="mt-8 text-center">
             <p className="text-sm text-text-muted font-medium">
-              {mode === 'login' ? "Don't have an account?" : "Already have an account?"}
+              {mode === 'login' ? "No tienes una cuenta?" : "Ya tienes una cuenta?"}
               <button type="button"
                 onClick={() => {
                   setMode(mode === 'login' ? 'signup' : 'login')
                   setError(null)
                   setSuccess(null)
                 }}
-                className="text-primary font-black hover:underline ml-2 transition-all cursor-pointer"
+                className="text-primary font-black   ml-2 transition-all cursor-pointer"
               >
-                {mode === 'login' ? 'Create an account' : 'Sign In instead'}
+                {mode === 'login' ? 'Crear una cuenta' : 'Iniciar sesión'}
               </button>
             </p>
           </div>
-        </div>
-
-        {/* Bottom Note */}
-        <div className="bg-white/5 px-8 py-4 text-center border-t border-white/5">
-          <p className="text-[10px] text-text-muted uppercase font-bold tracking-tight leading-relaxed">
-            By continuing, you agree to AniTrack&apos;s <button type="button" className="underline hover:text-foreground transition-colors cursor-pointer">Terms</button> and <button type="button" className="underline hover:text-foreground transition-colors cursor-pointer">Privacy</button>.
-          </p>
         </div>
       </div>
     </Modal>

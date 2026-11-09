@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   icon?: string;
@@ -17,9 +19,9 @@ export default function Input({ label, icon, error, forgotLink, ...props }: Read
           </label>
         )}
         {forgotLink && (
-          <a className="text-xs font-semibold text-primary hover:underline" href={forgotLink}>
-            Forgot?
-          </a>
+          <Link className="inline-flex min-h-11 items-center text-xs font-semibold text-primary  " href={forgotLink}>
+            ¿Olvidaste tu contraseña?
+          </Link>
         )}
       </div>
       <div className="relative">
@@ -28,13 +30,13 @@ export default function Input({ label, icon, error, forgotLink, ...props }: Read
             {icon}
           </span>
         )}
-        <input 
+        <input
           id={inputId}
           aria-label={!label ? props['aria-label'] ?? props.placeholder : undefined}
           className={`
-            w-full bg-slate-dark/50 border-white/5 border rounded-xl py-3 
-            ${icon ? "pl-12" : "pl-4"} pr-4 text-sm 
-            focus:ring-1 focus:ring-primary focus:bg-slate-dark/80 
+            w-full bg-slate-dark/50 border-white/5 border rounded-xl py-3
+            ${icon ? "pl-12" : "pl-4"} pr-4 text-sm
+            focus:ring-1 focus:ring-primary focus:bg-slate-dark/80
             transition-all outline-none text-foreground placeholder:text-muted-foreground
             ${error ? "border-red-500" : "border-white/5"}
           `}

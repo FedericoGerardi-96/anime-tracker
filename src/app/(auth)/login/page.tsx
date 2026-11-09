@@ -23,16 +23,19 @@ export default async function LoginPage({
       {/* Decorative background elements matching code.html blurs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[120px] -z-10 animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -z-10 animate-transition delay-1000"></div>
-      
+
       {/* Glassmorphism Auth Card */}
       <div className="w-full max-w-md glass-card p-8 shadow-2xl relative overflow-hidden rounded-2xl">
         {/* Subtle gradient line at top */}
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary to-transparent opacity-50"></div>
-        
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black text-foreground tracking-tight">Welcome Back</h1>
           <p className="text-muted-foreground mt-2 text-sm font-medium">Continue your journey in the world of anime.</p>
           {error && <p className="text-red-400 text-sm mt-4 p-2 bg-red-400/10 rounded-lg">{error}</p>}
+          {resolvedParams.reset === "1" && <p role="status" className="mt-4 rounded-xl bg-primary/10 p-3 text-sm text-foreground">
+            Cambiaste tu contraseña. Iniciá sesión con la nueva.
+          </p>}
         </div>
 
         {/* Toggle Tabs */}
@@ -59,18 +62,18 @@ export default async function LoginPage({
 
         {/* Form */}
         <form className="space-y-5" action={login}>
-          <Input 
+          <Input
             name="email"
             type="email"
-            label="Email Address"
+            label="Email"
             placeholder="name@example.com"
             icon="mail"
             required
           />
-          <Input 
+          <Input
             name="password"
             type="password"
-            label="Password"
+            label="Contraseña"
             placeholder="••••••••"
             icon="lock"
             forgotLink="/forgot-password"
@@ -85,8 +88,8 @@ export default async function LoginPage({
         </form>
 
         <p className="text-center mt-8 text-xs text-muted-foreground font-medium">
-          Don&apos;t have an account?{''}
-          <a className="text-primary font-bold hover:underline ml-1" href="/register">Create an account</a>
+          No tenes una cuenta?{''}
+          <a className="text-primary font-bold hover:text-secondary ml-1" href="/register">Crear una cuenta</a>
         </p>
       </div>
     </div>

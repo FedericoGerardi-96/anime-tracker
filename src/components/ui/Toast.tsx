@@ -4,19 +4,21 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useMemo } from 'react'
 
 type ToastType = 'success' | 'error' | 'info' | 'warning'
+type ToastAction = { label: string; onClick: () => void }
 
 interface Toast {
   id: string
   message: string
   type: ToastType
+  action?: ToastAction
 }
 
 interface ToastContextType {
   toast: {
     success: (message: string) => void
-    error: (message: string) => void
+    error: (message: string, action?: ToastAction) => void
     info: (message: string) => void
-    warning: (message: string) => void
+    warning: (message: string, action?: ToastAction) => void
   }
 }
 
@@ -62,28 +64,29 @@ export function ToastProvider({ children }: Readonly<{ children: ReactNode }>) {
     setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  const addToast = useCallback((message: string, type: ToastType) => {
+  const addToast = useCallback((message: string, type: ToastType, action?: ToastAction) => {
     const id = Math.random().toString(36).substring(2, 11)
-    setToasts((prev) => [...prev, { id, message, type }])
+    setToasts((prev) => [...prev.slice(-2), { id, message, type, action }])
     setTimeout(() => removeToast(id), 5000)
   }, [removeToast])
 
   const toastValue = useMemo(() => ({
     toast: {
       success: (message: string) => addToast(message, 'success'),
-      error: (message: string) => addToast(message, 'error'),
+      error: (message: string, action?: ToastAction) => addToast(message, 'error', action),
       info: (message: string) => addToast(message, 'info'),
-      warning: (message: string) => addToast(message, 'warning'),
+      warning: (message: string, action?: ToastAction) => addToast(message, 'warning', action),
     }
   }), [addToast])
 
   return (
     <ToastContext.Provider value={toastValue}>
       {children}
-      <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none w-full max-w-xs sm:max-w-sm">
+      <div className="fixed bottom-6 right-4 z-[200] flex flex-col gap-3 pointer-events-none w-[calc(100%-2rem)] max-w-sm sm:right-6">
         {toasts.map((t) => (
           <div
             key={t.id}
+            role={t.type === 'error' ? 'alert' : 'status'}
             className={`
               pointer-events-auto
               glass-panel p-4 rounded-2xl shadow-2xl border flex items-center gap-3
@@ -100,12 +103,13 @@ export function ToastProvider({ children }: Readonly<{ children: ReactNode }>) {
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white line-clamp-2">{t.message}</p>
+              <p className="text-sm font-semibold text-foreground break-words">{t.message}</p>
+              {t.action && <button type="button" className="mt-2 min-h-11 text-sm text-primary underline underline-offset-4" onClick={() => { removeToast(t.id); t.action?.onClick(); }}>{t.action.label}</button>}
             </div>
             <button type="button"
               aria-label="Cerrar notificación"
               onClick={() => removeToast(t.id)}
-              className="text-white/40 hover:text-white transition-colors p-1"
+              className="flex size-11 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <span className="material-symbols-outlined text-lg">close</span>
             </button>

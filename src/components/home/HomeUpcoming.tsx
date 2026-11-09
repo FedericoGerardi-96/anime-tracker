@@ -15,7 +15,8 @@ const FORMAT_LABELS: Record<string, string> = {
 
 export default async function HomeUpcoming() {
   const result = await getHomeUpcoming();
-  if (result.unavailable) return <HomeSectionUnavailable title="Próximos estrenos" />;
+  if (result.unavailable)
+    return <HomeSectionUnavailable title="Próximos estrenos" />;
   const upcomingAnime = result.data;
   return (
     <section>
@@ -34,12 +35,12 @@ export default async function HomeUpcoming() {
         <Link
           href="/anime?status=upcoming"
           aria-label="Ver todos los próximos estrenos de anime"
-          className="shrink-0 text-sm font-semibold text-primary hover:underline"
+          className="shrink-0 text-sm font-semibold text-primary hover:text-secondary"
         >
           Ver todo
         </Link>
       </div>
-    
+
       {upcomingAnime.length > 0 ? (
         <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {upcomingAnime.slice(0, 6).map((anime) => {
@@ -47,7 +48,8 @@ export default async function HomeUpcoming() {
             const image =
               anime.images.webp.large_image_url ||
               anime.images.jpg.large_image_url;
-            const format = FORMAT_LABELS[anime.type.toLowerCase()] ?? anime.type;
+            const format =
+              FORMAT_LABELS[anime.type.toLowerCase()] ?? anime.type;
             return (
               <Link
                 key={anime.mal_id}
@@ -64,19 +66,26 @@ export default async function HomeUpcoming() {
                       className="object-cover transition-transform duration-500 motion-reduce:transition-none motion-safe:group-hover:scale-105"
                     />
                   )}
-                  <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black via-black/80 to-transparent" />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-linear-to-t from-black via-black/80 to-transparent"
+                  />
                   {anime.year && (
                     <span className="absolute left-2 top-2 rounded-md bg-background px-2 py-1 text-xs font-bold text-foreground">
                       {anime.year}
                     </span>
                   )}
                   <div className="absolute inset-x-0 bottom-0 p-3">
-                    <h3 className="line-clamp-3 text-sm font-bold leading-snug text-white">{title}</h3>
+                    <h3 className="line-clamp-3 text-sm font-bold leading-snug text-white">
+                      {title}
+                    </h3>
                   </div>
                 </div>
                 {(anime.studios[0]?.name || format) && (
                   <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                    {[anime.studios[0]?.name, format].filter(Boolean).join(" · ")}
+                    {[anime.studios[0]?.name, format]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </p>
                 )}
               </Link>
@@ -88,9 +97,7 @@ export default async function HomeUpcoming() {
           <span className="material-symbols-outlined mb-2 text-3xl text-muted-foreground">
             event
           </span>
-          <p className="font-semibold">
-            No hay próximos estrenos disponibles
-          </p>
+          <p className="font-semibold">No hay próximos estrenos disponibles</p>
           <p className="mt-1 max-w-md text-sm text-muted-foreground">
             Consultá nuevamente más adelante para ver nuevos anuncios.
           </p>

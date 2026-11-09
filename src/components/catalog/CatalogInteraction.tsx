@@ -14,10 +14,10 @@ export function useCatalogLoading() {
   return useContext(LoadingContext);
 }
 
-export function CatalogResultsArea({ children }: { children: ReactNode }) {
+export function CatalogResultsArea({ children, fallback = <GridSkeleton /> }: { children: ReactNode; fallback?: ReactNode }) {
   const loading = useCatalogLoading()?.loading ?? false;
   return <div className="min-w-0" aria-busy={loading}>
-    {loading && <GridSkeleton />}
+    {loading && fallback}
     <div hidden={loading}>{children}</div>
   </div>;
 }

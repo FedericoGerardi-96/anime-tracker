@@ -1,156 +1,1028 @@
 <!doctype html>
 <html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Inicio logueado · AniTrack</title>
-<link rel="stylesheet" href="anitrack.css">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Inicio logueado · AniTrack</title>
+        <link rel="stylesheet" href="anitrack.css" />
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
-<style>
-body{margin:0}
-a{color:#4BF2C5}a:hover{color:#8F7BFF}
-</style>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap"
+        />
+        <style>
+            body {
+                margin: 0;
+            }
+            a {
+                color: #4bf2c5;
+            }
+            a:hover {
+                color: #8f7bff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="dc-root"></div>
+        <template id="dc-tpl">
+            <div class="at" style="padding-bottom: 96px">
+                <header class="nav">
+                    <div class="wrap nav-in">
+                        <a href="#" class="logo" aria-label="AniTrack, inicio"
+                            ><svg
+                                width="34"
+                                height="34"
+                                viewBox="-3 -3 42 42"
+                                aria-hidden="true"
+                            >
+                                <defs>
+                                    <linearGradient
+                                        id="lgN"
+                                        x1="0"
+                                        y1="0"
+                                        x2="1"
+                                        y2="1"
+                                    >
+                                        <stop
+                                            offset="0"
+                                            stop-color="#4BF2C5"
+                                        ></stop>
+                                        <stop
+                                            offset="1"
+                                            stop-color="#8F7BFF"
+                                        ></stop>
+                                    </linearGradient>
+                                </defs>
+                                <circle
+                                    cx="18"
+                                    cy="18"
+                                    r="13"
+                                    fill="none"
+                                    stroke="rgba(243,241,255,.13)"
+                                    stroke-width="4"
+                                ></circle>
+                                <path
+                                    d="M18 5 A13 13 0 1 1 5 18"
+                                    fill="none"
+                                    stroke="url(#lgN)"
+                                    stroke-width="4"
+                                    stroke-linecap="round"
+                                ></path>
+                                <path
+                                    d="M15 12.6 L24 18 L15 23.4 Z"
+                                    fill="#F3F1FF"
+                                ></path>
+                                <path
+                                    d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z"
+                                    fill="#FF7AB8"
+                                ></path></svg
+                            ><span class="logo-word">Ani<b>Track</b></span></a
+                        >
+                        <nav class="links" aria-label="Principal">
+                            <a href="#" class="on">Inicio</a
+                            ><a href="#">Anime</a><a href="#">Manga</a
+                            ><a href="#">Calendario</a><a href="#">Listas</a
+                            ><a href="#">Amigos</a>
+                        </nav>
+                        <div class="nav-end">
+                            <label class="search" for="qh"
+                                ><svg
+                                    class="ico"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <circle cx="11" cy="11" r="6.5"></circle>
+                                    <path d="M20 20l-4-4"></path></svg
+                                ><input
+                                    id="qh"
+                                    placeholder="Buscar"
+                                    style="
+                                        flex: 1;
+                                        min-width: 0;
+                                        background: transparent;
+                                        border: 0;
+                                        color: #f3f1ff;
+                                        font: inherit;
+                                        outline: none;
+                                    "
+                                /><span class="kbd">Ctrl K</span></label
+                            ><a href="#" class="avatar" aria-label="Tu perfil"
+                                ><span>RT</span></a
+                            >
+                        </div>
+                    </div>
+                </header>
 
-</head>
-<body>
-<div id="dc-root"></div>
-<template id="dc-tpl">
+                <main
+                    class="wrap"
+                    style="
+                        display: flex;
+                        flex-direction: column;
+                        gap: 64px;
+                        padding-top: 48px;
+                    "
+                >
+                    <section style="display: flex; flex-wrap: wrap; gap: 32px">
+                        <div
+                            style="
+                                flex: 999 1 640px;
+                                min-width: 0;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 22px;
+                            "
+                        >
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 8px;
+                                "
+                            >
+                                <p class="eyebrow">Jueves 29 de octubre</p>
+                                <h1 class="display" style="font-size: 46px">
+                                    Hola, Rodri. Tenés 3 episodios nuevos.
+                                </h1>
+                            </div>
+                            <div class="sec-head">
+                                <h2 class="h2">Seguir viendo</h2>
+                                <a href="#" class="link">Ver mi biblioteca</a>
+                            </div>
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 14px;
+                                "
+                            >
+                                <div
+                                    class="panel"
+                                    style="
+                                        display: flex;
+                                        gap: 18px;
+                                        padding: 14px;
+                                        align-items: center;
+                                        flex-wrap: wrap;
+                                    "
+                                >
+                                    <div
+                                        class="poster p2"
+                                        style="
+                                            width: 84px;
+                                            flex: none;
+                                            border-radius: 10px;
+                                        "
+                                    ></div>
+                                    <div
+                                        style="
+                                            flex: 1 1 240px;
+                                            min-width: 0;
+                                            display: flex;
+                                            flex-direction: column;
+                                            gap: 8px;
+                                        "
+                                    >
+                                        <div
+                                            style="
+                                                display: flex;
+                                                gap: 8px;
+                                                align-items: center;
+                                                flex-wrap: wrap;
+                                            "
+                                        >
+                                            <span class="badge b-live"
+                                                ><i></i>Nuevo hoy</span
+                                            ><span class="mono xs faint"
+                                                >EP 9 salió a las 11:00</span
+                                            >
+                                        </div>
+                                        <span class="h3" style="font-size: 18px"
+                                            >Dandadan 2nd Season</span
+                                        >
+                                        <div
+                                            style="
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 12px;
+                                            "
+                                        >
+                                            <div
+                                                class="bar"
+                                                style="
+                                                    flex: 1;
+                                                    max-width: 320px;
+                                                "
+                                            >
+                                                <i style="width: 66%"></i>
+                                            </div>
+                                            <span class="mono xs muted"
+                                                >8 / 12</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px">
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                        >
+                                            <svg
+                                                class="ico"
+                                                viewBox="0 0 24 24"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M7 5l11 7-11 7z"
+                                                ></path></svg
+                                            >Vi el EP 9
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    class="panel"
+                                    style="
+                                        display: flex;
+                                        gap: 18px;
+                                        padding: 14px;
+                                        align-items: center;
+                                        flex-wrap: wrap;
+                                    "
+                                >
+                                    <div
+                                        class="poster p3"
+                                        style="
+                                            width: 84px;
+                                            flex: none;
+                                            border-radius: 10px;
+                                        "
+                                    ></div>
+                                    <div
+                                        style="
+                                            flex: 1 1 240px;
+                                            min-width: 0;
+                                            display: flex;
+                                            flex-direction: column;
+                                            gap: 8px;
+                                        "
+                                    >
+                                        <div
+                                            style="
+                                                display: flex;
+                                                gap: 8px;
+                                                align-items: center;
+                                                flex-wrap: wrap;
+                                            "
+                                        >
+                                            <span class="badge b-fmt"
+                                                >Hoy 13:30</span
+                                            ><span class="mono xs faint"
+                                                >Sale el EP 18 en 2 h 10
+                                                min</span
+                                            >
+                                        </div>
+                                        <span class="h3" style="font-size: 18px"
+                                            >The Apothecary Diaries</span
+                                        >
+                                        <div
+                                            style="
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 12px;
+                                            "
+                                        >
+                                            <div
+                                                class="bar"
+                                                style="
+                                                    flex: 1;
+                                                    max-width: 320px;
+                                                "
+                                            >
+                                                <i style="width: 70%"></i>
+                                            </div>
+                                            <span class="mono xs muted"
+                                                >17 / 24</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px">
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                        >
+                                            Al día
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    class="panel"
+                                    style="
+                                        display: flex;
+                                        gap: 18px;
+                                        padding: 14px;
+                                        align-items: center;
+                                        flex-wrap: wrap;
+                                    "
+                                >
+                                    <div
+                                        class="poster p6"
+                                        style="
+                                            width: 84px;
+                                            flex: none;
+                                            border-radius: 10px;
+                                        "
+                                    ></div>
+                                    <div
+                                        style="
+                                            flex: 1 1 240px;
+                                            min-width: 0;
+                                            display: flex;
+                                            flex-direction: column;
+                                            gap: 8px;
+                                        "
+                                    >
+                                        <div
+                                            style="
+                                                display: flex;
+                                                gap: 8px;
+                                                align-items: center;
+                                                flex-wrap: wrap;
+                                            "
+                                        >
+                                            <span class="badge b-fmt"
+                                                >Terminada</span
+                                            ><span class="mono xs faint"
+                                                >Te quedan 4 episodios · 1 h 32
+                                                min</span
+                                            >
+                                        </div>
+                                        <span class="h3" style="font-size: 18px"
+                                            >Mob Psycho 100 III</span
+                                        >
+                                        <div
+                                            style="
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 12px;
+                                            "
+                                        >
+                                            <div
+                                                class="bar"
+                                                style="
+                                                    flex: 1;
+                                                    max-width: 320px;
+                                                "
+                                            >
+                                                <i style="width: 67%"></i>
+                                            </div>
+                                            <span class="mono xs muted"
+                                                >8 / 12</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px">
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                        >
+                                            <svg
+                                                class="ico"
+                                                viewBox="0 0 24 24"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M7 5l11 7-11 7z"
+                                                ></path></svg
+                                            >Vi el EP 9
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-<div class="at" style="padding-bottom: 96px">
-<header class="nav"><div class="wrap nav-in">
-<a href="#" class="logo" aria-label="AniTrack, inicio"><svg width="34" height="34" viewBox="-3 -3 42 42" aria-hidden="true"><defs><linearGradient id="lgN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4BF2C5"></stop><stop offset="1" stop-color="#8F7BFF"></stop></linearGradient></defs><circle cx="18" cy="18" r="13" fill="none" stroke="rgba(243,241,255,.13)" stroke-width="4"></circle><path d="M18 5 A13 13 0 1 1 5 18" fill="none" stroke="url(#lgN)" stroke-width="4" stroke-linecap="round"></path><path d="M15 12.6 L24 18 L15 23.4 Z" fill="#F3F1FF"></path><path d="M5 11.5 L6.3 16.7 L11.5 18 L6.3 19.3 L5 24.5 L3.7 19.3 L-1.5 18 L3.7 16.7 Z" fill="#FF7AB8"></path></svg><span class="logo-word">Ani<b>Track</b></span></a>
-<nav class="links" aria-label="Principal"><a href="#" class="on">Inicio</a><a href="#">Anime</a><a href="#">Manga</a><a href="#">Calendario</a><a href="#">Listas</a><a href="#">Amigos</a></nav>
-<div class="nav-end"><label class="search" for="qh"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg><input id="qh" placeholder="Buscar" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F1FF; font: inherit; outline: none"><span class="kbd">Ctrl K</span></label><a href="#" class="avatar" aria-label="Tu perfil"><span>RT</span></a></div>
-</div></header>
+                        <aside
+                            style="
+                                flex: 1 1 340px;
+                                min-width: 0;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 20px;
+                            "
+                        >
+                            <div
+                                class="panel"
+                                style="
+                                    padding: 24px;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 18px;
+                                "
+                            >
+                                <div class="sec-head">
+                                    <h2 class="h2">Hoy</h2>
+                                    <span class="mono xs faint"
+                                        >Hora de Buenos Aires</span
+                                    >
+                                </div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 0;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            display: grid;
+                                            grid-template-columns: 56px 1fr;
+                                            gap: 14px;
+                                            padding: 10px 0;
+                                            border-bottom: 1px solid
+                                                rgba(190, 180, 255, 0.13);
+                                        "
+                                    >
+                                        <span class="mono sm faint">11:00</span>
+                                        <div>
+                                            <b class="sm">Dandadan</b>
+                                            <div class="xs faint">
+                                                EP 9 · ya salió
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="
+                                            display: grid;
+                                            grid-template-columns: 56px 1fr;
+                                            gap: 14px;
+                                            padding: 6px 0;
+                                            align-items: center;
+                                        "
+                                    >
+                                        <span
+                                            class="mono xs"
+                                            style="color: #4bf2c5"
+                                            >11:20</span
+                                        >
+                                        <div
+                                            style="
+                                                height: 2px;
+                                                background: #4bf2c5;
+                                                border-radius: 2px;
+                                                position: relative;
+                                            "
+                                        >
+                                            <span
+                                                class="xs"
+                                                style="
+                                                    position: absolute;
+                                                    right: 0;
+                                                    top: -20px;
+                                                    color: #4bf2c5;
+                                                    font-weight: 700;
+                                                "
+                                                >ahora</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="
+                                            display: grid;
+                                            grid-template-columns: 56px 1fr;
+                                            gap: 14px;
+                                            padding: 10px 0;
+                                            border-bottom: 1px solid
+                                                rgba(190, 180, 255, 0.13);
+                                        "
+                                    >
+                                        <span class="mono sm">13:30</span>
+                                        <div>
+                                            <b class="sm"
+                                                >The Apothecary Diaries</b
+                                            >
+                                            <div class="xs faint">
+                                                EP 18 · en 2 h 10 min
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="
+                                            display: grid;
+                                            grid-template-columns: 56px 1fr;
+                                            gap: 14px;
+                                            padding: 10px 0;
+                                        "
+                                    >
+                                        <span class="mono sm">22:00</span>
+                                        <div>
+                                            <b class="sm"
+                                                >Reincarnated as a Sword II</b
+                                            >
+                                            <div class="xs faint">
+                                                EP 5 · en tu lista Pendientes
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="#" class="link sm">Abrir calendario</a>
+                            </div>
+                            <div
+                                class="panel"
+                                style="
+                                    padding: 24px;
+                                    display: grid;
+                                    grid-template-columns: repeat(
+                                        3,
+                                        minmax(0, 1fr)
+                                    );
+                                    gap: 12px;
+                                "
+                            >
+                                <div style="grid-column: span 3">
+                                    <h2 class="h3">Tu semana</h2>
+                                </div>
+                                <div>
+                                    <div class="mono" style="font-size: 26px">
+                                        14
+                                    </div>
+                                    <div class="xs faint">episodios</div>
+                                </div>
+                                <div>
+                                    <div class="mono" style="font-size: 26px">
+                                        5:36
+                                    </div>
+                                    <div class="xs faint">horas</div>
+                                </div>
+                                <div>
+                                    <div class="mono" style="font-size: 26px">
+                                        2
+                                    </div>
+                                    <div class="xs faint">completadas</div>
+                                </div>
+                            </div>
+                        </aside>
+                    </section>
 
-<main class="wrap" style="display: flex; flex-direction: column; gap: 64px; padding-top: 48px">
+                    <section
+                        style="display: flex; flex-direction: column; gap: 20px"
+                    >
+                        <div class="sec-head">
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 4px;
+                                "
+                            >
+                                <p class="eyebrow" style="color: #ff7ab8">
+                                    De tus amigos
+                                </p>
+                                <h2 class="h2">Te recomendaron</h2>
+                            </div>
+                            <a href="#" class="link">Ver bandeja (3)</a>
+                        </div>
+                        <div
+                            style="
+                                display: grid;
+                                grid-template-columns: repeat(
+                                    auto-fit,
+                                    minmax(300px, 1fr)
+                                );
+                                gap: 16px;
+                            "
+                        >
+                            <div
+                                class="panel"
+                                style="display: flex; gap: 16px; padding: 16px"
+                            >
+                                <div
+                                    class="poster p10"
+                                    style="
+                                        width: 92px;
+                                        flex: none;
+                                        border-radius: 10px;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 8px;
+                                        min-width: 0;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                        "
+                                    >
+                                        <span
+                                            class="avatar"
+                                            style="width: 26px; height: 26px"
+                                            ><span style="font-size: 10px"
+                                                >FG</span
+                                            ></span
+                                        ><span class="sm"
+                                            ><b>Fede</b>
+                                            <span class="faint"
+                                                >te recomendó</span
+                                            ></span
+                                        >
+                                    </div>
+                                    <b>Mushishi</b>
+                                    <p class="sm muted" style="margin: 0">
+                                        “Mirala de noche, un capítulo por vez.”
+                                    </p>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            gap: 8px;
+                                            margin-top: auto;
+                                        "
+                                    >
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary btn-sm"
+                                        >
+                                            Guardar en lista</button
+                                        ><button
+                                            type="button"
+                                            class="btn btn-ghost btn-sm"
+                                        >
+                                            Descartar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="panel"
+                                style="display: flex; gap: 16px; padding: 16px"
+                            >
+                                <div
+                                    class="poster p9"
+                                    style="
+                                        width: 92px;
+                                        flex: none;
+                                        border-radius: 10px;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 8px;
+                                        min-width: 0;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                        "
+                                    >
+                                        <span
+                                            class="avatar"
+                                            style="width: 26px; height: 26px"
+                                            ><span style="font-size: 10px"
+                                                >MA</span
+                                            ></span
+                                        ><span class="sm"
+                                            ><b>Mati</b>
+                                            <span class="faint"
+                                                >te recomendó</span
+                                            ></span
+                                        >
+                                    </div>
+                                    <b>Vinland Saga</b>
+                                    <p class="sm muted" style="margin: 0">
+                                        “La segunda temporada cambia todo.”
+                                    </p>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            gap: 8px;
+                                            margin-top: auto;
+                                        "
+                                    >
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary btn-sm"
+                                        >
+                                            Guardar en lista</button
+                                        ><button
+                                            type="button"
+                                            class="btn btn-ghost btn-sm"
+                                        >
+                                            Descartar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="panel"
+                                style="display: flex; gap: 16px; padding: 16px"
+                            >
+                                <div
+                                    class="poster p8"
+                                    style="
+                                        width: 92px;
+                                        flex: none;
+                                        border-radius: 10px;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 8px;
+                                        min-width: 0;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                        "
+                                    >
+                                        <span
+                                            class="avatar"
+                                            style="width: 26px; height: 26px"
+                                            ><span style="font-size: 10px"
+                                                >FG</span
+                                            ></span
+                                        ><span class="sm"
+                                            ><b>Fede</b>
+                                            <span class="faint"
+                                                >te recomendó</span
+                                            ></span
+                                        >
+                                    </div>
+                                    <b>Odd Taxi</b>
+                                    <p class="sm muted" style="margin: 0">
+                                        “Parece tranqui y no lo es.”
+                                    </p>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            gap: 8px;
+                                            margin-top: auto;
+                                        "
+                                    >
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary btn-sm"
+                                        >
+                                            Guardar en lista</button
+                                        ><button
+                                            type="button"
+                                            class="btn btn-ghost btn-sm"
+                                        >
+                                            Descartar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
 
-<section style="display: flex; flex-wrap: wrap; gap: 32px">
-<div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
-<div style="display: flex; flex-direction: column; gap: 8px">
-<p class="eyebrow">Jueves 29 de octubre</p>
-<h1 class="display" style="font-size: 46px">Hola, Rodri. Tenés 3 episodios nuevos.</h1>
-</div>
-<div class="sec-head"><h2 class="h2">Seguir viendo</h2><a href="#" class="link">Ver mi biblioteca</a></div>
-<div style="display: flex; flex-direction: column; gap: 14px">
-<div class="panel" style="display: flex; gap: 18px; padding: 14px; align-items: center; flex-wrap: wrap">
-<div class="poster p2" style="width: 84px; flex: none; border-radius: 10px"></div>
-<div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
-<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><span class="badge b-live"><i></i>Nuevo hoy</span><span class="mono xs faint">EP 9 salió a las 11:00</span></div>
-<span class="h3" style="font-size: 18px">Dandadan 2nd Season</span>
-<div style="display: flex; align-items: center; gap: 12px"><div class="bar" style="flex: 1; max-width: 320px"><i style="width: 66%"></i></div><span class="mono xs muted">8 / 12</span></div>
-</div>
-<div style="display: flex; gap: 8px"><button type="button" class="btn btn-primary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l11 7-11 7z"></path></svg>Vi el EP 9</button></div>
-</div>
-<div class="panel" style="display: flex; gap: 18px; padding: 14px; align-items: center; flex-wrap: wrap">
-<div class="poster p3" style="width: 84px; flex: none; border-radius: 10px"></div>
-<div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
-<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><span class="badge b-fmt">Hoy 13:30</span><span class="mono xs faint">Sale el EP 18 en 2 h 10 min</span></div>
-<span class="h3" style="font-size: 18px">The Apothecary Diaries</span>
-<div style="display: flex; align-items: center; gap: 12px"><div class="bar" style="flex: 1; max-width: 320px"><i style="width: 70%"></i></div><span class="mono xs muted">17 / 24</span></div>
-</div>
-<div style="display: flex; gap: 8px"><button type="button" class="btn btn-secondary">Al día</button></div>
-</div>
-<div class="panel" style="display: flex; gap: 18px; padding: 14px; align-items: center; flex-wrap: wrap">
-<div class="poster p6" style="width: 84px; flex: none; border-radius: 10px"></div>
-<div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
-<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><span class="badge b-fmt">Terminada</span><span class="mono xs faint">Te quedan 4 episodios · 1 h 32 min</span></div>
-<span class="h3" style="font-size: 18px">Mob Psycho 100 III</span>
-<div style="display: flex; align-items: center; gap: 12px"><div class="bar" style="flex: 1; max-width: 320px"><i style="width: 67%"></i></div><span class="mono xs muted">8 / 12</span></div>
-</div>
-<div style="display: flex; gap: 8px"><button type="button" class="btn btn-primary"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l11 7-11 7z"></path></svg>Vi el EP 9</button></div>
-</div>
-</div>
-</div>
+                    <section
+                        style="display: flex; flex-direction: column; gap: 20px"
+                    >
+                        <div class="sec-head">
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 4px;
+                                "
+                            >
+                                <p class="eyebrow">Próximamente</p>
+                                <h2 class="h2">Lo que viene</h2>
+                            </div>
+                            <a href="#" class="link hover:text-secondary">Ver todo</a>
+                        </div>
+                        <div
+                            class="grid-cards"
+                            style="
+                                grid-template-columns: repeat(
+                                    auto-fill,
+                                    minmax(150px, 1fr)
+                                );
+                            "
+                        >
+                            <div class="card">
+                                <div class="poster p2">
+                                    <span class="pbadge badge b-soon">2027</span
+                                    ><span class="pt">Dandadan 3rd Season</span>
+                                </div>
+                                <p class="meta">Science SARU · TV</p>
+                            </div>
+                            <div class="card">
+                                <div class="poster p7">
+                                    <span class="pbadge badge b-soon"
+                                        >Ene 2027</span
+                                    ><span class="pt"
+                                        >Delicious in Dungeon 2</span
+                                    >
+                                </div>
+                                <p class="meta">Trigger · TV</p>
+                            </div>
+                            <div class="card">
+                                <div class="poster p8">
+                                    <span class="pbadge badge b-soon">2027</span
+                                    ><span class="pt"
+                                        >The Eminence in Shadow: Lost
+                                        Echoes</span
+                                    >
+                                </div>
+                                <p class="meta">Nexus · Película</p>
+                            </div>
+                            <div class="card">
+                                <div class="poster p4">
+                                    <span class="pbadge badge b-soon">2027</span
+                                    ><span class="pt"
+                                        >Bocchi the Rock! Season 2</span
+                                    >
+                                </div>
+                                <p class="meta">CloverWorks · TV</p>
+                            </div>
+                            <div class="card">
+                                <div class="poster p1">
+                                    <span class="pbadge badge b-soon"
+                                        >Ene 2027</span
+                                    ><span class="pt"
+                                        >Frieren: Golden Land Arc</span
+                                    >
+                                </div>
+                                <p class="meta">Madhouse · TV</p>
+                            </div>
+                            <div class="card">
+                                <div class="poster p6">
+                                    <span class="pbadge badge b-soon">2027</span
+                                    ><span class="pt">Alya Season 2</span>
+                                </div>
+                                <p class="meta">Doga Kobo · TV</p>
+                            </div>
+                        </div>
+                    </section>
 
-<aside style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
-<div class="panel" style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
-<div class="sec-head"><h2 class="h2">Hoy</h2><span class="mono xs faint">Hora de Buenos Aires</span></div>
-<div style="display: flex; flex-direction: column; gap: 0">
-<div style="display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding: 10px 0; border-bottom: 1px solid rgba(190,180,255,.13)"><span class="mono sm faint">11:00</span><div><b class="sm">Dandadan</b><div class="xs faint">EP 9 · ya salió</div></div></div>
-<div style="display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding: 6px 0; align-items: center"><span class="mono xs" style="color: #4BF2C5">11:20</span><div style="height: 2px; background: #4BF2C5; border-radius: 2px; position: relative"><span class="xs" style="position: absolute; right: 0; top: -20px; color: #4BF2C5; font-weight: 700">ahora</span></div></div>
-<div style="display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding: 10px 0; border-bottom: 1px solid rgba(190,180,255,.13)"><span class="mono sm">13:30</span><div><b class="sm">The Apothecary Diaries</b><div class="xs faint">EP 18 · en 2 h 10 min</div></div></div>
-<div style="display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding: 10px 0"><span class="mono sm">22:00</span><div><b class="sm">Reincarnated as a Sword II</b><div class="xs faint">EP 5 · en tu lista Pendientes</div></div></div>
-</div>
-<a href="#" class="link sm">Abrir calendario</a>
-</div>
-<div class="panel" style="padding: 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
-<div style="grid-column: span 3"><h2 class="h3">Tu semana</h2></div>
-<div><div class="mono" style="font-size: 26px">14</div><div class="xs faint">episodios</div></div>
-<div><div class="mono" style="font-size: 26px">5:36</div><div class="xs faint">horas</div></div>
-<div><div class="mono" style="font-size: 26px">2</div><div class="xs faint">completadas</div></div>
-</div>
-</aside>
-</section>
+                    <section
+                        style="display: flex; flex-direction: column; gap: 20px"
+                    >
+                        <div class="sec-head">
+                            <h2 class="h2">Top de todos los tiempos</h2>
+                            <a href="#" class="link">Ver ranking</a>
+                        </div>
+                        <div
+                            style="
+                                display: grid;
+                                grid-template-columns: repeat(
+                                    auto-fill,
+                                    minmax(190px, 1fr)
+                                );
+                                gap: 20px;
+                            "
+                        >
+                            <div
+                                style="
+                                    display: flex;
+                                    align-items: flex-end;
+                                    gap: 4px;
+                                "
+                            >
+                                <span
+                                    class="display"
+                                    style="
+                                        font-size: 92px;
+                                        color: transparent;
+                                        -webkit-text-stroke: 1.5px #8f7bff;
+                                        line-height: 0.8;
+                                    "
+                                    >1</span
+                                >
+                                <div class="card" style="flex: 1">
+                                    <div class="poster p1">
+                                        <span class="pt">Frieren</span>
+                                    </div>
+                                    <p class="meta mono">★ 9.2 · 28 eps</p>
+                                </div>
+                            </div>
+                            <div
+                                style="
+                                    display: flex;
+                                    align-items: flex-end;
+                                    gap: 4px;
+                                "
+                            >
+                                <span
+                                    class="display"
+                                    style="
+                                        font-size: 92px;
+                                        color: transparent;
+                                        -webkit-text-stroke: 1.5px #8f7bff;
+                                        line-height: 0.8;
+                                    "
+                                    >2</span
+                                >
+                                <div class="card" style="flex: 1">
+                                    <div class="poster p9">
+                                        <span class="pt"
+                                            >Fullmetal Alchemist:
+                                            Brotherhood</span
+                                        >
+                                    </div>
+                                    <p class="meta mono">★ 9.1 · 64 eps</p>
+                                </div>
+                            </div>
+                            <div
+                                style="
+                                    display: flex;
+                                    align-items: flex-end;
+                                    gap: 4px;
+                                "
+                            >
+                                <span
+                                    class="display"
+                                    style="
+                                        font-size: 92px;
+                                        color: transparent;
+                                        -webkit-text-stroke: 1.5px #8f7bff;
+                                        line-height: 0.8;
+                                    "
+                                    >3</span
+                                >
+                                <div class="card" style="flex: 1">
+                                    <div class="poster p6">
+                                        <span class="pt">Steins;Gate</span>
+                                    </div>
+                                    <p class="meta mono">★ 9.1 · 24 eps</p>
+                                </div>
+                            </div>
+                            <div
+                                style="
+                                    display: flex;
+                                    align-items: flex-end;
+                                    gap: 4px;
+                                "
+                            >
+                                <span
+                                    class="display"
+                                    style="
+                                        font-size: 92px;
+                                        color: transparent;
+                                        -webkit-text-stroke: 1.5px #8f7bff;
+                                        line-height: 0.8;
+                                    "
+                                    >4</span
+                                >
+                                <div class="card" style="flex: 1">
+                                    <div class="poster p3">
+                                        <span class="pt">Gintama Season 4</span>
+                                    </div>
+                                    <p class="meta mono">★ 9.1 · 51 eps</p>
+                                </div>
+                            </div>
+                            <div
+                                style="
+                                    display: flex;
+                                    align-items: flex-end;
+                                    gap: 4px;
+                                "
+                            >
+                                <span
+                                    class="display"
+                                    style="
+                                        font-size: 92px;
+                                        color: transparent;
+                                        -webkit-text-stroke: 1.5px #8f7bff;
+                                        line-height: 0.8;
+                                    "
+                                    >5</span
+                                >
+                                <div class="card" style="flex: 1">
+                                    <div class="poster p10">
+                                        <span class="pt"
+                                            >Hunter x Hunter (2011)</span
+                                        >
+                                    </div>
+                                    <p class="meta mono">★ 9.0 · 148 eps</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </template>
+        <script src="runtime.js"></script>
+        <script>
+            class Component extends DCLogic {
+                renderVals() {
+                    return {};
+                }
+            }
 
-<section style="display: flex; flex-direction: column; gap: 20px">
-<div class="sec-head"><div style="display: flex; flex-direction: column; gap: 4px"><p class="eyebrow" style="color: #FF7AB8">De tus amigos</p><h2 class="h2">Te recomendaron</h2></div><a href="#" class="link">Ver bandeja (3)</a></div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
-<div class="panel" style="display: flex; gap: 16px; padding: 16px">
-<div class="poster p10" style="width: 92px; flex: none; border-radius: 10px"></div>
-<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
-<div style="display: flex; align-items: center; gap: 8px"><span class="avatar" style="width: 26px; height: 26px"><span style="font-size: 10px">FG</span></span><span class="sm"><b>Fede</b> <span class="faint">te recomendó</span></span></div>
-<b>Mushishi</b>
-<p class="sm muted" style="margin: 0">“Mirala de noche, un capítulo por vez.”</p>
-<div style="display: flex; gap: 8px; margin-top: auto"><button type="button" class="btn btn-secondary btn-sm">Guardar en lista</button><button type="button" class="btn btn-ghost btn-sm">Descartar</button></div>
-</div>
-</div>
-<div class="panel" style="display: flex; gap: 16px; padding: 16px">
-<div class="poster p9" style="width: 92px; flex: none; border-radius: 10px"></div>
-<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
-<div style="display: flex; align-items: center; gap: 8px"><span class="avatar" style="width: 26px; height: 26px"><span style="font-size: 10px">MA</span></span><span class="sm"><b>Mati</b> <span class="faint">te recomendó</span></span></div>
-<b>Vinland Saga</b>
-<p class="sm muted" style="margin: 0">“La segunda temporada cambia todo.”</p>
-<div style="display: flex; gap: 8px; margin-top: auto"><button type="button" class="btn btn-secondary btn-sm">Guardar en lista</button><button type="button" class="btn btn-ghost btn-sm">Descartar</button></div>
-</div>
-</div>
-<div class="panel" style="display: flex; gap: 16px; padding: 16px">
-<div class="poster p8" style="width: 92px; flex: none; border-radius: 10px"></div>
-<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
-<div style="display: flex; align-items: center; gap: 8px"><span class="avatar" style="width: 26px; height: 26px"><span style="font-size: 10px">FG</span></span><span class="sm"><b>Fede</b> <span class="faint">te recomendó</span></span></div>
-<b>Odd Taxi</b>
-<p class="sm muted" style="margin: 0">“Parece tranqui y no lo es.”</p>
-<div style="display: flex; gap: 8px; margin-top: auto"><button type="button" class="btn btn-secondary btn-sm">Guardar en lista</button><button type="button" class="btn btn-ghost btn-sm">Descartar</button></div>
-</div>
-</div>
-</div>
-</section>
-
-<section style="display: flex; flex-direction: column; gap: 20px">
-<div class="sec-head"><div style="display: flex; flex-direction: column; gap: 4px"><p class="eyebrow">Próximamente</p><h2 class="h2">Lo que viene</h2></div><a href="#" class="link">Ver todo</a></div>
-<div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))">
-<div class="card"><div class="poster p2"><span class="pbadge badge b-soon">2027</span><span class="pt">Dandadan 3rd Season</span></div><p class="meta">Science SARU · TV</p></div>
-<div class="card"><div class="poster p7"><span class="pbadge badge b-soon">Ene 2027</span><span class="pt">Delicious in Dungeon 2</span></div><p class="meta">Trigger · TV</p></div>
-<div class="card"><div class="poster p8"><span class="pbadge badge b-soon">2027</span><span class="pt">The Eminence in Shadow: Lost Echoes</span></div><p class="meta">Nexus · Película</p></div>
-<div class="card"><div class="poster p4"><span class="pbadge badge b-soon">2027</span><span class="pt">Bocchi the Rock! Season 2</span></div><p class="meta">CloverWorks · TV</p></div>
-<div class="card"><div class="poster p1"><span class="pbadge badge b-soon">Ene 2027</span><span class="pt">Frieren: Golden Land Arc</span></div><p class="meta">Madhouse · TV</p></div>
-<div class="card"><div class="poster p6"><span class="pbadge badge b-soon">2027</span><span class="pt">Alya Season 2</span></div><p class="meta">Doga Kobo · TV</p></div>
-</div>
-</section>
-
-<section style="display: flex; flex-direction: column; gap: 20px">
-<div class="sec-head"><h2 class="h2">Top de todos los tiempos</h2><a href="#" class="link">Ver ranking</a></div>
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px">
-<div style="display: flex; align-items: flex-end; gap: 4px"><span class="display" style="font-size: 92px; color: transparent; -webkit-text-stroke: 1.5px #8F7BFF; line-height: .8">1</span><div class="card" style="flex: 1"><div class="poster p1"><span class="pt">Frieren</span></div><p class="meta mono">★ 9.2 · 28 eps</p></div></div>
-<div style="display: flex; align-items: flex-end; gap: 4px"><span class="display" style="font-size: 92px; color: transparent; -webkit-text-stroke: 1.5px #8F7BFF; line-height: .8">2</span><div class="card" style="flex: 1"><div class="poster p9"><span class="pt">Fullmetal Alchemist: Brotherhood</span></div><p class="meta mono">★ 9.1 · 64 eps</p></div></div>
-<div style="display: flex; align-items: flex-end; gap: 4px"><span class="display" style="font-size: 92px; color: transparent; -webkit-text-stroke: 1.5px #8F7BFF; line-height: .8">3</span><div class="card" style="flex: 1"><div class="poster p6"><span class="pt">Steins;Gate</span></div><p class="meta mono">★ 9.1 · 24 eps</p></div></div>
-<div style="display: flex; align-items: flex-end; gap: 4px"><span class="display" style="font-size: 92px; color: transparent; -webkit-text-stroke: 1.5px #8F7BFF; line-height: .8">4</span><div class="card" style="flex: 1"><div class="poster p3"><span class="pt">Gintama Season 4</span></div><p class="meta mono">★ 9.1 · 51 eps</p></div></div>
-<div style="display: flex; align-items: flex-end; gap: 4px"><span class="display" style="font-size: 92px; color: transparent; -webkit-text-stroke: 1.5px #8F7BFF; line-height: .8">5</span><div class="card" style="flex: 1"><div class="poster p10"><span class="pt">Hunter x Hunter (2011)</span></div><p class="meta mono">★ 9.0 · 148 eps</p></div></div>
-</div>
-</section>
-
-</main>
-</div>
-</template>
-<script src="runtime.js"></script>
-<script>
-
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-
-window.__dcBoot(Component, {});
-</script>
-</body>
+            window.__dcBoot(Component, {});
+        </script>
+    </body>
 </html>

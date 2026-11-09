@@ -96,7 +96,7 @@ export async function getMediaProgress(malId: number, mediaType: 'anime' | 'mang
 
   const { data, error } = await supabase
     .from('user_media_progress')
-    .select('status, current_episode, media!inner(mal_id, type)')
+    .select('status, current_episode, updated_at, media_id, media!inner(mal_id, type)')
     .eq('media.mal_id', malId)
     .eq('media.type', mediaType)
     .eq('user_id', user.id)
@@ -106,7 +106,9 @@ export async function getMediaProgress(malId: number, mediaType: 'anime' | 'mang
 
   return {
     status: data.status,
-    current_episode: data.current_episode
+    current_episode: data.current_episode,
+    revision: data.updated_at,
+    mediaId: data.media_id
   }
 }
 

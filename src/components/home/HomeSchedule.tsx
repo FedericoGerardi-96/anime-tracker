@@ -19,7 +19,7 @@ export default async function HomeSchedule() {
         <h2 id="home-schedule-title" className="text-lg font-bold">Hoy</h2>
         <p className="mt-1 text-xs text-muted-foreground">Hora local · emisiones de anime</p>
         <div className="mt-4">{schedule ? <HomePublicToday {...schedule} /> : <p role="status" className="text-sm text-muted-foreground">No pudimos cargar los horarios. Probá de nuevo más tarde.</p>}</div>
-        <Link href="/anime/schedule" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">Abrir calendario</Link>
+        <Link href="/anime/schedule" className="mt-4 inline-block text-sm font-semibold text-primary  ">Abrir calendario</Link>
       </section>
     );
   }
@@ -35,7 +35,7 @@ export default async function HomeSchedule() {
         <h2 id="home-schedule-title" className="text-lg font-bold">Próximas emisiones</h2>
         <p role="status" className="mt-4 text-sm text-muted-foreground">No pudimos cargar los horarios. Probá de nuevo más tarde.</p>
       </>}
-      <Link href="/anime/schedule" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">Abrir calendario</Link>
+      <Link href="/anime/schedule" className="mt-4 inline-block text-sm font-semibold text-primary  ">Abrir calendario</Link>
     </section>
   );
 }

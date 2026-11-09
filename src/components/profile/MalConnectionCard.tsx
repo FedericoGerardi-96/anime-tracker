@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ConnectionNotice from "@/components/profile/ConnectionNotice";
 import MalSyncButton from "@/components/favorites/MalSyncButton";
 import type { MalConnectionStatus } from "@/interfaces/myanimelist-auth";
@@ -23,11 +22,11 @@ const RESULT_MESSAGES: Record<string, { text: string; error?: boolean }> = {
 };
 
 export default function MalConnectionCard({ connection, result, missingConfiguration }: Readonly<MalConnectionCardProps>) {
-  const message = result ? RESULT_MESSAGES[result] : undefined;
+  const message = result && Object.hasOwn(RESULT_MESSAGES, result) ? RESULT_MESSAGES[result] : undefined;
   const needsReconnect = connection.status === "reconnect_required";
 
   return (
-    <div className="glass-card max-w-2xl overflow-hidden rounded-2xl border border-border">
+    <div className="bg-card max-w-2xl overflow-hidden rounded-(--radius-panel) border border-border">
       {message && result && (
         <ConnectionNotice key={result} provider="mal" result={result} error={!!message.error}>
           {message.text}
@@ -44,7 +43,7 @@ export default function MalConnectionCard({ connection, result, missingConfigura
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h4 className="font-bold text-text-primary">MyAnimeList</h4>
+            <h3 className="font-bold text-text-primary">MyAnimeList</h3>
             <span className={`size-2 rounded-full ${connection.connected && !needsReconnect ? "bg-emerald-500" : "bg-slate-400"}`} />
           </div>
           {connection.connected ? (
@@ -68,9 +67,9 @@ export default function MalConnectionCard({ connection, result, missingConfigura
 
         <div className="flex shrink-0 flex-wrap gap-2">
           {(!connection.connected || needsReconnect) && (
-            <Link href="/api/mal/connect" className="rounded-xl bg-[#2e51a2] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#3b63bd]">
+            <a href="/api/mal/connect" className="rounded-xl bg-[#2e51a2] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#3b63bd]">
               {needsReconnect ? "Volver a conectar" : "Conectar cuenta"}
-            </Link>
+            </a>
           )}
           {connection.connected && !needsReconnect && (
             <MalSyncButton />

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { CONNECTED_ACCOUNTS_PATH } from "@/lib/oauth-return-path";
 import { deleteMalConnection } from "@/services/myanimelist-connection";
 import { getAuthenticatedUser } from "@/services/supabase";
 
@@ -8,8 +9,8 @@ export async function POST(request: NextRequest) {
 
   try {
     await deleteMalConnection(user.id);
-    return NextResponse.redirect(new URL("/profile?mal=disconnected", request.url), 303);
+    return NextResponse.redirect(new URL(`${CONNECTED_ACCOUNTS_PATH}?mal=disconnected`, request.url), 303);
   } catch {
-    return NextResponse.redirect(new URL("/profile?mal=disconnect_error", request.url), 303);
+    return NextResponse.redirect(new URL(`${CONNECTED_ACCOUNTS_PATH}?mal=disconnect_error`, request.url), 303);
   }
 }

@@ -1,0 +1,25 @@
+.control { border-color: var(--border); background: transparent; }
+.control:hover:not(:disabled), .control[aria-pressed="true"] {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+.input:focus { border-color: var(--primary-color); }
+.square { width: 44px; height: 44px; flex-shrink: 0; padding: 0; border-radius: 10px; font-size: 20px; }
+.step { border-color: var(--primary-color); color: var(--primary-color); }
+.episode {
+  width: 3ch;
+  min-width: 48px;
+  max-width: 100%;
+  height: 48px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+.episode:hover { border-color: var(--primary-color); }
+.episode:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; }

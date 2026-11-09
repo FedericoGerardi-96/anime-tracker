@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONNECTED_ACCOUNTS_PATH } from "@/lib/oauth-return-path";
 import LibrarySyncButton from "@/components/favorites/LibrarySync";
 import ConnectionNotice from "@/components/profile/ConnectionNotice";
 import type { MalConnectionStatus } from "@/interfaces/myanimelist-auth";
@@ -10,7 +11,7 @@ function Feedback({ provider, result }: { provider: "mal" | "anilist"; result?: 
   const name = provider === "mal" ? "MyAnimeList" : "AniList";
   const messages: Record<string, string> = {
     connected: `Tu cuenta de ${name} quedó conectada. Ya podés sincronizar tu biblioteca.`,
-    configuration_error: `La conexión con ${name} todavía no está configurada. Revisá la configuración desde tu perfil.`,
+    configuration_error: `La conexión con ${name} todavía no está configurada. Revisá la configuración en Ajustes → Cuentas conectadas.`,
     invalid_state: "La autorización venció o no pudo verificarse. Volvé a conectar la cuenta.",
     denied: `No autorizaste la conexión con ${name}. Podés intentarlo nuevamente.`,
     session_expired: "Tu sesión venció. Iniciá sesión nuevamente.",
@@ -36,7 +37,7 @@ export default function LibraryConnectionsCard({ mal, anilist, results }: {
     <div className="p-5 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3"><span aria-hidden="true" className="material-symbols-outlined rounded-xl bg-primary/10 p-2 text-primary">sync</span><h2 id="library-connections-title" className="text-lg font-bold text-foreground">Tus bibliotecas conectadas</h2></div>
-        <Link href="/profile" className="text-xs font-semibold text-muted-foreground transition hover:text-primary">Administrar cuentas →</Link>
+        <Link href={CONNECTED_ACCOUNTS_PATH} className="text-xs font-semibold text-muted-foreground transition hover:text-primary">Administrar cuentas →</Link>
       </div>
       <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">Tus favoritos y cambios de progreso se envían automáticamente a las cuentas conectadas. Usá la sincronización completa para traer cambios hechos en esas plataformas y revisar las diferencias entre bibliotecas.</p>
       <div className="mt-5 grid gap-3 xl:grid-cols-2">

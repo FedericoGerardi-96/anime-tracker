@@ -8,6 +8,7 @@ import { getPreferredAnimeByMalId, getPreferredMangaByMalId } from '@/services/m
 import type { DetailContentProps } from '@/interfaces/page';
 import type { DetailMediaType, MediaDetailViewModel } from '@/interfaces/media-detail-view';
 import MediaDetailView from './MediaDetailView';
+import AnimeDetailView from './AnimeDetailView';
 
 export default async function MediaDetailContent({ slug, mediaType }: Readonly<DetailContentProps & { mediaType: DetailMediaType }>) {
   const idMatch = slug.match(/^(\d+)/);
@@ -68,5 +69,5 @@ export default async function MediaDetailContent({ slug, mediaType }: Readonly<D
     },
   };
 
-  return <MediaDetailView detail={detail} />;
+  return mediaType === 'anime' ? <AnimeDetailView detail={detail} /> : <MediaDetailView detail={detail} />;
 }

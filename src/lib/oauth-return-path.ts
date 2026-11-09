@@ -1,4 +1,6 @@
-// OAuth return destinations are intentionally limited to these two local pages.
-export function oauthReturnPath(value: string | null | undefined): "/favorites" | "/profile" {
-  return value === "/favorites" ? "/favorites" : "/profile";
+export const CONNECTED_ACCOUNTS_PATH = "/settings/connections";
+
+// Keep the library return and send every other request to the accounts page.
+export function oauthReturnPath(value: string | null | undefined) {
+  return value === "/favorites" ? "/favorites" : CONNECTED_ACCOUNTS_PATH;
 }

@@ -20,12 +20,9 @@ export default async function AnimeDetailCharacters({
             </div>
             <Link
               href={`/anime/${slug}/characters`}
-              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              className="flex items-center gap-1 text-sm font-medium text-white hover:text-primary"
             >
               Ver todos{" "}
-              <span className="material-symbols-outlined text-sm">
-                arrow_forward
-              </span>
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">

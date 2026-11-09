@@ -1,5 +1,5 @@
-import ProviderChoice from '@/components/catalog/ProviderChoice';
-import { getCatalogProvider } from '@/services/catalog-provider';
+import ProviderChoice from "@/components/catalog/ProviderChoice";
+import { getCatalogProvider } from "@/services/catalog-provider";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -8,25 +8,103 @@ import Pagination from "@/components/ui/Pagination";
 import { searchCharacters } from "@/services/anilist-characters";
 import { slugify } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Personajes", description: "Buscá personajes de anime y manga." };
+export const metadata: Metadata = {
+  title: "Personajes",
+  description: "Buscá personajes de anime y manga.",
+};
 
-export default async function CharactersPage({ searchParams }: Readonly<{ searchParams: Promise<{ q?: string; page?: string }> }>) {
+export default async function CharactersPage({
+  searchParams,
+}: Readonly<{ searchParams: Promise<{ q?: string; page?: string }> }>) {
   const provider = await getCatalogProvider();
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
   const page = Math.max(1, Number(params.page) || 1);
-  let result = { characters: [], hasNextPage: false } as Awaited<ReturnType<typeof searchCharacters>>;
+  let result = { characters: [], hasNextPage: false } as Awaited<
+    ReturnType<typeof searchCharacters>
+  >;
   let unavailable = false;
   if (query.length >= 2) {
-    try { result = await searchCharacters(query, page); } catch { unavailable = true; }
+    try {
+      result = await searchCharacters(query, page);
+    } catch {
+      unavailable = true;
+    }
   }
 
-  return <div className="mx-auto max-w-7xl py-10">
-    <div className="mb-10"><p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Directorio de {provider === 'anilist' ? 'AniList' : 'MyAnimeList'}</p><h1 className="mt-2 text-4xl font-black sm:text-6xl">Personajes</h1><p className="mt-3 text-muted-foreground">Buscá personajes por nombre y explorá sus perfiles, apariciones y seiyūs.</p></div>
-    <form className="mb-10 flex max-w-2xl gap-3" action="/characters"><input aria-label="Buscar personajes" name="q" defaultValue={query} minLength={2} required placeholder="Ej.: Hinata Hyuuga" className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-card px-4 outline-none focus:border-primary"/><button type="submit" className="rounded-xl bg-primary px-6 font-bold text-primary-foreground">Buscar</button></form>
-    <ProviderChoice provider={provider} failed={unavailable} />
-    {!unavailable && query && result.characters.length === 0 && <p className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">No encontramos personajes para “{query}”.</p>}
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">{result.characters.map((character, index) => <Link key={character.id} href={`/characters/${character.provider === "myanimelist" ? `mal-${character.malId ?? character.id}` : character.id}-${slugify(character.name)}`} className="group overflow-hidden rounded-2xl border border-border bg-card"><div className="relative aspect-3/4 overflow-hidden"><Image loading={index < 5 ? "eager" : "lazy"} fill sizes="(max-width: 639px) 44vw, (max-width: 767px) 29vw, (max-width: 1023px) 21vw, 225px" src={character.image || "/placeholder-cover.svg"} alt={character.name} className="size-full object-cover transition duration-500 group-hover:scale-105"/></div><div className="p-4"><h2 className="truncate font-bold group-hover:text-primary">{character.name}</h2><p className="mt-1 truncate text-xs text-muted-foreground">{character.nativeName || `${character.favorites.toLocaleString("es-AR")} favoritos`}</p></div></Link>)}</div>
-    {!unavailable && query.length >= 2 && <Suspense fallback={null}><Pagination currentPage={page} hasNextPage={result.hasNextPage} showBoundaryPages={false} /></Suspense>}
-  </div>;
+  return (
+    <div className="mx-auto max-w-7xl py-10">
+      <div className="mb-10">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+          Directorio de {provider === "anilist" ? "AniList" : "MyAnimeList"}
+        </p>
+        <h1 className="mt-2 text-4xl font-black sm:text-6xl">Personajes</h1>
+        <p className="mt-3 text-muted-foreground">
+          Buscá personajes por nombre y explorá sus perfiles, apariciones y
+          seiyūs.
+        </p>
+      </div>
+      <form className="mb-10 flex max-w-2xl gap-3" action="/characters">
+        <input
+          aria-label="Buscar personajes"
+          name="q"
+          defaultValue={query}
+          minLength={2}
+          required
+          placeholder="Ej.: Hinata Hyuuga"
+          className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-card px-4 outline-none focus:border-primary"
+        />
+        <button
+          type="submit"
+          className="rounded-xl bg-primary px-6 font-bold text-primary-foreground"
+        >
+          Buscar
+        </button>
+      </form>
+      <ProviderChoice provider={provider} failed={unavailable} />
+      {!unavailable && query && result.characters.length === 0 && (
+        <p className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
+          No encontramos personajes para “{query}”.
+        </p>
+      )}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {result.characters.map((character, index) => (
+          <Link
+            key={character.id}
+            href={`/characters/${character.provider === "myanimelist" ? `mal-${character.malId ?? character.id}` : character.id}-${slugify(character.name)}`}
+            className="group overflow-hidden rounded-2xl border border-border bg-card"
+          >
+            <div className="relative aspect-3/4 overflow-hidden">
+              <Image
+                loading={index < 5 ? "eager" : "lazy"}
+                fill
+                sizes="(max-width: 639px) 44vw, (max-width: 767px) 29vw, (max-width: 1023px) 21vw, 225px"
+                src={character.image || "/placeholder-cover.svg"}
+                alt={character.name}
+                className="size-full object-cover transition duration-500 group-hover:scale-105"
+              />
+            </div>
+            <div className="p-4">
+              <h2 className="truncate font-bold group-hover:text-primary">
+                {character.name}
+              </h2>
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                {character.nativeName ||
+                  `${character.favorites.toLocaleString("es-AR")} favoritos`}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+      {!unavailable && query.length >= 2 && (
+        <Suspense fallback={null}>
+          <Pagination
+            currentPage={page}
+            hasNextPage={result.hasNextPage}
+            showBoundaryPages={false}
+          />
+        </Suspense>
+      )}
+    </div>
+  );
 }

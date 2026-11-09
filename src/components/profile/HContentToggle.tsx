@@ -2,45 +2,55 @@
 
 import { useState, useTransition } from "react";
 import { updateShowHContent } from "@/lib/actions/profile";
+import styles from "@/components/settings/AppearanceSettings.module.css";
 
 export default function HContentToggle({ enabled }: Readonly<{ enabled: boolean }>) {
   const [checked, setChecked] = useState(enabled);
+  const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleToggle() {
     const next = !checked;
-    setChecked(next);
+    setMessage(null);
     startTransition(async () => {
-      await updateShowHContent(next);
+      try {
+        const result = await updateShowHContent(next);
+        if (result.success) {
+          setChecked(next);
+          setMessage({ text: next ? "Contenido adulto activado." : "Contenido adulto desactivado." });
+          return;
+        }
+      } catch {
+        // Keep the last saved value if the request fails.
+      }
+      setMessage({ text: "No pudimos guardar tu preferencia. Intentá de nuevo.", error: true });
     });
   }
 
   return (
-    <div className="glass-card p-5 rounded-2xl flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        <span className="material-symbols-outlined text-primary">lock</span>
+    <div className="max-w-lg rounded-(--radius-panel) border border-border bg-card p-5">
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-bold">Adult Content</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Show the Hentai Vault section in the sidebar
+          <p id="adult-content-label" className="text-sm font-bold">Mostrar contenido adulto</p>
+          <p id="adult-content-description" className="mt-1 text-sm text-muted-foreground">
+            Agrega Hentai al menú principal.
           </p>
         </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={checked}
+          aria-labelledby="adult-content-label"
+          aria-describedby="adult-content-description"
+          disabled={isPending}
+          onClick={handleToggle}
+          className={`${styles.switch} disabled:opacity-60`}
+        >
+          <i aria-hidden="true" />
+        </button>
       </div>
-      <button type="button"
-        onClick={handleToggle}
-        disabled={isPending}
-        aria-checked={checked}
-        role="switch"
-        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-60 ${
-          checked ? "bg-primary" : "bg-slate-300 dark:bg-slate-700"
-        }`}
-      >
-        <span
-          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200 ${
-            checked ? "translate-x-5" : "translate-x-0"
-          }`}
-        />
-      </button>
+      {isPending && <p role="status" className="mt-2 text-sm text-muted-foreground">Guardando…</p>}
+      {message && <p role={message.error ? 'alert' : 'status'} className="mt-2 text-sm text-foreground">{message.text}</p>}
     </div>
   );
 }

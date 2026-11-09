@@ -1,0 +1,29 @@
+.sidebar {
+  --list-watching: var(--brand-mint);
+  --list-pending: #1d68b0;
+  --list-completed: var(--brand-aurora);
+  --list-paused: #8f5a00;
+  --list-dropped: #b83a2b;
+}
+:global(.dark) .sidebar {
+  --list-pending: #74c7ff;
+  --list-completed: #b3a6ff;
+  --list-paused: #ffc566;
+  --list-dropped: #ff8a7a;
+}
+.heading {
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+}
+.collection {
+  background: conic-gradient(var(--brand-mint), var(--brand-aurora), var(--brand-sakura), var(--brand-mint));
+}
