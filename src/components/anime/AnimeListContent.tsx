@@ -32,11 +32,11 @@ export default function AnimeListContent({ animeList, userId }: Readonly<AnimeLi
   return (
     <>
       <h2 className="sr-only">Resultados del catálogo</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
         {animeList.map((anime, index) => (
-          <AnimeCard 
-            key={anime.id} 
-            {...anime} 
+          <AnimeCard
+            key={anime.id}
+            {...anime}
             priorityImage={index < 2}
             userId={userId}
             onAddClick={handleAddClick}
@@ -44,13 +44,13 @@ export default function AnimeListContent({ animeList, userId }: Readonly<AnimeLi
         ))}
       </div>
 
-      <AuthModal 
+      <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
       />
 
-      <AddToListModal 
-        isOpen={isModalOpen} 
+      <AddToListModal
+        isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedAnime(null);

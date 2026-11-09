@@ -16,7 +16,7 @@ export default async function HomeWatching() {
   if (!user) return (
     <div className="space-y-5">
       <p className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-        <Link href="/login" className="font-semibold text-primary hover:underline">Iniciá sesión</Link> para ver tus series en Viendo.
+        <Link href="/login" className="font-semibold text-primary  ">Iniciá sesión</Link> para ver tus series en Viendo.
       </p>
       <HomeAiringToday />
     </div>
@@ -34,7 +34,7 @@ export default async function HomeWatching() {
         <div>
           <h2 id="home-watching-title" className="text-2xl font-bold tracking-tight">Seguir viendo</h2>
         </div>
-        <Link href="/lists?tab=watching&type=anime" className="shrink-0 text-sm font-semibold text-primary hover:underline">Ver mi biblioteca</Link>
+        <Link href="/lists?tab=watching&type=anime" className="shrink-0 text-sm font-semibold text-primary hover:text-secondary">Ver mi biblioteca</Link>
       </div>
 
       {error ? (
@@ -43,7 +43,7 @@ export default async function HomeWatching() {
         <div className="rounded-2xl border border-dashed border-border bg-card p-6">
           <p className="font-semibold">Todavía no tenés anime en Viendo.</p>
           <p className="mt-1 text-sm text-muted-foreground">Cuando agregues uno, vas a encontrar tu progreso acá.</p>
-          <Link href="/anime" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">Explorar anime</Link>
+          <Link href="/anime" className="mt-4 inline-block text-sm font-semibold text-primary  ">Explorar anime</Link>
         </div>
       ) : (
         <div className="space-y-3">

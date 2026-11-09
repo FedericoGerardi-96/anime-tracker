@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { signupErrorMessage } from "@/lib/auth-signup";
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
@@ -22,26 +24,34 @@ export async function login(formData: FormData) {
 }
 
 export async function register(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const username = formData.get("username") as string; // Will be stored in user metadata if desired
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const username = formData.get("username");
+  if (typeof email !== "string" || !email.trim() || typeof password !== "string" || !password
+    || typeof username !== "string" || !username.trim()) {
+    redirect("/register?" + new URLSearchParams({ error: signupErrorMessage("validation_failed") }));
+  }
 
   const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+  const emailRedirectTo = origin && URL.canParse("/auth/callback", origin)
+    ? new URL("/auth/callback", origin).href
+    : undefined;
 
-  const { error } = await supabase.auth.signUp({
-    email,
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim(),
     password,
     options: {
-      data: {
-        username
-      }
+      data: { username: username.trim() },
+      emailRedirectTo,
     }
   });
 
   if (error) {
-    redirect("/register?error=Could not create user");
+    redirect("/register?" + new URLSearchParams({ error: signupErrorMessage(error.code) }));
   }
 
+  if (!data.session) redirect("/register?confirm=1");
   redirect("/");
 }
 

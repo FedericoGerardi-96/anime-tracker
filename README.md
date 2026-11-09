@@ -8,6 +8,7 @@ Aplicación para explorar anime y manga, llevar el progreso personal, organizar 
 - [Estado y próximos pasos](docs/ESTADO.md): contexto para continuar entre chats.
 - [Prompts reutilizables](docs/PROMPTS.md): inicio de tarea, rediseño, funciones, errores y revisión.
 - [Guardado y sincronización](docs/guardado-local-y-sincronizacion.md): cola de cambios, activación y pruebas.
+- [Privacidad de listas compartidas](docs/listas-compartidas.md): permisos, modal, enlaces y vista previa.
 - [Requisitos del rediseño](Requerimientos/AniTrack%20%C2%B7%20Requerimientos%20del%20redise%C3%B1o.md) y [guía visual](Requerimientos/AniTrack-rediseno/LEEME.md): destino del producto, todavía no equivalente al estado implementado.
 
 Codex reconoce `AGENTS.md` como instrucciones de proyecto al iniciar una sesión en este repositorio. Los acuerdos deben quedar guardados aquí para acompañar al código; no dependen de recordar conversaciones. Para otros asistentes, pedí explícitamente que lean el archivo. [Documentación oficial](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
@@ -42,14 +43,22 @@ Las escrituras de biblioteca/progreso se guardan en Supabase y los cambios pendi
 | `/anime/[slug]`, `/manga/[slug]` | Fichas |
 | `/anime/[slug]/characters`, `/characters`, `/characters/[slug]` | Personajes |
 | `/anime/schedule` | Calendario |
-| `/favorites`, `/lists` | Biblioteca/favoritos y listas |
-| `/profile`, `/profile/highlights` | Perfil, configuración y destacados |
+| `/lists` | Biblioteca completa, progreso y colecciones; `/favorites` redirige conservando filtros |
+| `/l/[shareSlug]` | Vista de lectura de una colección compartida y vista previa para redes |
+| `/profile`, `/profile/highlights` | Perfil y destacados |
+| `/settings`, `/settings/appearance` | Apariencia, con tres temas y modo automático. `/settings` redirige a Apariencia |
+| `/settings/preferences` | Hora del calendario y fuente de búsqueda de anime, manga y personajes |
+| `/settings/profile`, `/settings/privacy` | Foto, portada y perfil social. Visibilidad de la biblioteca y los destacados |
+| `/settings/connections`, `/settings/adult-content` | Cuentas de AniList y MyAnimeList y visibilidad de la sección Hentai |
 | `/friends`, `/users/[username]`, `/users/[username]/favorites` | Funciones sociales |
 | `/login`, `/register`, `/auth/callback` | Autenticación |
+| `/forgot-password`, `/auth/recovery`, `/reset-password` | Solicitud y confirmación de recuperación de contraseña |
 | `/hentai` | Sección de contenido adulto |
 | `/api/anilist/*`, `/api/mal/*`, `/api/library/sync*` | Conexiones y sincronización |
 
 Las rutas nuevas de los requisitos se incorporarán por fases. No sustituir enlaces actuales por rutas propuestas que todavía no existen.
+
+Para habilitar los correos de recuperación, configurá el SMTP de Supabase Auth y agregá el callback exacto `https://<dominio-de-la-app>/auth/recovery` en **Authentication → URL Configuration → Redirect URLs**. Para desarrollo, agregá `http://localhost:3000/auth/recovery`. La plantilla **Reset Password** usa `{{ .ConfirmationURL }}` y el enlace se abre en el mismo navegador y origen desde el que se solicitó. [Correo de Auth](https://supabase.com/docs/guides/auth/auth-smtp) · [Recuperación de contraseña](https://supabase.com/docs/guides/auth/passwords).
 
 ## Desarrollo local
 
@@ -84,10 +93,19 @@ Abrir `http://localhost:3000` si el servidor usa el puerto predeterminado. `pnpm
 | `pnpm icons:generate` | Regenerar subconjunto de Material Symbols |
 | `node --test tests/pending-library-sync.test.mjs` | Pruebas de sincronización pendiente |
 | `node --test tests/home-airing.test.mjs` | Validación y zonas horarias de emisiones de Inicio (Node.js 24) |
+| `node --test tests/calendar-next.test.mjs` | Próxima emisión desde ahora, modos público/personal y fallos (Node.js 24) |
+| `node --test tests/personal-next-airings.test.mjs` | Tandas personales dentro del límite de AniList, bibliotecas grandes y fallos (Node.js 24) |
 | `node --test tests/catalog-filter-navigation.test.mjs` | Parámetros y compatibilidad de filtros del catálogo (Node.js 24) |
+| `node --test tests/theme.test.mjs` | Compatibilidad de temas anteriores, validación y resolución del modo automático |
 | `node --test tests/home-greeting.test.mjs` | Nombre y fecha local del saludo de Inicio (Node.js 24) |
+| `node --test tests/library-editor.test.mjs` | Validación, conflictos de edición, eliminación idempotente y filtros de listas (Node.js 24) |
+| `node --test tests/library-editor-form.test.mjs` | Cambios rápidos de episodio, guardado serializado y borradores ante errores (hooks y red simulados) |
+| `node --test tests/list-hero.test.mjs` | Resumen de progreso y candidatos de la ruleta de listas (Node.js 24) |
 | `node --test tests/home-watching.test.mjs` | Selección y episodios restantes en Inicio (Node.js 24) |
 | `node --test tests/pending-library-migration.test.mjs` | Prueba de migración con PGlite externo |
+| `node --test tests/list-visibility-migration.test.mjs` | Privacidad, enlaces, seguimiento y copias de listas con PGlite externo |
+| `node --test tests/password-recovery.test.mjs` | Solicitud, callback y permisos de recuperación de contraseña |
+| `node --test tests/profile-images.test.mjs` | Optimización de imágenes y protección de Storage con PGlite externo |
 
 La prueba de migración requiere `PGLITE_MODULE` apuntando a una instalación externa de `@electric-sql/pglite`; sin esa variable se omite. Ver la [guía de sincronización](docs/guardado-local-y-sincronizacion.md).
 

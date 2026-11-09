@@ -1,0 +1,12 @@
+.calendar {
+  --status-viendo: var(--brand-mint);
+  --status-pendiente: #1d68b0;
+  --status-pausa: #8f5a00;
+  --status-abandonado: #b83a2b;
+}
+
+:global(.dark) .calendar {
+  --status-pendiente: #74c7ff;
+  --status-pausa: #ffc566;
+  --status-abandonado: #ff8a7a;
+}

@@ -14,7 +14,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ clave:
     return (
       <section className="space-y-4 py-10">
         <h1 className="text-2xl font-bold">No pudimos cargar la ficha de la emisión</h1>
-        <Link href="/anime/schedule" className="text-primary underline">
+        <Link href="/anime/schedule" className="text-primary underline hover:text-secondary">
           Volver al calendario
         </Link>
       </section>
@@ -23,7 +23,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ clave:
   if (!detail) notFound();
   return (
     <section className="space-y-6 py-8">
-      <Link href="/anime/schedule" className="text-sm text-primary hover:underline">
+      <Link href="/anime/schedule" className="text-sm text-primary hover:text-secondary">
         Volver al calendario
       </Link>
       <div className="flex flex-wrap gap-6 rounded-2xl border bg-card p-5 sm:p-8">
@@ -38,7 +38,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ clave:
           {detail.summary && <p className="max-w-prose text-muted-foreground">{detail.summary}</p>}
           <nav aria-label="Más información" className="flex flex-wrap gap-4">
             {detail.links.map((link) => (
-              <a key={link.label} className="text-primary hover:underline" href={link.href}>
+              <a key={link.label} className="text-primary hover:text-secondary" href={link.href}>
                 {link.label}
               </a>
             ))}

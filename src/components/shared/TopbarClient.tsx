@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -13,7 +13,6 @@ import Dropdown from '@/components/dropdown/dropdown';
 import { logout } from '@/lib/actions/auth';
 import { slugify } from '@/lib/utils';
 import type { IProfile } from '@/types/profile';
-import { THEME_COOKIE, type Theme } from '@/lib/theme';
 import { DEFAULT_PROFILE_AVATAR, getProfileAvatar, profileAvatarBackground } from '@/lib/profile-avatar';
 
 type SearchType = 'anime' | 'manga' | 'character';
@@ -28,30 +27,11 @@ const NAV_ITEMS = [
   { href: '/', label: 'Inicio' },
   { href: '/anime', label: 'Catálogo' },
   { href: '/anime/schedule', label: 'Calendario' },
-  { href: '/favorites', label: 'Favoritos', private: true },
   { href: '/lists', label: 'Mis listas', private: true },
   { href: '/hentai', label: 'Hentai', private: true, adult: true },
 ];
 
-function subscribeTheme(callback: () => void) {
-  window.addEventListener('anitrack-theme-change', callback);
-  const onStorage = (event: StorageEvent) => {
-    if (event.key !== THEME_COOKIE || (event.newValue !== 'dark' && event.newValue !== 'light')) return;
-    document.documentElement.classList.toggle('dark', event.newValue === 'dark');
-    callback();
-  };
-  window.addEventListener('storage', onStorage);
-  return () => {
-    window.removeEventListener('anitrack-theme-change', callback);
-    window.removeEventListener('storage', onStorage);
-  };
-}
-
-function isDarkTheme() {
-  return document.documentElement.classList.contains('dark');
-}
-
-export default function TopbarClient({ user, profile, initialTheme }: Readonly<{ user?: User | null; profile?: IProfile | null; initialTheme: Theme }>) {
+export default function TopbarClient({ user, profile }: Readonly<{ user?: User | null; profile?: IProfile | null }>) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -65,7 +45,6 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const isDark = useSyncExternalStore(subscribeTheme, isDarkTheme, () => initialTheme === 'dark');
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const desktopSearchRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
@@ -157,15 +136,6 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
     .filter((item) => pathname === item.href || (item.href !== '/' && pathname.startsWith(`${item.href}/`)) || (item.href === '/anime' && (pathname === '/manga' || pathname.startsWith('/manga/'))))
     .sort((first, second) => second.href.length - first.href.length)[0]?.href;
   const isActive = (href: string) => href === activeNavHref;
-
-  const toggleTheme = () => {
-    const nextThemeIsDark = !isDark;
-    document.documentElement.classList.toggle('dark', nextThemeIsDark);
-    const nextTheme = nextThemeIsDark ? 'dark' : 'light';
-    document.cookie = `${THEME_COOKIE}=${nextTheme}; Max-Age=31536000; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
-    window.localStorage.setItem(THEME_COOKIE, nextTheme);
-    window.dispatchEvent(new Event('anitrack-theme-change'));
-  };
 
   return (
     <>
@@ -266,16 +236,7 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
               )}
             </div>
 
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label={isDark ? 'Activar tema claro' : 'Activar tema oscuro'}
-              title={isDark ? 'Tema claro' : 'Tema oscuro'}
-              className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            >
-              <span className="material-symbols-outlined text-xl">{isDark ? 'light_mode' : 'dark_mode'}</span>
-            </button>
-
+            {!user && <Link href="/settings/appearance" aria-label="Ajustes de apariencia" className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"><span aria-hidden="true" className="material-symbols-outlined">settings</span></Link>}
             {user ? (
               <div
                 ref={accountMenuRef}
@@ -299,6 +260,7 @@ export default function TopbarClient({ user, profile, initialTheme }: Readonly<{
                   <div className="absolute right-0 top-full w-40 pt-2" role="menu">
                     <div className="rounded-xl border border-border bg-popover p-1 shadow-xl">
                       <Link href="/profile" role="menuitem" onClick={() => setIsAccountMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-muted">Mi perfil</Link>
+                      <Link href="/settings/appearance" role="menuitem" onClick={() => setIsAccountMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-muted">Ajustes</Link>
                       <Link href="/friends" role="menuitem" onClick={() => setIsAccountMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-muted">Amigos</Link>
                       <form action={logout}>
                         <button type="submit" role="menuitem" className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-400 hover:bg-muted">Cerrar sesión</button>

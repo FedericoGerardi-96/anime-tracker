@@ -3,10 +3,12 @@
 
 import React, { useState, useTransition, useEffect, useRef, useId } from 'react';
 import { toggleFavorite } from '@/lib/actions/media';
-import { addMediaToLists } from '@/lib/actions/lists';
+import { addMediaToLists, getMediaProgress } from '@/lib/actions/lists';
 import AddToListModal from '@/components/ui/AddToListModal';
 import AuthModal from '@/components/auth/AuthModal';
 import { requestListDialog } from '@/lib/list-dialog-request';
+import { useDetailProgress, type DetailProgress } from '@/hooks/useDetailProgress';
+import { libraryStatuses } from '@/lib/library-editor';
 import type { ListDialogResult } from '@/interfaces/list-dialog';
 
 interface AnimeActionsProps {
@@ -18,17 +20,17 @@ interface AnimeActionsProps {
   };
   isFavorite: boolean;
   initialListIds: string[];
-  initialProgress: { status: string; current_episode: number | null } | null;
+  initialProgress: DetailProgress | null;
   maxEpisodes?: number;
   userId?: string;
 }
 
 import { useToast } from '@/components/ui/Toast';
 
-export default function AnimeActions({ 
-  animeData, 
-  isFavorite: initialFavorite, 
-  initialListIds, 
+export default function AnimeActions({
+  animeData,
+  isFavorite: initialFavorite,
+  initialListIds,
   initialProgress,
   maxEpisodes = 0,
   userId
@@ -40,16 +42,16 @@ export default function AnimeActions({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const { error, warning } = useToast();
-  
-  const [status, setStatus] = useState(initialProgress?.status || '');
-  const [episode, setEpisode] = useState<number | ''>(initialProgress?.current_episode ?? '');
+
+  const progress = useDetailProgress(initialProgress, maxEpisodes);
+  const { status, episode } = progress;
   const [isSavingProgress, setIsSavingProgress] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
-  const busy = isPending || isSavingProgress;
+  const busy = isPending || isSavingProgress || progress.pending || progress.dirty;
   const options = [
     { value: 'watching', label: animeData.type === 'manga' ? 'Leyendo' : 'Viendo', icon: 'play_arrow', color: 'text-emerald-400' },
     { value: 'completed', label: 'Completado', icon: 'check', color: 'text-primary' },
@@ -80,9 +82,11 @@ export default function AnimeActions({
 
   const isManga = animeData.type === 'manga';
 
-  useEffect(() => {
+  const [previousFavorite, setPreviousFavorite] = useState(initialFavorite);
+  if (previousFavorite !== initialFavorite) {
+    setPreviousFavorite(initialFavorite);
     setIsFavorite(initialFavorite);
-  }, [initialFavorite]);
+  }
 
   const handleFavoriteClick = async () => {
     if (busy) return;
@@ -116,7 +120,7 @@ export default function AnimeActions({
           error(result.error);
         } else {
           setIsFavorite(result.isFavorite ?? nextState);
-          if (nextState && !status) { setStatus('plan_to_watch'); setEpisode(episode || 0); }
+          if (nextState) progress.reset(await getMediaProgress(animeData.id, animeData.type || 'anime'));
           if (result?.warning) warning(result.warning);
         }
       } catch {
@@ -126,7 +130,7 @@ export default function AnimeActions({
     });
   };
 
-  const handleSaveProgress = async (newStatus?: string, newEpisode?: number | '') => {
+  const handleSaveProgress = async (newStatus?: string, newEpisode?: number | string) => {
     if (!userId) {
       error('Please login to track your progress');
       setAuthMode('login');
@@ -159,12 +163,11 @@ export default function AnimeActions({
           current_episode: e === '' ? 0 : Number(e)
         }
       );
-    
+
       if (result.error) { error(result.error); return false; }
       if (result.warning) warning(result.warning);
       if (result.success) {
-        setStatus(s || 'plan_to_watch');
-        setEpisode(e);
+        progress.reset(await getMediaProgress(animeData.id, animeData.type || 'anime'));
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 2000);
       }
@@ -192,6 +195,15 @@ export default function AnimeActions({
       }
       await handleSaveProgress(newStatus, newStatus === 'completed' && maxEpisodes > 0 ? maxEpisodes : episode);
     });
+  };
+
+  const changeEpisode = (value: string) => {
+    if (!userId) { setAuthMode('login'); setIsAuthModalOpen(true); return; }
+    // The existing add/status flow creates the local record before editing progress.
+    if (!progress.ready) { error('Elegí un estado de seguimiento antes de registrar el progreso.'); return; }
+    const nextStatus = status === 'completed' || !status || status === 'plan_to_watch'
+      ? 'watching' : libraryStatuses.find(item => item.value === status)?.value ?? 'watching';
+    progress.change(value, nextStatus);
   };
 
   return (
@@ -237,6 +249,7 @@ export default function AnimeActions({
           )}
         </div>
         <button type="button"
+          disabled={busy}
           onClick={() => {
             if (userId) {
               setDataPromise(requestListDialog(Number(animeData.id), isManga ? 'manga' : 'anime'));
@@ -255,31 +268,34 @@ export default function AnimeActions({
 
         <div className="h-10 w-px bg-muted dark:bg-white/10 mx-1 hidden sm:block"></div>
 
-        {/* Episode/Chapter Input */}
-        <div className="flex items-center gap-2 px-3 py-1 bg-muted/60 dark:bg-white/5 rounded-xl border border-border flex-1 min-w-[120px]">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0" aria-hidden="true">{isManga ? 'CH' : 'EP'}</span>
-          <input 
-            aria-label={isManga ? 'Capítulos leídos' : 'Episodios vistos'}
-            type="number"
-            value={episode}
-            onChange={(e) => setEpisode(e.target.value === '' ? '' : Number(e.target.value))}
-            onBlur={() => handleSaveProgress(undefined, episode)}
-            disabled={busy}
-            max={maxEpisodes > 0 ? maxEpisodes : undefined}
-            min={0}
-            className="bg-transparent border-none text-sm font-bold text-text-primary focus:ring-0 p-1 w-full text-center outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          {maxEpisodes > 0 && (
-            <span className="text-[10px] font-bold text-muted-foreground shrink-0">/ {maxEpisodes}</span>
-          )}
+        <div className="inline-flex h-12 items-center overflow-hidden rounded-xl border border-border bg-muted/60 font-mono text-sm">
+          <button type="button" aria-label={isManga ? 'Restar un capítulo' : 'Restar un episodio'}
+            disabled={isPending || isSavingProgress || !progress.valid || Number(episode) <= 0}
+            onClick={() => changeEpisode(String(Number(episode) - 1))}
+            className="h-full w-11 cursor-pointer hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40">−</button>
+          <label className="flex items-center gap-1 px-2">
+            <span aria-hidden="true">{isManga ? 'CAP' : 'EP'}</span>
+            <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={7}
+              aria-label={isManga ? 'Capítulos leídos' : 'Episodios vistos'} aria-invalid={!progress.valid}
+              value={episode} onChange={event => changeEpisode(event.target.value)} disabled={isPending || isSavingProgress}
+              style={{ width: Math.max(2, episode.length) + 'ch' }}
+              className="min-w-6 bg-transparent py-2 text-center font-semibold" />
+            <span className="text-muted-foreground">/{maxEpisodes || '?'}</span>
+          </label>
+          <button type="button" aria-label={isManga ? 'Sumar un capítulo' : 'Sumar un episodio'}
+            disabled={isPending || isSavingProgress || !progress.valid || Number(episode) >= (maxEpisodes || 1000000)}
+            onClick={() => changeEpisode(String(Number(episode) + 1))}
+            className="h-full w-11 cursor-pointer bg-primary/10 font-bold text-primary hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-40">+</button>
         </div>
-
         <span role="status" className="text-xs text-muted-foreground">
-          {busy ? 'Guardando…' : showSuccess ? 'Guardado' : ''}
+          {progress.pending || isSavingProgress ? 'Guardando…' : progress.dirty ? 'Cambios sin guardar' : progress.saved || showSuccess ? 'Guardado en AniTrack' : ''}
         </span>
+        {!progress.valid && <p className="w-full text-sm text-muted-foreground">Ingresá un entero entre 0 y {maxEpisodes || 1000000}.</p>}
+        {progress.error && <div className="w-full text-sm"><p role="alert">{progress.error}</p><button type="button" onClick={progress.retry} className="mt-2 min-h-11 cursor-pointer text-primary underline">Reintentar guardado</button></div>}
+
       </div>
 
-      <AddToListModal 
+      <AddToListModal
         isOpen={isModalOpen}
         onClose={() => { setIsModalOpen(false); setDataPromise(null); }}
         mode="add-anime"
@@ -297,7 +313,7 @@ export default function AnimeActions({
         dataPromise={dataPromise}
       />
 
-      <AuthModal 
+      <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authMode}

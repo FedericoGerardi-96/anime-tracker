@@ -34,3 +34,17 @@ Agregar tres favoritos y después cambiar sus estados ya no realiza las doce lla
 - `tests/pending-library-migration.test.mjs`: ejecutar con PGLITE_MODULE apuntando a una instalación de `@electric-sql/pglite` externa al proyecto; prueba la migración real, deduplicación, rollback, RLS y exclusión de importaciones. Sin esa variable se omite explícitamente.
 
 No se enviaron cambios a cuentas reales durante las pruebas.
+
+
+## Editor lateral de Mis listas
+
+El editor de tabla usa las acciones de `src/lib/actions/library-editor.ts`: reutiliza la versión leída para la tabla y guarda progreso o metadatos por separado. La tabla incluye updated_at en su consulta existente, por lo que abrir el panel no dispara otra lectura; solo los datos sin versión usan la lectura de respaldo con skeleton. Cada actualización incluye el `updated_at` leído, además de `user_id` y `media_id`; si no coincide se rechaza y se pide reabrir el editor. Una inserción concurrente no sobrescribe el registro existente. La respuesta usa el registro devuelto por la misma escritura.
+
+Estado, input de episodio y botones ± actualizan un borrador visible y agrupan cambios tras 450 ms sin interacción. Solo hay una escritura en curso: los controles de progreso siguen disponibles y un cambio posterior espera para usar la revisión devuelta por la escritura anterior. Una respuesta anterior no reemplaza un borrador más reciente. Ante un error se conserva el borrador y se detiene el guardado automático hasta reintentar o editar; no se anuncia éxito mientras haya progreso pendiente. Nota, enlace y etiquetas requieren Guardar y esperan a que termine el progreso. Cerrar con ×, Escape o el fondo oculta el diálogo sin desmontar la sesión de edición: continúan la escritura y el último progreso pendiente. El resultado o error se informa con un toast temporal de cinco segundos y cierre manual; errores y borradores ofrecen Volver a editar. El borrador se conserva aunque el aviso desaparezca y también se recupera desde Editar en la fila. Los metadatos no enviados siguen requiriendo Guardar. Estas sesiones viven mientras la tabla esté montada; no persisten al recargar o cerrar la pestaña. Todas las escrituras requieren la cola existente y siguen generando pendientes mediante sus triggers. Quitar de favoritos elimina solo la fila del usuario en `favorites`, sin alternar ni borrar progreso, metadatos o colecciones.
+
+`node --test tests/library-editor.test.mjs` verifica las acciones con un cliente simulado, incluidos conflictos y filtros por usuario. No reemplaza las pruebas de integración de la migración ni una comprobación de RLS real.
+
+
+## Contador de la ficha
+
+Los botones ± y la entrada directa de episodio/capítulo agrupan cambios durante 600 ms mediante `useDetailProgress`. Reutilizan `saveLibraryEditor` con el ID local y la revisión leídos por `getMediaProgress`; no llaman a `addMediaToLists` ni reescriben colecciones por cada episodio. Una sola escritura en curso, borrador posterior preservado y error sin reintento automático. Los límites, la sesión, la cola y el conflicto entre pestañas se verifican en servidor. El guardado confirmado se distingue del borrador pendiente y no significa sincronización remota. El flujo previo para elegir estado o agregar el título se conserva y actualiza la revisión local al terminar. `tests/detail-progress.test.mjs` cubre el debounce y las respuestas en vuelo con tiempo y red controlados; no sustituye una prueba de escritura con cuenta real.

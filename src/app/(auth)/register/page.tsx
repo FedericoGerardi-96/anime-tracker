@@ -4,10 +4,11 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import AuthTabs from "@/components/ui/AuthTabs";
 import { register, signInWithGoogle } from "@/lib/actions/auth";
+import { signupConfirmationMessage } from "@/lib/auth-signup";
 
 export const metadata: Metadata = {
-  title: "Register",
-  description: "Join AniTrack to track your progress and discover new anime/manga.",
+  title: "Registrarse",
+  description: "Unete a AniTrack para guardar tu progreso y descubrir nuevos animes/mangas.",
 };
 
 export default async function RegisterPage({
@@ -16,23 +17,25 @@ export default async function RegisterPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }>) {
   const resolvedParams = await searchParams;
-  const error = resolvedParams.error as string;
+  const error = typeof resolvedParams.error === "string" ? resolvedParams.error : null;
+  const confirmationPending = resolvedParams.confirm === "1";
 
   return (
     <div className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative background elements matching code.html blurs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[120px] -z-10 animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -z-10 animate-transition delay-1000"></div>
-      
+
       {/* Glassmorphism Auth Card */}
       <div className="w-full max-w-md glass-card p-8 shadow-2xl relative overflow-hidden rounded-2xl">
         {/* Subtle gradient line at top */}
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary to-transparent opacity-50"></div>
-        
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black text-foreground tracking-tight">Create Account</h1>
           <p className="text-muted-foreground mt-2 text-sm font-medium">Join the community of anime lovers.</p>
-          {error && <p className="text-red-400 text-sm mt-4 p-2 bg-red-400/10 rounded-lg">{error}</p>}
+          {error && <p role="alert" className="text-foreground text-sm mt-4 p-2 bg-red-400/10 rounded-lg">{error}</p>}
+          {confirmationPending && <p role="status" className="text-foreground text-sm mt-4 p-3 bg-primary/10 rounded-lg">{signupConfirmationMessage}</p>}
         </div>
 
         {/* Toggle Tabs */}
@@ -59,7 +62,7 @@ export default async function RegisterPage({
 
         {/* Form */}
         <form className="space-y-5" action={register}>
-           <Input 
+           <Input
             name="username"
             type="text"
             label="Username"
@@ -67,18 +70,18 @@ export default async function RegisterPage({
             icon="person"
             required
           />
-          <Input 
+          <Input
             name="email"
             type="email"
-            label="Email Address"
+            label="Email"
             placeholder="name@example.com"
             icon="mail"
             required
           />
-          <Input 
+          <Input
             name="password"
             type="password"
-            label="Password"
+            label="Contraseña"
             placeholder="••••••••"
             icon="lock"
             required
@@ -86,14 +89,14 @@ export default async function RegisterPage({
 
           <div className="pt-2">
             <Button variant="primary" type="submit">
-              CREATE ACCOUNT
+              Crear Cuenta
             </Button>
           </div>
         </form>
 
         <p className="text-center mt-8 text-xs text-muted-foreground font-medium">
-          Already have an account?{''}
-          <a className="text-primary font-bold hover:underline ml-1" href="/login">Log in here</a>
+          Ya posees una cuenta?{''}
+          <a className="text-primary font-bold hover:text-secondary ml-1" href="/login">Inicia session aquí</a>
         </p>
       </div>
     </div>

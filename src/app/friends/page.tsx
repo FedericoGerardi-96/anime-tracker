@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import FriendsClient from "@/components/friends/FriendsClient";
 import type { SocialConnection } from "@/types/social";
+import { getProfileImagesByUser } from "@/services/profile-images";
 
 export default async function FriendsPage() {
   const supabase = await createClient();
@@ -10,6 +11,8 @@ export default async function FriendsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const { data, error } = await supabase.rpc("get_my_social_connections");
+  const connections = (data ?? []) as SocialConnection[];
+  const images = error ? null : await getProfileImagesByUser(connections.map(connection => connection.user_id));
 
   return (
     <main className="mx-auto w-full py-10">
@@ -29,7 +32,9 @@ export default async function FriendsPage() {
         </div>
       ) : (
         <FriendsClient
-          initialConnections={(data ?? []) as SocialConnection[]}
+          initialConnections={connections.map(connection => ({
+            ...connection, avatar: images?.get(connection.user_id)?.avatar ?? connection.avatar,
+          }))}
         />
       )}
     </main>

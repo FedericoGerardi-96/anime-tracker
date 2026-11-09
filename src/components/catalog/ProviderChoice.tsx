@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { CATALOG_PROVIDER_COOKIE } from '@/lib/catalog-provider';
 import type { CatalogProvider } from '@/interfaces/anilist-catalog';
 
 export default function ProviderChoice({ provider, failed = false, retryAfterMs = 0, compact = false }: { provider: CatalogProvider; failed?: boolean; retryAfterMs?: number; compact?: boolean }) {
@@ -15,7 +16,7 @@ export default function ProviderChoice({ provider, failed = false, retryAfterMs 
   const [pending, startTransition] = useTransition();
   const name = provider === 'anilist' ? 'AniList' : 'MyAnimeList';
   function choose(value: CatalogProvider) {
-    document.cookie = `catalog-provider=${value}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+    document.cookie = `${CATALOG_PROVIDER_COOKIE}=${value}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
     // Reload also clears prefetched results and suggestions from the previous engine.
     const url = new URL(location.href);
     if (/^\/(anime|manga|characters)\/?$/.test(url.pathname)) {

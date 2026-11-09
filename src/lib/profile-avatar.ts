@@ -36,3 +36,7 @@ export function getProfileAvatar(...values: unknown[]): string | null {
 export function profileAvatarBackground(avatar: string): string {
   return `url(${JSON.stringify(avatar)})`;
 }
+
+export function getProfileInitials(name: string): string {
+  return name.trim().split(/\s+/).slice(0, 2).map(part => Array.from(part)[0]).join('').toLocaleUpperCase('es-AR');
+}

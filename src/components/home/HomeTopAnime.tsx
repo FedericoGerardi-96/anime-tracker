@@ -19,7 +19,11 @@ function AnimePoster({
       className="group flex min-w-0 items-end gap-1 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
     >
       <span className="sr-only">Puesto {position}: </span>
-      <span aria-hidden="true" className="shrink-0 pb-6 text-4xl font-black leading-none text-transparent sm:text-5xl" style={{ WebkitTextStroke: "1px var(--brand-aurora)" }}>
+      <span
+        aria-hidden="true"
+        className="shrink-0 pb-6 text-4xl font-black leading-none text-transparent sm:text-5xl"
+        style={{ WebkitTextStroke: "1px var(--brand-aurora)" }}
+      >
         {position}
       </span>
       <div className="min-w-0 flex-1">
@@ -33,13 +37,22 @@ function AnimePoster({
               className="object-cover transition-transform duration-500 motion-reduce:transition-none motion-safe:group-hover:scale-105"
             />
           )}
-          <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black via-black/80 to-transparent" />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-linear-to-t from-black via-black/80 to-transparent"
+          />
           <div className="absolute inset-x-0 bottom-0 p-2.5">
-            <h3 className="line-clamp-3 text-sm font-bold leading-snug text-white">{title}</h3>
+            <h3 className="line-clamp-3 text-sm font-bold leading-snug text-white">
+              {title}
+            </h3>
           </div>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          {[anime.score ? `★ ${anime.score.toFixed(1)}` : null, anime.type, anime.episodes ? `${anime.episodes} episodios` : null]
+          {[
+            anime.score ? `★ ${anime.score.toFixed(1)}` : null,
+            anime.type,
+            anime.episodes ? `${anime.episodes} episodios` : null,
+          ]
             .filter(Boolean)
             .join(" · ")}
         </p>
@@ -50,7 +63,8 @@ function AnimePoster({
 
 export default async function HomeTopAnime() {
   const result = await getHomeTopAnime();
-  if (result.unavailable) return <HomeSectionUnavailable title="Top anime de todos los tiempos" />;
+  if (result.unavailable)
+    return <HomeSectionUnavailable title="Top anime de todos los tiempos" />;
   const topAnime = result.data;
   if (!topAnime.length) return null;
   return (
@@ -67,18 +81,14 @@ export default async function HomeTopAnime() {
         <Link
           href="/anime?sort=popularity"
           aria-label="Ver todos los animes populares"
-          className="shrink-0 text-sm font-semibold text-primary hover:underline"
+          className="shrink-0 text-sm font-semibold text-primary hover:text-secondary"
         >
           Ver todo
         </Link>
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-5">
         {topAnime.map((anime, index) => (
-          <AnimePoster
-            key={anime.mal_id}
-            anime={anime}
-            position={index + 1}
-          />
+          <AnimePoster key={anime.mal_id} anime={anime} position={index + 1} />
         ))}
       </div>
     </section>

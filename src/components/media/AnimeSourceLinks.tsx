@@ -12,7 +12,7 @@ export default async function AnimeSourceLinks({ malId }: { malId: number }) {
       className="mt-4 flex flex-wrap gap-4 text-sm font-semibold text-primary"
     >
       {links.map((link) => (
-        <a key={link.name} href={link.href} className="hover:underline">
+        <a key={link.name} href={link.href} className=" ">
           {link.name}
         </a>
       ))}

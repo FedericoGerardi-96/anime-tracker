@@ -56,6 +56,7 @@ export async function updateProfilePrivacy(settings: ProfilePrivacy) {
   });
   if (error) return { error: error.message };
   refreshSocialPages();
+  revalidatePath('/settings/privacy');
   return { success: true };
 }
 
@@ -72,6 +73,7 @@ export async function updateSocialProfile(input: { username: string; bio: string
   });
   if (error) return { error: error.message.includes('already in use') ? 'Ese nombre de usuario ya está en uso.' : error.message };
   refreshSocialPages(username);
+  revalidatePath('/settings/profile');
   return { success: true };
 }
 

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 // The client you created from the server-side auth instructions
 import { createClient } from '@/lib/supabase/server'
+import { sharedListReturnPath } from '@/lib/list-sharing'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if "next" is in search params, use it as the redirection URL after successful login
-  const next = searchParams.get('next') ?? '/'
+  const next = sharedListReturnPath(searchParams.get('next')) ?? '/'
 
   if (code) {
     const supabase = await createClient()

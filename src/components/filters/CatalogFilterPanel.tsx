@@ -14,10 +14,11 @@ const SECTIONS = ['name', 'genre', 'excludeGenre', 'status', 'year', 'season', '
 
 interface Props {
   mediaType?: 'anime' | 'manga';
+  embedded?: boolean;
   library?: { genres: string[]; formats: string[]; tags: string[]; showPersonalStatus: boolean };
 }
 
-export default function CatalogFilterPanel({ mediaType = 'anime', library }: Readonly<Props>) {
+export default function CatalogFilterPanel({ mediaType = 'anime', library, embedded = false }: Readonly<Props>) {
   const sections = library ? ['name', 'type', ...(library.showPersonalStatus ? ['status'] : []), 'genre', 'excludeGenre', 'tags', 'catalogStatus', 'year', 'season', 'format', 'scoreBands', 'sort', 'direction'] : SECTIONS;
   const genreOptions = library?.genres ?? GENRES;
   const router = useRouter();
@@ -103,11 +104,11 @@ export default function CatalogFilterPanel({ mediaType = 'anime', library }: Rea
   </>);
 
   return <div className='w-full [&_button]:cursor-pointer [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-offset-2 [&_button]:focus-visible:outline-primary'>
-    <button type='button' aria-expanded={mobileOpen} aria-controls='catalog-filter-panel' onClick={() => setMobileOpen((value) => !value)} className='flex w-full items-center gap-2 rounded-xl border border-primary/20 p-3 font-semibold lg:hidden'>
+    {!embedded && <button type='button' aria-expanded={mobileOpen} aria-controls='catalog-filter-panel' onClick={() => setMobileOpen((value) => !value)} className='flex w-full items-center gap-2 rounded-xl border border-primary/20 p-3 font-semibold lg:hidden'>
       <span className='material-symbols-outlined'>tune</span> Filtros {total > 0 && <span className='rounded-full bg-primary px-2 text-xs text-primary-foreground'>{total}</span>}
       <span className='material-symbols-outlined ml-auto'>{mobileOpen ? 'expand_less' : 'expand_more'}</span>
-    </button>
-    <div id='catalog-filter-panel' className={`${mobileOpen ? 'block' : 'hidden'} mt-3 rounded-xl border border-primary/10 bg-background/80 p-4 lg:mt-0 lg:block`}>
+    </button>}
+    <div id='catalog-filter-panel' className={`${embedded || mobileOpen ? 'block' : 'hidden'} mt-3 rounded-xl border border-primary/10 bg-background/80 p-4 lg:mt-0 lg:block`}>
       <div className='mb-3 flex items-center gap-2'>
         <h2 className='mr-auto font-bold'>Filtros {total > 0 && <span className='text-sm text-primary'>({total})</span>}</h2>
         <button type='button' aria-label='Cerrar todos los filtros' title='Cerrar todos' onClick={() => setOpen([])} className='rounded p-1 hover:bg-primary/10'><span className='material-symbols-outlined text-lg'>unfold_less</span></button>
@@ -128,7 +129,7 @@ export default function CatalogFilterPanel({ mediaType = 'anime', library }: Rea
       {select('sort', 'Orden', library ? [{label: 'Fecha de agregado', value: 'Date Added'}, {label: 'Título', value: 'Title'}, {label: 'Puntuación', value: 'Score'}, {label: 'Año', value: 'Year'}] : [{ label: 'Popularidad', value: 'popularity' }, { label: 'Puntuación', value: 'score' }, { label: 'Tendencia', value: 'trending' }, { label: 'Más recientes', value: 'newest' }, { label: 'Título', value: 'title' }])}
       {library && select('direction', 'Dirección', [{label: 'Descendente', value: 'desc'}, {label: 'Ascendente', value: 'asc'}])}
       <div role='status' aria-live='polite' className='text-xs text-text-muted'>{isPending ? 'Actualizando resultados…' : total > 0 ? `${total} filtros activos` : 'Sin filtros activos'}</div>
-      <button type='button' onClick={() => setMobileOpen(false)} className='mt-3 w-full rounded-lg bg-primary p-3 text-sm font-bold text-primary-foreground lg:hidden'>Ver resultados</button>
+      {!embedded && <button type='button' onClick={() => setMobileOpen(false)} className='mt-3 w-full rounded-lg bg-primary p-3 text-sm font-bold text-primary-foreground lg:hidden'>Ver resultados</button>}
     </div>
   </div>;
 }

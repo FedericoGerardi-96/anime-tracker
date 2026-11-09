@@ -13,7 +13,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Pro
   const params = await searchParams;
   return (
     <div className="space-y-6 py-8">
-      <Suspense key={JSON.stringify(params)} fallback={<ScheduleSkeleton />}><ScheduleContent params={params} /></Suspense>
+      <Suspense fallback={<ScheduleSkeleton />}><ScheduleContent params={params} /></Suspense>
     </div>
   );
 }
