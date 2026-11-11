@@ -1,3 +1,5 @@
+import type { MediaTitleVariants } from '@/interfaces/media-titles';
+
 export interface IFavorites {
     id:    string;
     media: Media | Media[];
@@ -8,7 +10,7 @@ export interface IFavorites {
     } | null;
 }
 
-export interface Media {
+export interface Media extends MediaTitleVariants {
     id:          string;
     type:        string;
     image:       string;

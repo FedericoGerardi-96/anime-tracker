@@ -5,6 +5,8 @@ import { readAllPages, readInBatches } from '@/lib/read-all-pages'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/services/supabase'
 import { revalidatePath } from 'next/cache'
+import type { MediaTitleVariants } from '@/interfaces/media-titles'
+import { cleanMediaTitles } from '@/lib/media-titles'
 
 const PROGRESS_STATUSES = ['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch'] as const
 type ProgressStatus = typeof PROGRESS_STATUSES[number]
@@ -128,7 +130,7 @@ export async function getMediaByProgressStatus(status: string) {
       custom_tags,
       watch_link,
       updated_at,
-      media ( id, mal_id, title, image, type, season, year, genres, format, status, total_units, score )
+      media ( id, mal_id, title, title_english, title_romaji, image, type, season, year, genres, format, status, total_units, score )
     `)
     .eq('user_id', user.id)
     .eq('status', status)
@@ -151,7 +153,7 @@ export async function getListMedia(listId: string) {
     .select(`
       id,
       created_at,
-      media ( id, mal_id, title, image, type, season, year, genres, format, status, total_units, score )
+      media ( id, mal_id, title, title_english, title_romaji, image, type, season, year, genres, format, status, total_units, score )
     `)
     .eq('list_id', listId)
     .order('created_at', { ascending: false }).order('id').range(from, to))
@@ -200,7 +202,7 @@ export async function createList(name: string, description?: string) {
   return { error: null, data }
 }
 
-export async function addMediaToLists(mediaData: {
+export async function addMediaToLists(mediaData: MediaTitleVariants & {
   mal_id: number;
   title: string;
   image: string;
@@ -246,6 +248,7 @@ export async function addMediaToLists(mediaData: {
       .from('media')
       .insert({
         mal_id: canonical.mal_id, title: canonical.title, type: canonical.type || mediaData.type,
+        ...cleanMediaTitles(canonical),
         image: canonical.image, season: canonical.season,
         year: canonical.year || null, genres: canonical.genres || [],
         format: canonical.format || null, status: canonical.status || null,

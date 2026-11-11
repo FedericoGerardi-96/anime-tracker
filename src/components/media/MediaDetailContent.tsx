@@ -54,6 +54,8 @@ export default async function MediaDetailContent({ slug, mediaType }: Readonly<D
     cardData: {
       id: malId,
       title: media.title_english || media.title,
+      title_english: media.title_english,
+      title_romaji: media.title_romaji ?? media.title,
       image,
       type: mediaType,
       score: media.score || 0,

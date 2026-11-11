@@ -11,7 +11,8 @@ export async function getListsPageData(options: ListsOptions): Promise<ListsPage
   const supabase = await getSupabaseServer();
   const empty: ListsPageData = { items: [], lists: [], selectedList: null, totalCount: 0, totalPages: 0, facets: { tags: [], genres: [], years: [], formats: [] } };
   if (options.listId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(options.listId)) return empty;
-  if (process.env.LISTS_RPC_ENABLED === 'true' && (process.env.LIBRARY_FILTERS_RPC_ENABLED === 'true' || !hasExtendedLibraryFilters(options))) {
+  // Legacy RPC definitions are not versioned here and only search the displayed title.
+  if (!options.query?.trim() && process.env.LISTS_RPC_ENABLED === 'true' && (process.env.LIBRARY_FILTERS_RPC_ENABLED === 'true' || !hasExtendedLibraryFilters(options))) {
     const { data, error } = await supabase.rpc('get_my_lists_page', { p_options: options });
     if (error) { console.error('Lists RPC failed:', error); throw new Error('No pudimos cargar tus listas.'); }
     if (!data || !Array.isArray(data.items) || !Array.isArray(data.lists) || !data.facets) throw new Error('Respuesta de listas inválida');
@@ -40,7 +41,7 @@ export async function getListsPageData(options: ListsOptions): Promise<ListsPage
   });
   const filtered = items.filter(item => {
     const m = item.media;
-    return matchesLibrarySearch(options.query ?? '', [m.title, item.custom_description, item.custom_tags ?? []])
+    return matchesLibrarySearch(options.query ?? '', [m.title, m.title_english, m.title_romaji, item.custom_description, item.custom_tags ?? []])
       && (!options.tags?.length || options.tags.some((tag) => item.custom_tags?.includes(tag)))
       && matchesLibraryFilters(m, options, item.status);
   });

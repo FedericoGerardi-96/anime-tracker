@@ -175,6 +175,8 @@ export async function getAniListCatalog(type: CatalogMediaType, options: AniList
   const items = page.media.filter((media): media is AniListMedia & { idMal: number } => Number.isInteger(media.idMal)).map((media) => ({
     id: media.idMal,
     title: media.title.english?.trim() || media.title.romaji,
+    title_english: media.title.english ?? null,
+    title_romaji: media.title.romaji,
     image: media.coverImage?.extraLarge || media.coverImage?.large || media.coverImage?.medium || '',
     score: (media.averageScore ?? 0) / 10,
     studio: media.studios?.nodes?.[0]?.name || (type === 'manga' ? 'Autor desconocido' : 'Estudio desconocido'),

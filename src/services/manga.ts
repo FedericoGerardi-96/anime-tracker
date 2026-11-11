@@ -24,6 +24,7 @@ export async function getMangaListWithFavorites(options: MalMangaCatalogOptions 
       const item = mapMalMangaToCatalog(manga);
       return {
         id: item.mal_id, title: item.title_english || item.title,
+        title_english: item.title_english, title_romaji: item.title_romaji,
         image: item.images.webp.large_image_url, score: item.score ?? 0,
         studio: item.authors[0]?.name || "Autor desconocido",
         isAiring: item.publishing, synopsis: item.synopsis ?? undefined,

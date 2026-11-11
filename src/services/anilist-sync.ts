@@ -7,6 +7,7 @@ import { decryptAniListToken } from "@/lib/anilist-token-crypto";
 import { localStatus, remoteStatus, reconcileAniListProgress } from "@/lib/anilist-sync-policy";
 import type { AniListSyncJob, PublicAniListSyncJob, RemoteListEntry, SyncProgress, SyncState, SyncProvider } from "@/interfaces/anilist-sync";
 import type { MalAnimeListEntry, MalMangaListEntry } from "@/interfaces/myanimelist-sync";
+import { cleanMediaTitles } from '@/lib/media-titles';
 
 type DB = ReturnType<typeof createSupabaseAdminClient>;
 const MEDIA_FIELDS = `id idMal type title { romaji english } coverImage { large } episodes chapters`;
@@ -96,10 +97,20 @@ async function importEntry(db: DB, job: AniListSyncJob, entry: RemoteListEntry, 
     const favorite = await db.from("favorites").select("id").eq("user_id", job.user_id).eq("media_id", mediaId).maybeSingle();
     check(favorite.error, "comprobar el favorito antes de actualizar");
     if (!favorite.data) return; // Respect a favorite removed while the comparison was running.
+    const stored = await db.from('media').select('title_english,title_romaji').eq('id', mediaId).maybeSingle();
+    check(stored.error, 'leer los títulos alternativos');
+    const variants = cleanMediaTitles({ title_english: media.title.english, title_romaji: media.title.romaji });
+    for (const key of ['title_english', 'title_romaji'] as const) {
+      if (stored.data && stored.data[key] == null && variants[key]) {
+        const result = await db.from('media').update({ [key]: variants[key] }).eq('id', mediaId).is(key, null);
+        check(result.error, 'completar un título alternativo');
+      }
+    }
   } else {
   // Insert missing metadata only. Never overwrite the shared MAL catalog.
   const inserted = await db.from("media").upsert({ mal_id: media.idMal, type,
     ...media.metadata, title: media.title.english || media.title.romaji, image: media.coverImage.large,
+    ...cleanMediaTitles({ title_english: media.title.english, title_romaji: media.title.romaji }),
     total_units: type === "anime" ? media.episodes : media.chapters,
   }, { onConflict: "mal_id,type", ignoreDuplicates: true });
   check(inserted.error);

@@ -13,7 +13,8 @@ export async function getSeasonAnime(year: number, season: string): Promise<Cata
       items.push(...batch.items.map(item => {
         const picture = { image_url: item.image, small_image_url: item.image, large_image_url: item.image };
         return {
-          mal_id: item.id, title: item.title, title_english: null, images: { jpg: picture, webp: picture },
+          mal_id: item.id, title: item.title, title_english: item.title_english ?? null,
+          title_romaji: item.title_romaji, images: { jpg: picture, webp: picture },
           type: item.format ?? '', source: '', episodes: item.episodes ?? null, status: item.status ?? '',
           airing: item.isAiring, score: item.score || null, scored_by: null, rank: null, popularity: 0,
           synopsis: item.synopsis ?? null, season: item.season ?? null, year: item.year || null,

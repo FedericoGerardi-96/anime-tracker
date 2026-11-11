@@ -1,5 +1,13 @@
 # Estado de AniTrack y continuidad entre chats
 
+### Títulos en inglés y romaji para Mis listas · 11 de noviembre de 2026
+
+`media` incorpora `title_english` y `title_romaji`, conservando `title` como nombre visible y criterio de orden. El guardado manual desde catálogo, calendario o ficha y las importaciones de AniList/MAL conservan las variantes que ya devuelve la fuente. Biblioteca, estados y colecciones buscan también en ambos campos, además de nota y etiquetas, sin consultar proveedores. Las búsquedas con texto usan las lecturas paginadas de compatibilidad de Supabase porque las definiciones de los RPC antiguos no están versionadas aquí. Ver [títulos alternativos](titulos-alternativos.md) para alcance, activación y mantenimiento.
+
+El usuario aplicó [`202611110001_media_title_variants.sql`](../supabase/migrations/202611110001_media_title_variants.sql) y el acceso REST confirmó las columnas. Se ejecutaron la vista previa y el script de actualización sobre los 855 registros existentes: 853 coincidieron con AniList. Las dos excepciones, anime MAL 45598 (TONIKAWA: Flashbacks) y 27821 (prólogo de Fate/Unlimited Blade Works), se completaron con consultas por ID exacto a MAL y las mismas actualizaciones condicionales. La verificación final en Supabase dio 855 con romaji, 779 con inglés y 76 con inglés no informado por AniList. Solo se rellenaron columnas nulas; no se cambiaron títulos visibles ni datos personales. El registro real de `Bloom Into You` conserva ese título, incorpora `Yagate Kimi ni Naru` y coincide con ambas búsquedas mediante el filtro compartido.
+
+Pasaron TypeScript, `pnpm build --webpack`, 31 pruebas de búsqueda, guardado, importaciones, script, SQL/RLS, editor y pendientes, sin omisiones, y `git diff --check`. ESLint del resto de los archivos afectados pasó; `AnimeCard.tsx` conserva el error previo de `react-hooks/set-state-in-effect`, reproducido también sobre su contenido de HEAD. La prueba SQL se ejecutó con PGlite externo y dos usuarios. No se comprobó la búsqueda en navegador con sesión real. Próximo paso: desplegar el código y verificar en Mis listas los dos nombres, una incorporación nueva y una importación real; la actualización única de los datos existentes ya está ejecutada.
+
 ### Imágenes sin transformaciones de Vercel · 11 de noviembre de 2026
 
 `next.config.ts` activa `images.unoptimized: true` para evitar que las portadas dejen de cargar al agotar la cuota de Image Optimization de Vercel. `next/image` conserva sus componentes, dimensiones y carga diferida configurada, pero entrega la URL original sin redimensionar, recomprimir ni convertir el formato. El peso de descarga depende del archivo de origen. El README explica esta decisión y la necesidad de un nuevo despliegue.

@@ -1,3 +1,5 @@
+import type { MediaTitleVariants } from './media-titles';
+
 export type CatalogMediaType = 'anime' | 'manga';
 export type CatalogProvider = 'anilist' | 'myanimelist';
 
@@ -18,7 +20,7 @@ export interface AniListCatalogOptions {
   perPage?: number;
 }
 
-export interface CatalogCard {
+export interface CatalogCard extends MediaTitleVariants {
   id: number;
   title: string;
   image: string;

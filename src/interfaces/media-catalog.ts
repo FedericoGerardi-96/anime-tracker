@@ -1,4 +1,5 @@
 export interface CatalogDetailMetadata {
+  title_romaji?: string | null;
   title_japanese?: string | null;
   title_synonyms?: string[];
   start_date?: string | null;

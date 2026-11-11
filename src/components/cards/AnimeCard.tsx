@@ -7,8 +7,9 @@ import { slugify } from '@/lib/utils';
 import { toggleFavorite } from '@/lib/actions/media';
 import { useToast } from '@/components/ui/Toast';
 import AuthModal from '@/components/auth/AuthModal';
+import type { MediaTitleVariants } from '@/interfaces/media-titles';
 
-export interface AnimeCardProps {
+export interface AnimeCardProps extends MediaTitleVariants {
   id: number | string;
   title: string;
   image: string;
@@ -34,6 +35,8 @@ export interface AnimeCardProps {
 export default function AnimeCard({
   id,
   title,
+  title_english,
+  title_romaji,
   image,
   score,
   studio,
@@ -76,6 +79,8 @@ export default function AnimeCard({
         const result = await toggleFavorite({
           mal_id: Number(id),
           title,
+          title_english,
+          title_romaji,
           image,
           type,
           synopsis,
@@ -131,7 +136,7 @@ export default function AnimeCard({
             aria-label={`Agregar ${title} a una lista`}
             onClick={(e) => {
               e.preventDefault();
-              onAddClick?.({ id, title, image, score, studio, year, isAiring, synopsis, season, genres, tags, format, status, episodes, totalUnits: totalUnits ?? episodes, type });
+              onAddClick?.({ id, title, title_english, title_romaji, image, score, studio, year, isAiring, synopsis, season, genres, tags, format, status, episodes, totalUnits: totalUnits ?? episodes, type });
             }}
             className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer"
           >

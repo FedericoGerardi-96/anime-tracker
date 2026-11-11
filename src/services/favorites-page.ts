@@ -6,9 +6,10 @@ import { getAllFavoritesFull } from '@/services/favorites';
 import type { FavoritesPageData, GetFavoritesOptions } from '@/interfaces/favorites-service';
 
 export async function getFavoritesPageData(userId: string, options: GetFavoritesOptions): Promise<FavoritesPageData> {
-  if (process.env.FAVORITES_RPC_ENABLED === 'true' && (process.env.LIBRARY_FILTERS_RPC_ENABLED === 'true' || !hasExtendedLibraryFilters(options))) {
-    const user = await getAuthenticatedUser();
-    if (!user || user.id !== userId) throw new Error('No autorizado');
+  const user = await getAuthenticatedUser();
+  if (!user || user.id !== userId) throw new Error('No autorizado');
+  // Keep alias searches on the Supabase-only compatibility path until the RPC is versioned.
+  if (!options.query?.trim() && process.env.FAVORITES_RPC_ENABLED === 'true' && (process.env.LIBRARY_FILTERS_RPC_ENABLED === 'true' || !hasExtendedLibraryFilters(options))) {
     const supabase = await getSupabaseServer();
     const { data, error } = await supabase.rpc('get_my_favorites_page', { p_options: options });
     // Do not silently fall back on database errors after activation.

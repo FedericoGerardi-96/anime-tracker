@@ -49,6 +49,8 @@ export default function SeasonCards({ seasonAnime, favoriteMalIds, userId }: Sea
             const mappedCard = {
               id: anime.mal_id,
               title: anime.title_english || anime.title,
+              title_english: anime.title_english,
+              title_romaji: anime.title_romaji ?? anime.title,
               image: anime.images.webp.large_image_url,
               score: anime.score ?? 0,
               studio: anime.studios[0]?.name || 'Estudio desconocido',
@@ -93,6 +95,8 @@ export default function SeasonCards({ seasonAnime, favoriteMalIds, userId }: Sea
             ? {
                 mal_id: Number(selectedAnime.id),
                 title: selectedAnime.title,
+                title_english: selectedAnime.title_english,
+                title_romaji: selectedAnime.title_romaji,
                 image: selectedAnime.image,
                 type: selectedAnime.type || 'anime',
                 synopsis: selectedAnime.synopsis,

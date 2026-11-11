@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
+import type { MediaTitleVariants } from './media-titles';
 
 export interface DialogList { id: string; name: string; description?: string | null }
-export interface DialogMedia {
+export interface DialogMedia extends MediaTitleVariants {
   mal_id: number; title: string; image: string; type: 'anime' | 'manga';
   synopsis?: string; season?: string; year?: number; genres?: string[]; tags?: string[];
   format?: string; status?: string; totalUnits?: number; episodes?: number; score?: number;

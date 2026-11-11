@@ -9,7 +9,7 @@ export function selectFavoritePage(favorites: (IFavorites & { created_at?: strin
   const mediaOf = (favorite: IFavorites) => Array.isArray(favorite.media) ? favorite.media[0] : favorite.media;
   const filtered = favorites.filter(favorite => {
     const media = mediaOf(favorite);
-    return media && matchesLibrarySearch(options.query ?? '', [media.title, favorite.user_metadata?.custom_description, favorite.user_metadata?.custom_tags])
+    return media && matchesLibrarySearch(options.query ?? '', [media.title, media.title_english, media.title_romaji, favorite.user_metadata?.custom_description, favorite.user_metadata?.custom_tags])
       && (!options.tags?.length || options.tags.some(tag => favorite.user_metadata?.custom_tags?.includes(tag)))
       && matchesLibraryFilters(media, options, favorite.progress?.status);
   });

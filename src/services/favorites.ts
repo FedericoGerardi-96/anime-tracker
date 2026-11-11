@@ -109,6 +109,8 @@ export async function getAllFavoritesFull(userId: string) {
         id,
         mal_id,
         title,
+        title_english,
+        title_romaji,
         type,
         image,
         season,

@@ -104,6 +104,8 @@ export default function AnimeActions({
         const result = await toggleFavorite({
           mal_id: animeData.id,
           title: animeData.title,
+          title_english: animeData.title_english,
+          title_romaji: animeData.title_romaji,
           image: animeData.image,
           type: animeData.type || 'anime',
           synopsis: animeData.synopsis ?? undefined,
@@ -146,6 +148,8 @@ export default function AnimeActions({
         {
           mal_id: animeData.id,
           title: animeData.title,
+          title_english: animeData.title_english,
+          title_romaji: animeData.title_romaji,
           image: animeData.image,
           type: animeData.type || 'anime',
           synopsis: animeData.synopsis ?? undefined,
@@ -302,6 +306,8 @@ export default function AnimeActions({
         animeData={{
           mal_id: animeData.id,
           title: animeData.title,
+          title_english: animeData.title_english,
+          title_romaji: animeData.title_romaji,
           image: animeData.image,
           type: animeData.type || 'anime',
           synopsis: animeData.synopsis ?? undefined,

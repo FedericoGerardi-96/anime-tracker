@@ -60,6 +60,8 @@ export default function AnimeListContent({ animeList, userId }: Readonly<AnimeLi
         animeData={selectedAnime ? {
           mal_id: Number(selectedAnime.id),
           title: selectedAnime.title,
+          title_english: selectedAnime.title_english,
+          title_romaji: selectedAnime.title_romaji,
           image: selectedAnime.image,
           type: selectedAnime.type || 'anime',
           synopsis: selectedAnime.synopsis,

@@ -4,6 +4,8 @@ import { getAuthenticatedUser } from "@/services/supabase"
 import { getFavoritesWithMedia as fetchFavoritesWithMedia, getFavoriteMalIds as fetchFavoriteMalIds, getAllFavoritesFull } from "@/services/favorites"
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import type { MediaTitleVariants } from '@/interfaces/media-titles'
+import { cleanMediaTitles } from '@/lib/media-titles'
 
 
 export async function getFavoritesWithMedia() {
@@ -22,7 +24,7 @@ export async function getFavoriteMalIds(): Promise<number[] | null> {
   return fetchFavoriteMalIds(user.id)
 }
 
-export async function toggleFavorite(mediaData: {
+export async function toggleFavorite(mediaData: MediaTitleVariants & {
   mal_id: number;
   title: string;
   image: string;
@@ -98,6 +100,7 @@ export async function toggleFavorite(mediaData: {
       .from('media')
       .insert({
         mal_id: canonical.mal_id, title: canonical.title, type: canonical.type || 'anime', image: canonical.image,
+        ...cleanMediaTitles(canonical),
         season: canonical.season, year: canonical.year || null,
         genres: canonical.genres || [], format: canonical.format || null,
         status: canonical.status || null, day: canonical.day || null,

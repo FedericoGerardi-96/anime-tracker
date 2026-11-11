@@ -143,7 +143,7 @@ export const getPreferredAnimeByMalId = cache(async (idMal: number): Promise<Cat
     const media = await fetchDetail(idMal, 'ANIME');
     return {
       ...detailMetadata(media),
-      mal_id: idMal, images: images(media), title: media.title.romaji, title_english: media.title.english ?? null,
+      mal_id: idMal, images: images(media), title: media.title.romaji, title_english: media.title.english ?? null, title_romaji: media.title.romaji,
       type: media.format ?? 'TV', source: media.source ?? '', episodes: media.episodes ?? null, status: media.status ?? '',
       airing: media.status === 'RELEASING', score: media.averageScore ? media.averageScore / 10 : null,
       scored_by: media.favourites ?? null, rank: rank(media), popularity: media.popularity ?? 0,
@@ -161,7 +161,7 @@ export const getPreferredMangaByMalId = cache(async (idMal: number): Promise<Cat
     const authors = media.staff?.edges?.filter((edge) => /story|art|original creator/i.test(edge.role)).map((edge) => ({ mal_id: edge.node.id, name: edge.node.name.full })) ?? [];
     return {
       ...detailMetadata(media),
-      mal_id: idMal, images: images(media), title: media.title.romaji, title_english: media.title.english ?? null,
+      mal_id: idMal, images: images(media), title: media.title.romaji, title_english: media.title.english ?? null, title_romaji: media.title.romaji,
       type: media.format ?? 'MANGA', year: media.startDate?.year ?? media.seasonYear ?? null, chapters: media.chapters ?? null,
       volumes: media.volumes ?? null, status: media.status ?? '', publishing: media.status === 'RELEASING',
       score: media.averageScore ? media.averageScore / 10 : null, scored_by: media.favourites ?? null,

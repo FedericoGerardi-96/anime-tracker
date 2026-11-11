@@ -41,6 +41,8 @@ El navbar de escritorio consulta `GET /api/catalog/search?type=…&q=…` con tr
 
 Agregar tres favoritos y después cambiar sus estados ya no realiza las doce llamadas de sincronización inmediata que podían generar esas seis acciones. Las escrituras remotas ocurren al enviar pendientes y se agrupan por estado final. Se quitaron además el enriquecimiento remoto al crear el registro local y las invalidaciones de catálogo de las acciones de guardado. Las revalidaciones de vistas locales se mantienen.
 
+Los títulos en inglés y romaji se conservan con los metadatos que ya devuelve el catálogo o la ficha, sin agregar lecturas al guardar ni al buscar en Mis listas. Las importaciones de AniList y MAL también los guardan. La actualización única del catálogo anterior es un script de mantenimiento independiente; ver [títulos alternativos](titulos-alternativos.md).
+
 ## Pruebas
 
 - `node --test tests/pending-library-sync.test.mjs`: separación de tandas, cambios concurrentes, confirmación por revisión, eliminaciones, conservación del estado remoto y ausencia de importaciones de sincronización inmediata en las acciones.

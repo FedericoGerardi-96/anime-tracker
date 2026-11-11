@@ -8,6 +8,7 @@ Aplicación para explorar anime y manga, llevar el progreso personal, organizar 
 - [Estado y próximos pasos](docs/ESTADO.md): contexto para continuar entre chats.
 - [Prompts reutilizables](docs/PROMPTS.md): inicio de tarea, rediseño, funciones, errores y revisión.
 - [Guardado y sincronización](docs/guardado-local-y-sincronizacion.md): cola de cambios, activación y pruebas.
+- [Títulos alternativos](docs/titulos-alternativos.md): búsqueda por inglés y romaji, migración y actualización de registros anteriores.
 - [Privacidad de listas compartidas](docs/listas-compartidas.md): permisos, modal, enlaces y vista previa.
 - [Requisitos del rediseño](Requerimientos/AniTrack%20%C2%B7%20Requerimientos%20del%20redise%C3%B1o.md) y [guía visual](Requerimientos/AniTrack-rediseno/LEEME.md): destino del producto, todavía no equivalente al estado implementado.
 
@@ -110,6 +111,8 @@ Abrir `http://localhost:3000` si el servidor usa el puerto predeterminado. `pnpm
 | `node --test tests/list-visibility-migration.test.mjs` | Privacidad, enlaces, seguimiento y copias de listas con PGlite externo |
 | `node --test tests/password-recovery.test.mjs` | Solicitud, callback y permisos de recuperación de contraseña |
 | `node --test tests/profile-images.test.mjs` | Optimización de imágenes y protección de Storage con PGlite externo |
+| `node --test tests/media-titles.test.mjs tests/media-titles-backfill.test.mjs` | Títulos alternativos, búsqueda local, guardado, importaciones y script de mantenimiento |
+| `node --test tests/media-titles-migration.test.mjs` | Migración aditiva y conservación de RLS con PGlite externo |
 
 La prueba de migración requiere `PGLITE_MODULE` apuntando a una instalación externa de `@electric-sql/pglite`; sin esa variable se omite. Ver la [guía de sincronización](docs/guardado-local-y-sincronizacion.md).
 
