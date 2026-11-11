@@ -5,9 +5,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { RelatedReading } from '@/interfaces/related-reading';
 import { relatedReadingImage } from '@/lib/related-reading-image';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { getAnimeRelationData } from '@/services/media-detail';
 
 const MAL_URL = 'https://myanimelist.net';
-const ANILIST_URL = 'https://graphql.anilist.co';
 const STALE_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 
 function clean(text: string) { return text.replace(/\s+/g, ' ').trim(); }
@@ -62,22 +62,9 @@ async function scrapeMalRelations(animeMalId: number): Promise<RelatedReading[]>
   return unique(result);
 }
 
-interface AnilistRelation {
-  relationType: string;
-  node: { idMal: number | null; type: string; format: string | null; title: { romaji: string; english: string | null }; coverImage: { extraLarge: string | null; large: string | null; medium: string | null } };
-}
-
 async function fetchAnilistRelations(animeMalId: number): Promise<RelatedReading[]> {
-  const query = `query ($idMal: Int) { Media(idMal: $idMal, type: ANIME) { relations { edges { relationType node { idMal type format title { romaji english } coverImage { extraLarge large medium } } } } } }`;
-  const response = await fetch(ANILIST_URL, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ query, variables: { idMal: animeMalId } }),
-    signal: AbortSignal.timeout(10_000), next: { revalidate: 24 * 60 * 60 },
-  });
-  if (!response.ok) throw new Error(`AniList respondió ${response.status}`);
-  const payload = await response.json() as { data?: { Media?: { relations?: { edges?: AnilistRelation[] } } }; errors?: unknown[] };
-  if (!payload.data?.Media || payload.errors?.length) throw new Error('AniList no devolvió relaciones');
-  return unique((payload.data.Media.relations?.edges ?? []).flatMap(({ relationType, node }) => {
+  const relations = await getAnimeRelationData(animeMalId);
+  return unique((relations?.edges ?? []).flatMap(({ relationType, node }) => {
     if (node?.type !== 'MANGA' || !node.idMal) return [];
     return [{ malId: node.idMal, title: node.title.english || node.title.romaji, image: node.coverImage?.extraLarge || node.coverImage?.large || node.coverImage?.medium || '', format: readingFormat(node.format || ''), relation: relationLabel(relationType) }];
   }));

@@ -37,10 +37,14 @@ export default function TopbarClient({ user, profile }: Readonly<{ user?: User |
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [searchType, setSearchType] = useState<SearchType>('anime');
-  const selectedSearchLabel = SEARCH_OPTIONS.find((option) => option.value === searchType)?.label ?? 'Anime';
-  const { data: searchResults, loading: isSearching, error: searchError } = useClientSearch<CatalogSuggestion>(query.trim().length >= 3 ? `/api/catalog/search?type=${searchType}&q=${encodeURIComponent(query.trim())}` : null, 500);
-  const suggestions = searchResults.slice(0, 5);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchQuery = query.trim();
+  const selectedSearchLabel = SEARCH_OPTIONS.find((option) => option.value === searchType)?.label ?? 'Anime';
+  const { data: searchResults, loading: isSearching, error: searchError } = useClientSearch<CatalogSuggestion>(
+    showSuggestions && searchQuery.length >= 3 ? `/api/catalog/search?type=${searchType}&q=${encodeURIComponent(searchQuery)}` : null,
+    500,
+  );
+  const suggestions = searchResults.slice(0, 5);
   const searchUnavailable = Boolean(searchError);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -231,7 +235,7 @@ export default function TopbarClient({ user, profile }: Readonly<{ user?: User |
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                     {searchError}
                   </p>
-                  <Link href={`/${searchType === "character" ? "characters" : searchType}?q=${encodeURIComponent(query)}`} className="mt-2 inline-block underline">Abrir búsqueda y elegir proveedor</Link>
+                  <Link href={`/${searchType === "character" ? "characters" : searchType}?q=${encodeURIComponent(searchQuery)}`} onClick={() => setShowSuggestions(false)} className="mt-2 inline-block underline">Abrir búsqueda y elegir proveedor</Link>
                 </div>
               )}
             </div>

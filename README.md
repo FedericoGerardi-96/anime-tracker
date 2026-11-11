@@ -80,6 +80,10 @@ Las banderas `FAVORITES_RPC_ENABLED`, `LISTS_RPC_ENABLED` y `LIBRARY_FILTERS_RPC
 
 Abrir `http://localhost:3000` si el servidor usa el puerto predeterminado. `pnpm dev` ejecuta `scripts/dev.mjs`, que genera el subconjunto de iconos antes de iniciar Next.js.
 
+### Imágenes en Vercel
+
+`next.config.ts` configura `images.unoptimized: true` para que `next/image` cargue los archivos originales sin consumir la cuota de Image Optimization de Vercel. Se conservan los componentes y la carga diferida configurada, pero no se generan versiones de menor tamaño o en otro formato: el peso depende del archivo de origen. Los cambios de esta configuración requieren un nuevo despliegue para aplicarse en producción.
+
 ## Comandos y verificación
 
 | Comando | Propósito |

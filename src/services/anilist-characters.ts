@@ -111,40 +111,24 @@ function mapEdge(edge: AniListCharacterEdge): AnimeCharacter {
   };
 }
 
-const PREVIEW_QUERY = `
-  query CharacterPreview($malId: Int!) {
-    Media(idMal: $malId, type: ANIME) {
-      characters(page: 1, perPage: 6, role: MAIN, sort: [RELEVANCE, ID]) {
-        pageInfo { hasNextPage }
-        edges { role node { id name { full } image { medium } } }
-      }
-    }
-  }
-`;
-
-const fetchCharacterPage = unstable_cache(async (malId: number, page: number, preview: boolean, provider: CatalogProvider) => {
+const fetchCharacterPage = unstable_cache(async (malId: number, page: number, provider: CatalogProvider) => {
   if (provider === 'anilist') {
-    const payload = await anilistRequest<AniListPageResponse>(preview ? PREVIEW_QUERY : CHARACTERS_QUERY, { malId, page, perPage: 24 });
+    const payload = await anilistRequest<AniListPageResponse>(CHARACTERS_QUERY, { malId, page, perPage: 24 });
     if (payload.errors?.length || !payload.data?.Media) throw new CharacterProviderUnavailableError();
     const result = payload.data.Media.characters;
     return { characters: result.edges.map(mapEdge), hasNextPage: result.pageInfo.hasNextPage };
   } else {
     try {
       const all = await scrapeMalAnimeCharacters(malId);
-      if (preview) return { characters: all.filter(character => character.role === 'MAIN').slice(0, 6), hasNextPage: false };
       const start = (page - 1) * 24;
       return { characters: all.slice(start, start + 24), hasNextPage: all.length > start + 24 };
     } catch { throw new CharacterProviderUnavailableError(); }
   }
-}, ['anime-character-page-v2'], { revalidate: 3600 });
-
-export async function getAnimeCharacterPreview(malId: number): Promise<AnimeCharacter[]> {
-  return (await fetchCharacterPage(malId, 1, true, await getCatalogProvider())).characters;
-}
+}, ['anime-character-page-v3'], { revalidate: 3600 });
 
 export async function getAnimeCharactersPage(malId: number, page = 1): Promise<CharacterSearchResult> {
   const safePage = Number.isSafeInteger(page) && page > 0 ? page : 1;
-  return fetchCharacterPage(malId, safePage, false, await getCatalogProvider());
+  return fetchCharacterPage(malId, safePage, await getCatalogProvider());
 }
 
 interface AniListCharacterResponse {

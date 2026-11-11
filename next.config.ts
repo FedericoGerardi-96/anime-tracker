@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Servir originales para no depender de la cuota de transformaciones de Vercel.
+    unoptimized: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'static.tvmaze.com', pathname: '/uploads/images/**' },
       {

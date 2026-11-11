@@ -1,5 +1,17 @@
 # Estado de AniTrack y continuidad entre chats
 
+### Imágenes sin transformaciones de Vercel · 11 de noviembre de 2026
+
+`next.config.ts` activa `images.unoptimized: true` para evitar que las portadas dejen de cargar al agotar la cuota de Image Optimization de Vercel. `next/image` conserva sus componentes, dimensiones y carga diferida configurada, pero entrega la URL original sin redimensionar, recomprimir ni convertir el formato. El peso de descarga depende del archivo de origen. El README explica esta decisión y la necesidad de un nuevo despliegue.
+
+Pasaron ESLint enfocado, TypeScript y `pnpm build --webpack`; el artefacto de producción conserva `images.unoptimized: true`. Una comprobación con la configuración real y el generador de props de Next.js verificó URL original, ausencia de `srcSet` del optimizador y carga diferida para AniList, MyAnimeList y un recurso local. En Chrome, sobre el build local y sin sesión, el catálogo mostró portadas reales de AniList a 1440 px y 390 px, sin desborde horizontal y con cero solicitudes a `/_next/image`. Pendiente desplegar y comprobar las imágenes en producción; esta entrega no modifica el sitio publicado.
+
+### Llamados de catálogo y ficha · 9 de noviembre de 2026
+
+La ficha de anime pide los seis personajes principales en el mismo `Detail` de AniList que usan los metadatos, el banner y los animes relacionados. Si falla la lectura de manga y novelas desde MyAnimeList, la ficha reutiliza las relaciones de esa misma respuesta. Esto baja de dos a una las lecturas normales a AniList por ficha fría y elimina la tercera consulta que podía hacer el respaldo. «Ver todos» sigue cargando su reparto paginado. El navbar solo pide sugerencias mientras están abiertas. El inventario de endpoints y casos que cambian el total está en [guardado y sincronización](guardado-local-y-sincronizacion.md#solicitudes).
+
+Pasaron ESLint enfocado, TypeScript, el build con webpack y 15 pruebas de relaciones, filtros, progreso y sincronización. Una consulta real a AniList confirmó los personajes y las relaciones de la operación agrupada. En el build local con proveedores simulados, las cuatro rutas hicieron una llamada a AniList en frío con AniList seleccionado y ambas fichas hicieron cero al repetirlas con caché fresca. Se verificó el respaldo con MyAnimeList respondiendo 503 y el conteo de las fichas con MyAnimeList seleccionado. En Chrome, la ficha mostró personajes y lecturas, el buscador móvil esperó al envío y en escritorio Escape canceló la sugerencia pendiente. Queda pendiente contrastar los logs del despliegue si reaparece el 429. El wrapper existente registra proveedor, operación, estado, cuota restante y espera indicada cuando falla una consulta.
+
 ### Foto y portada del perfil · 8 de noviembre de 2026
 
 En Ajustes → Perfil y biografía se puede previsualizar, guardar, reemplazar o quitar cada imagen. Se aceptan JPG, PNG y WebP de hasta 4 MB y 24 megapíxeles. El servidor corrige la orientación, aplica un recorte centrado, quita los metadatos y guarda WebP. Los máximos son 320 × 320 y 80 KiB para la foto, y 1440 × 480 y 240 KiB para la portada. Al quitar una imagen, se recupera el avatar anterior o las iniciales y el banner aurora según corresponda.

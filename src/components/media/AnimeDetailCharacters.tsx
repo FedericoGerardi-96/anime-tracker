@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { slugify } from "@/lib/utils";
-import { getAnimeCharacterPreview } from "@/services/anilist-characters";
+import { getAnimeCharacterPreview } from "@/services/media-detail";
 import type { MediaSectionProps } from "@/interfaces/media-detail-components";
 export default async function AnimeDetailCharacters({
   malId,

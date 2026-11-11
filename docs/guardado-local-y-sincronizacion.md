@@ -24,7 +24,20 @@ La comparación completa sigue disponible para importar/reconciliar bibliotecas;
 
 ## Solicitudes
 
-Una página normal del catálogo requiere una consulta (salvo caché, reintentos o filtros que necesiten combinar páginas). Abrir una ficha puede requerir otra consulta de detalles y otra de personajes. Las búsquedas mientras se escribe también son consultas. Esas lecturas siguen siendo necesarias.
+Las siguientes cifras corresponden a un render con caché fría y respuestas exitosas de los proveedores. Las consultas GraphQL de AniList usan `POST https://graphql.anilist.co`. Las rutas REST de la tabla usan `GET https://api.myanimelist.net/v2`.
+
+| Página | Con AniList seleccionado | Con MyAnimeList seleccionado |
+| --- | --- | --- |
+| `/anime` | 1 AniList (`Catalog`) | 1 REST (`/anime/ranking`, `/anime?q=…` o `/anime/season/{año}/{temporada}`) |
+| `/manga` | 1 AniList (`Catalog`) | 1 REST (`/manga/ranking` o `/manga?q=…`) |
+| `/anime/[slug]` | 1 AniList (`Detail`, incluidos personajes principales y relaciones) + 2 REST a `/anime/{id}` (puntaje y recomendaciones con campos distintos) | 1 AniList (banner, puntaje y relaciones) + 2 REST a `/anime/{id}` (ficha y recomendaciones) + 1 GET a `https://myanimelist.net/anime/{id}/_/characters` |
+| `/manga/[slug]` | 1 AniList (`Detail`) + 1 REST a `/manga/{id}` (recomendaciones) | 2 REST a `/manga/{id}` (ficha y recomendaciones) |
+
+En los catálogos, seleccionar tramos de puntaje separados puede requerir varias páginas por tramo. En anime, si las lecturas relacionadas guardadas en Supabase faltan o vencieron, se intenta un GET a `https://myanimelist.net/anime/{id}/_`. Si falla, se reutilizan las relaciones de `Detail`. La equivalencia de IDs (GitHub) y los puntajes de IMDb tienen cachés propias. Abrir «Ver todos» sí consulta el reparto completo y paginado.
+
+La caché de datos de Next revalida las consultas de catálogo de AniList cada cinco minutos y las de ficha cada hora. Una coincidencia fresca evita la salida al proveedor. Con sesión, los catálogos hacen dos lecturas agrupadas en Supabase para marcar favoritos (`favorites` y `hentai`). Las fichas consultan esas marcas, las colecciones (`list_media`) y el progreso (`user_media_progress`). La sesión y el perfil del encabezado se resuelven por separado.
+
+El navbar de escritorio consulta `GET /api/catalog/search?type=…&q=…` con tres o más caracteres y 500 ms de espera mientras se muestran las sugerencias. Cada consulta de anime o manga puede hacer una lectura del proveedor seleccionado. Al cerrar las sugerencias, se cancela el temporizador o la espera del cliente. Una consulta que ya salió hacia el proveedor puede haber consumido cuota. El buscador móvil consulta al enviar el formulario al catálogo.
 
 Agregar tres favoritos y después cambiar sus estados ya no realiza las doce llamadas de sincronización inmediata que podían generar esas seis acciones. Las escrituras remotas ocurren al enviar pendientes y se agrupan por estado final. Se quitaron además el enriquecimiento remoto al crear el registro local y las invalidaciones de catálogo de las acciones de guardado. Las revalidaciones de vistas locales se mantienen.
 

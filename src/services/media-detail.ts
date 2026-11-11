@@ -5,10 +5,12 @@ import { cache } from 'react';
 import { parseAnimeRelations } from '@/lib/anime-relations';
 
 import type { CatalogAnime, CatalogManga } from '@/interfaces/media-catalog';
+import type { AnimeCharacter } from '@/interfaces/character';
 import { getMalAnimeById, getMalMangaById } from '@/lib/myanimelist-service';
+import { scrapeMalAnimeCharacters } from '@/services/myanimelist-characters-scraper';
 
 const ENDPOINT = 'https://graphql.anilist.co';
-const QUERY = `query Detail($idMal: Int, $type: MediaType) {
+const QUERY = `query Detail($idMal: Int, $type: MediaType, $includeCharacters: Boolean!) {
   Media(idMal: $idMal, type: $type) {
     id idMal bannerImage title { romaji english native } coverImage { extraLarge large medium }
     averageScore meanScore popularity favourites status format season seasonYear startDate { year month day } endDate { year month day } source duration synonyms
@@ -16,7 +18,10 @@ const QUERY = `query Detail($idMal: Int, $type: MediaType) {
     studios(isMain: true) { nodes { id name } }
     staff(sort: RELEVANCE, perPage: 5) { edges { role node { id name { full } } } }
     rankings { rank type allTime context }
-    relations { edges { relationType node { idMal type format title { romaji english } coverImage { large } } } }
+    relations { edges { relationType node { idMal type format title { romaji english } coverImage { extraLarge large medium } } } }
+    characters(page: 1, perPage: 6, role: MAIN, sort: [RELEVANCE, ID]) @include(if: $includeCharacters) {
+      nodes { id name { full } image { medium } }
+    }
   }
 }`;
 
@@ -40,8 +45,18 @@ function detailMetadata(media: DetailMedia) {
   };
 }
 
+type CharacterPreview = Pick<AnimeCharacter, 'id' | 'malId' | 'name' | 'image' | 'provider'>;
+
 interface DetailMedia {
-  relations?: unknown;
+  relations?: { edges?: Array<{
+    relationType: string;
+    node?: {
+      idMal: number | null; type: string; format: string | null;
+      title: { romaji: string; english: string | null };
+      coverImage?: { extraLarge?: string; large?: string; medium?: string };
+    } | null;
+  }> };
+  characters?: { nodes?: Array<{ id: number; name?: { full?: string }; image?: { medium?: string } } | null> };
   id?: number;
   bannerImage?: string | null;
   idMal: number; title: { romaji: string; english?: string | null; native?: string | null };
@@ -63,16 +78,32 @@ interface DetailMedia {
 const fetchDetail = cache(async (idMal: number, type: 'ANIME' | 'MANGA'): Promise<DetailMedia> => {
   const payload = await providerRead<{ data?: { Media?: DetailMedia }; errors?: Array<{ message: string }> }>('anilist', 'detail', ENDPOINT, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ query: QUERY, variables: { idMal, type } }),
+    body: JSON.stringify({ query: QUERY, variables: { idMal, type, includeCharacters: type === 'ANIME' } }),
     signal: AbortSignal.timeout(10_000), next: { revalidate: 3600 },
   });
   if (!payload.data?.Media || payload.errors?.length) throw new ProviderRequestError('anilist', 404);
   return payload.data.Media;
 });
 
+export async function getAnimeRelationData(malId: number) {
+  return (await fetchDetail(malId, 'ANIME')).relations;
+}
+
 export async function getAnimeRelations(malId: number) {
+  return parseAnimeRelations(await getAnimeRelationData(malId), malId);
+}
+
+export async function getAnimeCharacterPreview(malId: number): Promise<CharacterPreview[]> {
+  if (await getCatalogProvider() === 'myanimelist') {
+    const characters = await scrapeMalAnimeCharacters(malId);
+    return characters.filter(character => character.role === 'MAIN').slice(0, 6);
+  }
   const media = await fetchDetail(malId, 'ANIME');
-  return parseAnimeRelations(media.relations, malId);
+  return (media.characters?.nodes ?? []).flatMap(character =>
+    character?.name?.full && Number.isSafeInteger(character.id)
+      ? [{ id: character.id, name: character.name.full, image: character.image?.medium ?? '', provider: 'anilist' }]
+      : [],
+  );
 }
 
 // Optional enrichment must never prevent reading the selected provider's detail.
