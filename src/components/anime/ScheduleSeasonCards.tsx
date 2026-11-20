@@ -1,19 +1,24 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AnimeCard, { type AnimeCardProps } from '@/components/cards/AnimeCard';
 import AddToListModal from '@/components/ui/AddToListModal';
 import AuthModal from '@/components/auth/AuthModal';
 import { requestListDialog } from '@/lib/list-dialog-request';
 import type { ListDialogResult } from '@/interfaces/list-dialog';
 import type { CatalogAnime } from '@/interfaces/media-catalog';
+import type { LibraryStatus } from '@/lib/library-editor';
 
 interface SeasonCardsProps {
   seasonAnime: CatalogAnime[];
   favoriteMalIds: number[];
+  personalStatuses: Array<[number, LibraryStatus]>;
   userId?: string;
 }
-export default function SeasonCards({ seasonAnime, favoriteMalIds, userId }: SeasonCardsProps) {
+export default function SeasonCards({ seasonAnime, favoriteMalIds, personalStatuses, userId }: SeasonCardsProps) {
+  const router = useRouter();
+  const statesByMalId = new Map(personalStatuses);
   // List actions remain available from the season catalog.
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,6 +61,7 @@ export default function SeasonCards({ seasonAnime, favoriteMalIds, userId }: Sea
               studio: anime.studios[0]?.name || 'Estudio desconocido',
               year: anime.year ?? 0,
               isAiring: anime.airing,
+              libraryStatus: statesByMalId.get(anime.mal_id),
               synopsis: anime.synopsis ?? undefined,
               season: anime.season ?? undefined,
               genres: anime.genres.map((genre) => genre.name),
@@ -90,6 +96,7 @@ export default function SeasonCards({ seasonAnime, favoriteMalIds, userId }: Sea
           setDataPromise(null);
         }}
         mode="add-anime"
+        onListCreated={() => router.refresh()}
         animeData={
           selectedAnime
             ? {

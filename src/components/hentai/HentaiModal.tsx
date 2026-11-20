@@ -1,150 +1,87 @@
-"use client";
+'use client';
 
-import { createHentaiEntry } from "@/lib/actions/hentai";
-import { useToast } from "@/components/ui/Toast";
-import { useState, useRef } from "react";
+import { createHentaiEntry, updateHentaiEntry } from '@/lib/actions/hentai';
+import { useToast } from '@/components/ui/Toast';
+import Modal from '@/components/ui/Modal';
+import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import type { HentaiEntry } from '@/interfaces/hentai';
 
 interface HentaiModalProps {
   isOpen: boolean;
   onClose: () => void;
+  entry?: HentaiEntry;
 }
 
-export default function HentaiModal({ isOpen, onClose }: Readonly<HentaiModalProps>) {
-  const { success, error } = useToast();
+export default function HentaiModal({ isOpen, onClose, entry }: Readonly<HentaiModalProps>) {
+  const { success } = useToast();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
-
+  const [error, setError] = useState('');
   if (!isOpen) return null;
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     setLoading(true);
-    const result = await createHentaiEntry(formData);
-    setLoading(false);
-
-    if (result.error) {
-      error(result.error);
-    } else {
-      success("Entry saved successfully to your vault.");
-      formRef.current?.reset();
+    setError('');
+    try {
+      const result = entry
+        ? await updateHentaiEntry(entry.id, entry.revision ?? '', formData)
+        : await createHentaiEntry(formData);
+      if ('error' in result) {
+        setError(result.error);
+        return;
+      }
+      success(entry ? 'Cambios guardados.' : 'Título agregado a tu colección.');
+      router.refresh();
       onClose();
+    } catch {
+      setError('No pudimos guardar. Revisá tu conexión y volvé a intentar.');
+    } finally {
+      setLoading(false);
     }
   }
 
+  const close = () => { if (!loading) onClose(); };
+  const field = 'mt-2 min-h-11 w-full rounded-(--radius-control) border border-border bg-background px-3 py-2 text-sm text-foreground';
+  const linkedType = entry?.mal_id != null;
+
   return (
-    <button type="button"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
-      onClick={onClose}
-    >
-      <div 
-        className="w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10 bg-card backdrop-blur-xl animate-in zoom-in-95 duration-300"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="p-6 border-b border-white/5 flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">security</span>
-              New Vault Entry
-            </h2>
-            <p className="text-xs text-muted-foreground mt-1 uppercase tracking-widest font-semibold">
-              Add private content to your collection
-            </p>
-          </div>
-          <button type="button"
-            aria-label="Cerrar formulario"
-            onClick={onClose}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer"
-          >
-            <span className="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-8 overflow-y-auto custom-scrollbar">
-          <form ref={formRef} action={handleSubmit} className="space-y-8">
-            {/* Basic Info Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="title" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Title</label>
-                <input
-                  name="title"
-                  id="title"
-                  required
-                  className="w-full bg-muted border border-white/5 rounded-xl p-4 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 outline-none transition-all"
-                  placeholder="Enter title..."
-                  type="text"
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="type" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Type</label>
-                <div className="relative">
-                  <select
-                    id="type"
-                    name="type"
-                    className="w-full bg-muted border border-white/5 rounded-xl p-4 text-foreground appearance-none focus:ring-2 focus:ring-primary/50 outline-none transition-all cursor-pointer"
-                  >
-                    <option value="anime">Anime</option>
-                    <option value="doujin">Doujin/Manga</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                    expand_more
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Image URL Section */}
-            <div className="space-y-2">
-              <label htmlFor="image" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Image URL</label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg">
-                  link
-                </span>
-                <input
-                  name="image"
-                  id="image"
-                  className="w-full bg-muted border border-white/5 rounded-xl p-4 pl-12 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 outline-none transition-all"
-                  placeholder="https://image-host.com/cover.jpg"
-                  type="text"
-                />
-              </div>
-            </div>
-
-            {/* Description Section */}
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Description</label>
-              <textarea
-                name="description"
-                id="description"
-                className="custom-scrollbar w-full bg-muted border border-white/5 rounded-xl p-4 text-foreground placeholder:text-muted-foreground resize-none focus:ring-2 focus:ring-primary/50 outline-none transition-all"
-                placeholder="Add a brief description..."
-                rows={4}
-              ></textarea>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-end pt-6 gap-4">
-              <button
-                className="w-full sm:w-auto px-8 py-3 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                type="button"
-                onClick={onClose}
-              >
-                Cancel
-              </button>
-              <button
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                type="submit"
-                disabled={loading}
-              >
-                <span className="material-symbols-outlined text-sm">
-                  {loading ? "sync" : "save"}
-                </span>
-                {loading ? "Saving..." : "Save to Vault"}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </button>
+    <Modal onClose={close} label={entry ? 'Editar título de Hentai' : 'Agregar título a Hentai'} className="p-0!">
+      <aside className="ml-auto flex h-full w-full max-w-lg flex-col overflow-y-auto border-l border-border bg-card p-5 sm:p-7" onClick={event => event.stopPropagation()}>
+        <header className="mb-6 flex items-start justify-between gap-3">
+          <div><h2 className="text-xl font-bold">{entry ? 'Editar título' : 'Agregar título'}</h2><p className="mt-2 text-sm text-muted-foreground">Guardá los datos de tu colección privada.</p></div>
+          <button type="button" onClick={close} disabled={loading} aria-label="Cerrar formulario" className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border text-xl disabled:opacity-40">×</button>
+        </header>
+        <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-6">
+          <fieldset disabled={loading} className="space-y-5">
+            <label className="block text-sm font-semibold" htmlFor="hentai-title">Título
+              <input id="hentai-title" name="title" required maxLength={300} defaultValue={entry?.title ?? ''} className={field} />
+            </label>
+            <label className="block text-sm font-semibold" htmlFor="hentai-type">Tipo
+              <select id="hentai-type" name={linkedType ? undefined : 'type'} disabled={linkedType || loading} defaultValue={entry?.type ?? 'anime'} className={field}>
+                <option value="anime">Anime</option><option value="doujin">Doujin/Manga</option>
+              </select>
+            </label>
+            {linkedType && <><input type="hidden" name="type" value={entry.type} /><p className="text-xs text-muted-foreground">El tipo de los títulos del catálogo se conserva.</p></>}
+            <label className="block text-sm font-semibold" htmlFor="hentai-image">URL de la portada
+              <input id="hentai-image" name="image" type="url" maxLength={2000} defaultValue={entry?.image ?? ''} placeholder="https://ejemplo.com/portada.jpg" className={field} />
+            </label>
+            <label className="block text-sm font-semibold" htmlFor="hentai-note">Mi nota
+              <textarea id="hentai-note" name="description" rows={6} maxLength={10000} defaultValue={entry?.description ?? ''} placeholder="Agregá una nota personal…" className={field + ' resize-y'} />
+            </label>
+            <label className="block text-sm font-semibold" htmlFor="hentai-link">Enlace para ver o leer
+              <input id="hentai-link" name="watch_link" type="url" maxLength={2000} defaultValue={entry?.watch_link ?? ''} placeholder="https://ejemplo.com/serie" className={field} />
+            </label>
+          </fieldset>
+          {error && <p role="alert" className="rounded-lg border border-border bg-background p-3 text-sm">{error}</p>}
+          <footer className="mt-auto flex flex-wrap justify-end gap-3 border-t border-border pt-5">
+            <button type="button" disabled={loading} onClick={close} className="min-h-11 rounded-(--radius-control) border border-border px-4 text-sm font-semibold disabled:opacity-40">Cancelar</button>
+            <button type="submit" disabled={loading} className="min-h-11 rounded-(--radius-control) bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-40">{loading ? 'Guardando…' : entry ? 'Guardar cambios' : 'Agregar título'}</button>
+          </footer>
+        </form>
+      </aside>
+    </Modal>
   );
 }

@@ -49,12 +49,12 @@ Las escrituras de biblioteca/progreso se guardan en Supabase y los cambios pendi
 | `/profile`, `/profile/highlights` | Perfil y destacados |
 | `/settings`, `/settings/appearance` | Apariencia, con tres temas y modo automático. `/settings` redirige a Apariencia |
 | `/settings/preferences` | Hora del calendario y fuente de búsqueda de anime, manga y personajes |
-| `/settings/profile`, `/settings/privacy` | Foto, portada y perfil social. Visibilidad de la biblioteca y los destacados |
+| `/settings/profile`, `/settings/privacy` | Foto, portada y perfil social. Visibilidad de la biblioteca y los destacados y contenido +18 en búsquedas |
 | `/settings/connections`, `/settings/adult-content` | Cuentas de AniList y MyAnimeList y visibilidad de la sección Hentai |
 | `/friends`, `/users/[username]`, `/users/[username]/favorites` | Funciones sociales |
 | `/login`, `/register`, `/auth/callback` | Autenticación |
 | `/forgot-password`, `/auth/recovery`, `/reset-password` | Solicitud y confirmación de recuperación de contraseña |
-| `/hentai` | Sección de contenido adulto |
+| `/hentai` | Colección privada en tabla, filtros, notas, enlaces y edición |
 | `/api/anilist/*`, `/api/mal/*`, `/api/library/sync*` | Conexiones y sincronización |
 
 Las rutas nuevas de los requisitos se incorporarán por fases. No sustituir enlaces actuales por rutas propuestas que todavía no existen.
@@ -101,6 +101,10 @@ Abrir `http://localhost:3000` si el servidor usa el puerto predeterminado. `pnpm
 | `node --test tests/calendar-next.test.mjs` | Próxima emisión desde ahora, modos público/personal y fallos (Node.js 24) |
 | `node --test tests/personal-next-airings.test.mjs` | Tandas personales dentro del límite de AniList, bibliotecas grandes y fallos (Node.js 24) |
 | `node --test tests/catalog-filter-navigation.test.mjs` | Parámetros y compatibilidad de filtros del catálogo (Node.js 24) |
+| `node --test tests/mal-manga-search.test.mjs` | Búsqueda explícita de manga en MAL, sugerencias y filtro del ranking |
+| `node --test tests/adult-search-preference.test.mjs` | Preferencia +18, sesión, errores de guardado y consultas de ambos proveedores |
+| `node --test tests/hentai-editor.test.mjs` | Filtros, paginación, validación, permisos y conflictos de edición de Hentai |
+| `node --test tests/hentai-editor-migration.test.mjs` | Migración del editor de Hentai y aislamiento con PGlite externo |
 | `node --test tests/theme.test.mjs` | Compatibilidad de temas anteriores, validación y resolución del modo automático |
 | `node --test tests/home-greeting.test.mjs` | Nombre y fecha local del saludo de Inicio (Node.js 24) |
 | `node --test tests/library-editor.test.mjs` | Validación, conflictos de edición, eliminación idempotente y filtros de listas (Node.js 24) |

@@ -1,5 +1,6 @@
 import "server-only";
 import { providerRead, ProviderRequestError } from "@/services/provider-request";
+import { getAdultSearchEnabled } from '@/services/search-preferences';
 
 import type { AnimeCardProps } from "@/components/cards/AnimeCard";
 import type {
@@ -103,10 +104,10 @@ function getCatalogPagination(options: MalAnimeCatalogOptions) {
   return { limit, offset: (page - 1) * limit };
 }
 
-function fetchSearchCatalog(query: string, limit: number, offset: number) {
+async function fetchSearchCatalog(query: string, limit: number, offset: number) {
   return malFetch<MalCatalogResponse>("/anime", {
     q: query,
-    nsfw: "true",
+    nsfw: String(await getAdultSearchEnabled()),
     limit,
     offset,
     fields: ANIME_LIST_FIELDS,
@@ -304,7 +305,7 @@ export async function getMalMangaCatalog(options: MalMangaCatalogOptions = {}): 
   const { limit, offset } = getCatalogPagination(options);
   const query = options.q?.trim();
   const response = query
-    ? await malFetch<MalMangaResponse>("/manga", { q: query, limit, offset, fields: MANGA_LIST_FIELDS })
+    ? await malFetch<MalMangaResponse>("/manga", { q: query, nsfw: String(await getAdultSearchEnabled()), limit, offset, fields: MANGA_LIST_FIELDS })
     : await malFetch<MalMangaResponse>("/manga/ranking", {
       ranking_type: options.sort === "score" ? "all" : "bypopularity", limit, offset, fields: MANGA_LIST_FIELDS,
     });

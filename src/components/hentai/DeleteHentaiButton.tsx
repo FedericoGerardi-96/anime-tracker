@@ -1,55 +1,26 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { deleteHentaiEntry } from "@/lib/actions/hentai";
-import { useToast } from "@/components/ui/Toast";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { deleteHentaiEntry } from '@/lib/actions/hentai';
+import { useToast } from '@/components/ui/Toast';
 
-interface DeleteHentaiButtonProps {
-  id: string;
-}
-
-export default function DeleteHentaiButton({ id }: Readonly<DeleteHentaiButtonProps>) {
-  const [isDeleting, setIsDeleting] = useState(false);
+export default function DeleteHentaiButton({ id, title }: { id: string; title: string }) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
   const { success, error } = useToast();
-
-  const handleDelete = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!globalThis.confirm("Are you sure you want to remove this from your Vault?")) {
-      return;
-    }
-
-    setIsDeleting(true);
-    const result = await deleteHentaiEntry(id);
-    
-    if (result.error) {
-      error("Failed to delete entry: " + result.error);
-    } else {
-      success("Entry successfully removed from your Vault.");
-    }
-    
-    setIsDeleting(false);
+  const remove = async () => {
+    if (!confirm(`¿Quitar “${title}” de tu colección? También se eliminarán su nota y su enlace.`)) return;
+    setPending(true);
+    try {
+      const result = await deleteHentaiEntry(id);
+      if (result.error) error(result.error);
+      else { success('Título quitado de tu colección.'); router.refresh(); }
+    } catch { error('No pudimos quitar el título. Volvé a intentar.'); }
+    finally { setPending(false); }
   };
-
-  return (
-    <button type="button"
-      onClick={handleDelete}
-      disabled={isDeleting}
-      className="absolute top-4 right-4 group/delete z-20 cursor-pointer disabled:cursor-not-allowed"
-      title="Remove from Vault"
-    >
-      <div className="w-10 h-10 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-red-500 border border-red-500/20 shadow-lg transition-all hover:bg-red-500 hover:text-white">
-        {isDeleting ? (
-          <span className="material-symbols-outlined text-xl animate-spin">
-            progress_activity
-          </span>
-        ) : (
-          <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-            delete
-          </span>
-        )}
-      </div>
-    </button>
-  );
+  return <button type="button" onClick={remove} disabled={pending} aria-label={`Quitar ${title}`} title="Quitar de la colección"
+    className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
+    <span aria-hidden="true" className="material-symbols-outlined text-lg">{pending ? 'sync' : 'delete'}</span>
+  </button>;
 }

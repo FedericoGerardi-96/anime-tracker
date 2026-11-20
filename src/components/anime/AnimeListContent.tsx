@@ -1,6 +1,7 @@
 
 'use client'
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import AnimeCard, { type AnimeCardProps } from '@/components/cards/AnimeCard';
 import AddToListModal from '@/components/ui/AddToListModal';
@@ -14,6 +15,7 @@ interface AnimeListContentProps {
 }
 
 export default function AnimeListContent({ animeList, userId }: Readonly<AnimeListContentProps>) {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<AnimeCardProps | null>(null);
@@ -57,6 +59,7 @@ export default function AnimeListContent({ animeList, userId }: Readonly<AnimeLi
           setDataPromise(null);
         }}
         mode="add-anime"
+        onListCreated={() => router.refresh()}
         animeData={selectedAnime ? {
           mal_id: Number(selectedAnime.id),
           title: selectedAnime.title,

@@ -16,6 +16,8 @@ import {
 import { resolveSchedulePeriod, scheduleYears, SCHEDULE_SEASONS } from '@/lib/schedule-filters';
 import { readAllPages } from '@/lib/read-all-pages';
 import { getCalendarNext } from '@/services/calendar-next';
+import { getMediaLibraryStatuses } from '@/services/related-anime';
+import type { LibraryStatus } from '@/lib/library-editor';
 import ScheduleCalendar from './ScheduleCalendar';
 import SeasonCards from './ScheduleSeasonCards';
 
@@ -127,6 +129,9 @@ export default async function ScheduleContent({
   const titles = followed
     ? anime.filter((a) => following.some((item) => item.malId === a.mal_id))
     : anime;
+  const seasonStatuses = seasonal
+    ? await getMediaLibraryStatuses('anime', titles.map(anime => anime.mal_id))
+    : new Map<number, LibraryStatus>();
   return (
     <ScheduleCalendar
       {...{
@@ -151,6 +156,7 @@ export default async function ScheduleContent({
         <SeasonCards
           seasonAnime={titles}
           favoriteMalIds={library.map((i) => i.malId)}
+          personalStatuses={[...seasonStatuses]}
           userId={user?.id}
         />
       )}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import PrivacySettings from '@/components/profile/PrivacySettings';
+import AdultSearchSetting from '@/components/settings/AdultSearchSetting';
 import { SettingsSection } from '@/components/settings/SettingsFrame';
 import { requireSettingsUser } from '@/lib/settings-session';
 import { createClient } from '@/lib/supabase/server';
@@ -23,9 +24,10 @@ export default async function PrivacyPage() {
     .maybeSingle();
 
   return (
-    <SettingsSection active="privacy" description="Controlá quién puede ver tu biblioteca, tu progreso en el perfil y tus destacados.">
+    <SettingsSection active="privacy" description="Controlá la visibilidad de tu perfil y el contenido de tus búsquedas.">
       {error ? <p role="alert">No pudimos cargar tus opciones de privacidad. Recargá la página para volver a intentarlo.</p>
         : <PrivacySettings initialSettings={data ?? defaults} />}
+      <AdultSearchSetting initialEnabled={user.user_metadata.search_include_adult !== false} />
     </SettingsSection>
   );
 }

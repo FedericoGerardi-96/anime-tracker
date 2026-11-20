@@ -1,5 +1,6 @@
 import 'server-only';
 import { providerRead, ProviderRequestError } from '@/services/provider-request';
+import { getAdultSearchEnabled } from '@/services/search-preferences';
 
 import type { AniListCatalogOptions, AniListCatalogResult, CatalogMediaType } from '@/interfaces/anilist-catalog';
 
@@ -76,7 +77,7 @@ const SORT: Record<string, string[]> = {
   trending: ['TRENDING_DESC', 'POPULARITY_DESC'], newest: ['START_DATE_DESC'], title: ['TITLE_ROMAJI'],
 };
 
-function variables(type: CatalogMediaType, options: AniListCatalogOptions, maximumScore?: number) {
+function variables(type: CatalogMediaType, options: AniListCatalogOptions, includeAdult: boolean, maximumScore?: number) {
   const validYear = (value: number | undefined) => value && Number.isInteger(value) && value >= 1900 && value <= new Date().getFullYear() + 1 ? value : undefined;
   const from = validYear(options.yearFrom);
   const to = validYear(options.yearTo);
@@ -90,8 +91,7 @@ function variables(type: CatalogMediaType, options: AniListCatalogOptions, maxim
     perPage: Math.min(options.perPage ?? 24, 50),
     type: type.toUpperCase(),
     search: options.q || undefined,
-    // Explicit anime searches can find adult-rated titles; browsing remains unchanged.
-    isAdult: type === 'anime' && options.q?.trim() ? undefined : false,
+    isAdult: includeAdult ? undefined : false,
     genre: options.genre ? options.genre.split(',').filter(Boolean) : undefined,
     excludedGenre: options.excludeGenre ? options.excludeGenre.split(',').filter(Boolean) : undefined,
     format: options.format ? options.format.split(',').filter(Boolean) : undefined,
@@ -106,10 +106,11 @@ function variables(type: CatalogMediaType, options: AniListCatalogOptions, maxim
 }
 
 async function fetchCatalogPage(type: CatalogMediaType, options: AniListCatalogOptions, maximumScore?: number) {
+  const includeAdult = Boolean(options.q?.trim()) && await getAdultSearchEnabled();
   const payload = await providerRead<AniListResponse>('anilist', 'catalog', ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ query: QUERY, variables: variables(type, options, maximumScore) }),
+    body: JSON.stringify({ query: QUERY, variables: variables(type, options, includeAdult, maximumScore) }),
     signal: AbortSignal.timeout(10_000),
     next: { revalidate: 300 },
   });

@@ -40,10 +40,6 @@ export default async function CharactersPage({
               </Suspense>
             </span>
           </h1>
-          <p className="max-w-2xl text-lg text-muted-foreground">
-            Reparto consultado en tiempo real desde AniList, con MyAnimeList
-            como respaldo.
-          </p>
         </header>
         <Suspense key={`${slug}-${page}`} fallback={<AnimeCharactersSkeleton />}>
           <AnimeCharactersContent slug={slug} page={page} />

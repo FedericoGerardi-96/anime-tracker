@@ -1,53 +1,44 @@
-"use client";
+'use client';
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useTransition } from "react";
-import { useDebouncedCallback } from "use-debounce";
+import { useRouter, usePathname } from 'next/navigation';
+import { useTransition, type FormEvent } from 'react';
+import Link from 'next/link';
+import type { HentaiFilters } from '@/interfaces/hentai';
 
-export default function HentaiSearch({ defaultValue }: Readonly<{ defaultValue?: string }>) {
+export default function HentaiSearch({ filters }: { filters: HentaiFilters }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
-  const createQueryString = useCallback(
-    (params: Record<string, string | null>) => {
-      const current = new URLSearchParams(searchParams.toString());
-      for (const [name, value] of Object.entries(params)) {
-        if (value === null || value === "") {
-          current.delete(name);
-        } else {
-          current.set(name, value);
-        }
-      }
-      return current.toString();
-    },
-    [searchParams]
-  );
-
-  const handleSearch = useDebouncedCallback((value: string) => {
-    startTransition(() => {
-      router.push(`${pathname}?${createQueryString({ q: value || null, page: "1" })}`);
-    });
-  }, 400);
-
+  const [pending, startTransition] = useTransition();
+  const apply = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const params = new URLSearchParams();
+    const query = String(data.get('q') ?? '').trim();
+    const type = String(data.get('type') ?? 'all');
+    const sort = String(data.get('sort') ?? 'newest');
+    if (query) params.set('q', query);
+    if (type !== 'all') params.set('type', type);
+    if (sort !== 'newest') params.set('sort', sort);
+    startTransition(() => router.push(pathname + (params.size ? '?' + params : ''), { scroll: false }));
+  };
+  const control = 'min-h-11 w-full rounded-(--radius-control) border border-border bg-background px-3 text-sm text-foreground';
   return (
-    <div className="relative group max-w-xl w-full">
-      <span
-        className={`absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-xl transition-colors ${
-          isPending ? "text-primary animate-pulse" : "text-muted-foreground group-focus-within:text-primary"
-        }`}
-      >
-        {isPending ? "sync" : "search"}
-      </span>
-      <input
-        aria-label="Buscar en la colección privada"
-        type="text"
-        defaultValue={defaultValue}
-        onChange={(e) => handleSearch(e.target.value)}
-        placeholder="Quick search by title or description..."
-        className="w-full rounded-xl border border-border bg-card py-4 pl-12 pr-6 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:outline-none focus:ring-1 focus:ring-primary/50"
-      />
-    </div>
+    <form onSubmit={apply} className="flex flex-wrap items-end gap-4 rounded-(--radius-panel) border border-border bg-card p-4" aria-label="Filtros de Hentai">
+      <label className="grid min-w-0 flex-1 basis-60 gap-2 text-xs font-semibold">Buscar por título o nota
+        <input type="search" name="q" defaultValue={filters.q} maxLength={200} placeholder="Buscá en tu colección…" className={control} />
+      </label>
+      <label className="grid min-w-0 flex-1 basis-40 gap-2 text-xs font-semibold">Tipo
+        <select name="type" defaultValue={filters.type} onChange={event => event.currentTarget.form?.requestSubmit()} className={control}>
+          <option value="all">Todos los tipos</option><option value="anime">Anime</option><option value="doujin">Doujin/Manga</option>
+        </select>
+      </label>
+      <label className="grid min-w-0 flex-1 basis-52 gap-2 text-xs font-semibold">Ordenar por
+        <select name="sort" defaultValue={filters.sort} onChange={event => event.currentTarget.form?.requestSubmit()} className={control}>
+          <option value="newest">Agregados recientemente</option><option value="oldest">Agregados más antiguos</option><option value="title-asc">Título de A a Z</option><option value="title-desc">Título de Z a A</option>
+        </select>
+      </label>
+      <button type="submit" disabled={pending} className="min-h-11 rounded-(--radius-control) bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-40">{pending ? 'Buscando…' : 'Buscar'}</button>
+      {(filters.q || filters.type !== 'all' || filters.sort !== 'newest') && <Link href="/hentai" className="inline-flex min-h-11 items-center px-2 text-sm text-muted-foreground underline underline-offset-4">Limpiar filtros</Link>}
+    </form>
   );
 }

@@ -8,6 +8,7 @@ import {
 } from "@/lib/myanimelist-service";
 import type { MalAnimeCatalogOptions } from "@/interfaces/myanimelist";
 import { getCatalogFavoriteIds } from "@/services/catalog-favorites";
+import { getMediaLibraryStatuses } from '@/services/related-anime';
 import { getAniListCatalog } from '@/services/anilist-catalog';
 import type { AniListCatalogOptions, CatalogProvider } from '@/interfaces/anilist-catalog';
 
@@ -29,9 +30,17 @@ export async function getAnimeListWithFavorites(options: MalAnimeCatalogOptions 
     totalPages = undefined;
     hasNextPage = catalog.hasNextPage;
   }
-  const favoriteMalIds = await getCatalogFavoriteIds(userId, 'anime', displayAnime.map(item => Number(item.id)));
+  const ids = displayAnime.map(item => Number(item.id));
+  const [favoriteMalIds, libraryStatuses] = await Promise.all([
+    getCatalogFavoriteIds(userId, 'anime', ids),
+    getMediaLibraryStatuses('anime', ids),
+  ]);
 
-  displayAnime = displayAnime.map((anime) => ({ ...anime, isFavorite: favoriteMalIds.has(Number(anime.id)) }));
+  displayAnime = displayAnime.map((anime) => ({
+    ...anime,
+    isFavorite: favoriteMalIds.has(Number(anime.id)),
+    libraryStatus: libraryStatuses.get(Number(anime.id)),
+  }));
   return {
     displayAnime,
     totalPages,

@@ -14,5 +14,5 @@ export default async function Topbar() {
     profile = stored && images.avatar ? { ...stored, avatar: images.avatar } : stored;
   }
 
-  return <TopbarClient key={provider} user={user} profile={profile} />;
+  return <TopbarClient key={`${provider}-${user?.user_metadata.search_include_adult !== false}`} user={user} profile={profile} />;
 }

@@ -15,13 +15,13 @@ export default function HentaiActions() {
         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
           add_circle
         </span>
-        <span className="uppercase text-xs tracking-widest">Add New Entry</span>
+        <span className="text-sm">Agregar título</span>
       </button>
 
-      <HentaiModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+      {isModalOpen && <HentaiModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />}
     </>
   );
 }

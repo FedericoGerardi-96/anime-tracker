@@ -142,10 +142,11 @@ test('los adaptadores de catálogo conservan ambos títulos sin agregar consulta
     calls++;
     return { data: { Page: { media: [{ id: 101, idMal: 37786, title: { english: 'Bloom Into You', romaji: 'Yagate Kimi ni Naru' } }], pageInfo: { lastPage: 1, hasNextPage: false } } } };
   }, ProviderRequestError: Error };
-  const catalog = load('src/services/anilist-catalog.ts', { '@/services/provider-request': provider });
+  const preferences = { getAdultSearchEnabled: async () => true };
+  const catalog = load('src/services/anilist-catalog.ts', { '@/services/provider-request': provider, '@/services/search-preferences': preferences });
   const item = (await catalog.getAniListCatalog('anime', {})).items[0];
   assert.equal(item.title, 'Bloom Into You'); assert.equal(item.title_romaji, 'Yagate Kimi ni Naru'); assert.equal(item.title_english, 'Bloom Into You'); assert.equal(calls, 1);
-  const mal = load('src/lib/myanimelist-service.ts', { '@/services/provider-request': provider });
+  const mal = load('src/lib/myanimelist-service.ts', { '@/services/provider-request': provider, '@/services/search-preferences': preferences });
   const raw = { id: 37786, title: 'Yagate Kimi ni Naru', alternative_titles: { en: 'Bloom Into You' } };
   for (const mapped of [mal.mapMalAnimeToCard(raw), mal.mapMalAnimeToCatalog(raw), mal.mapMalMangaToCatalog(raw)]) {
     assert.equal(mapped.title_english, 'Bloom Into You'); assert.equal(mapped.title_romaji, 'Yagate Kimi ni Naru');

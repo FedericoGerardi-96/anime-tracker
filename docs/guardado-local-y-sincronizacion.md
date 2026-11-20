@@ -35,9 +35,11 @@ Las siguientes cifras corresponden a un render con caché fría y respuestas exi
 
 En los catálogos, seleccionar tramos de puntaje separados puede requerir varias páginas por tramo. En anime, si las lecturas relacionadas guardadas en Supabase faltan o vencieron, se intenta un GET a `https://myanimelist.net/anime/{id}/_`. Si falla, se reutilizan las relaciones de `Detail`. La equivalencia de IDs (GitHub) y los puntajes de IMDb tienen cachés propias. Abrir «Ver todos» sí consulta el reparto completo y paginado.
 
-La caché de datos de Next revalida las consultas de catálogo de AniList cada cinco minutos y las de ficha cada hora. Una coincidencia fresca evita la salida al proveedor. Con sesión, los catálogos hacen dos lecturas agrupadas en Supabase para marcar favoritos (`favorites` y `hentai`). Las fichas consultan esas marcas, las colecciones (`list_media`) y el progreso (`user_media_progress`). La sesión y el perfil del encabezado se resuelven por separado.
+La caché de datos de Next revalida las consultas de catálogo de AniList cada cinco minutos y las de ficha cada hora. Una coincidencia fresca evita la salida al proveedor. Con sesión, los catálogos hacen dos lecturas agrupadas en Supabase para marcar favoritos (`favorites` y `hentai`) y una lectura de `user_media_progress` para mostrar el estado personal en las cards. Las consultas se limitan a los ID MAL visibles y se dividen en tandas de hasta 100. Las fichas consultan esas marcas, las colecciones (`list_media`) y el progreso (`user_media_progress`). La sesión y el perfil del encabezado se resuelven por separado.
 
 El navbar de escritorio consulta `GET /api/catalog/search?type=…&q=…` con tres o más caracteres y 500 ms de espera mientras se muestran las sugerencias. Cada consulta de anime o manga puede hacer una lectura del proveedor seleccionado. Al cerrar las sugerencias, se cancela el temporizador o la espera del cliente. Una consulta que ya salió hacia el proveedor puede haber consumido cuota. El buscador móvil consulta al enviar el formulario al catálogo.
+
+«Contenido +18 en búsquedas», en Ajustes → Privacidad, controla las búsquedas explícitas de anime y manga de ambos proveedores y las sugerencias. Se guarda en la cuenta mediante Supabase Auth y está activado inicialmente. AniList omite `isAdult` al permitirlo y envía `false` al excluirlo; MAL envía el booleano correspondiente en `nsfw`. La lectura de la preferencia precede a la consulta del proveedor, cuyas claves de caché distinguen ambos valores. No agrega consultas a proveedores ni modifica la cola de biblioteca.
 
 Agregar tres favoritos y después cambiar sus estados ya no realiza las doce llamadas de sincronización inmediata que podían generar esas seis acciones. Las escrituras remotas ocurren al enviar pendientes y se agrupan por estado final. Se quitaron además el enriquecimiento remoto al crear el registro local y las invalidaciones de catálogo de las acciones de guardado. Las revalidaciones de vistas locales se mantienen.
 
@@ -49,6 +51,12 @@ Los títulos en inglés y romaji se conservan con los metadatos que ya devuelve 
 - `tests/pending-library-migration.test.mjs`: ejecutar con PGLITE_MODULE apuntando a una instalación de `@electric-sql/pglite` externa al proyecto; prueba la migración real, deduplicación, rollback, RLS y exclusión de importaciones. Sin esa variable se omite explícitamente.
 
 No se enviaron cambios a cuentas reales durante las pruebas.
+
+## Edición de la colección Hentai
+
+El editor de `/hentai` conserva las notas anteriores en `hentai.description` y guarda el enlace personal en `watch_link`. Requiere aplicar `supabase/migrations/202611200001_hentai_editor.sql`, que agrega el enlace, una revisión UUID y permisos de edición del titular con RLS. El trigger cambia la revisión en cada actualización; la edición compara la versión leída para rechazar escrituras desde una pestaña desactualizada. Título, portada, nota y enlace son metadatos locales. Los registros con ID MAL conservan su tipo original.
+
+La migración mantiene los triggers de inserción y eliminación de la cola de pendientes. Quitar un título con ID MAL sigue registrando la eliminación para sus proveedores conectados. Un registro manual sin ID MAL no genera un envío remoto. Editar los metadatos no ejecuta escrituras en AniList ni MAL.
 
 
 ## Editor lateral de Mis listas
