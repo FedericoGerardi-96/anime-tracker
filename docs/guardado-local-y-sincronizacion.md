@@ -58,6 +58,8 @@ El editor de `/hentai` conserva las notas anteriores en `hentai.description` y g
 
 La migración mantiene los triggers de inserción y eliminación de la cola de pendientes. Quitar un título con ID MAL sigue registrando la eliminación para sus proveedores conectados. Un registro manual sin ID MAL no genera un envío remoto. Editar los metadatos no ejecuta escrituras en AniList ni MAL.
 
+La clasificación por anime de origen requiere además `supabase/migrations/202611200002_hentai_source_anime.sql`, después de la del editor. Guarda `source_anime` o `is_original`; ambos sin informar representan registros aún sin clasificar. El formulario no cambia IDs MAL ni relaciones de los proveedores. Los nombres del selector salen de `get_hentai_source_animes()`, una función con permisos del invocador y filtro por `auth.uid()`, que obtiene todos los nombres distintos del titular sin depender de la paginación. Es una lectura adicional en Supabase por visita, sin caché compartida ni llamados a AniList/MAL. Los filtros de origen se ejecutan en la lectura paginada existente. La migración es aditiva y no modifica los triggers de pendientes.
+
 
 ## Editor lateral de Mis listas
 

@@ -27,8 +27,14 @@ function fixture() {
     { id: '3', user_id: 'owner', title: 'Alfa', type: 'doujin', description: '', image: null, watch_link: null, revision: 'r1', mal_id: null, created_at: '2026-02-01' },
     { id: '4', user_id: 'other', title: 'Privado ajeno', type: 'anime', description: 'Secreto', image: null, watch_link: null, revision: 'r1', mal_id: null, created_at: '2026-04-01' },
   ];
-  const state = { rows: structuredClone(initial), calls: [], invalidations: [], user: { id: 'owner' }, failure: '', race: false };
-  const db = { auth: { getUser: async () => ({ data: { user: state.user } }) }, from(table) {
+  const state = { rows: structuredClone(initial), calls: [], sourceCalls: 0, invalidations: [], user: { id: 'owner' }, failure: '', race: false };
+  const db = { auth: { getUser: async () => ({ data: { user: state.user } }) }, async rpc(name) {
+    assert.equal(name, 'get_hentai_source_animes');
+    state.sourceCalls++;
+    if (state.failure === 'sources') return { data: null, error: { message: 'Unavailable' } };
+    if (state.failure === 'sources-invalid') return { data: [42], error: null };
+    return { data: [...new Set(state.rows.filter(row => row.user_id === state.user.id && row.source_anime).map(row => row.source_anime))].sort(), error: null };
+  }, from(table) {
     assert.equal(table, 'hentai');
     const call = { op: 'read', filters: [], orders: [] };
     state.calls.push(call);
@@ -132,6 +138,45 @@ test('rechaza escrituras ajenas y sin sesión y conserva la identidad de título
   assert.ok((await actions.deleteHentaiEntry('1')).error);
   assert.ok((await actions.getHentaiEntries()).error);
   assert.equal(state.calls.length, 0);
+  assert.ok((await actions.getHentaiSourceAnimes()).error);
+  assert.equal(state.sourceCalls, 0);
+});
+
+test('clasifica el origen, lo filtra antes de paginar y lista animes de toda la colección privada', async () => {
+  const { actions, state } = fixture();
+  assert.equal(helpers.parseHentaiEntry(state.rows[0]).source_anime, null);
+  assert.equal(helpers.parseHentaiEntry(state.rows[0]).is_original, false);
+  assert.equal(helpers.parseHentaiFilters({ origin: 'anime:  Año   en 東京  ' }).origin, 'anime:Año en 東京');
+  for (const origin of ['invalid', 'anime: ', 'anime:' + 'x'.repeat(201), ['original']]) assert.equal(helpers.parseHentaiFilters({ origin }).origin, 'all');
+  assert.ok(helpers.parseHentaiInput(form({ origin_kind: 'anime', source_anime: ' ' })).error);
+  assert.ok(helpers.parseHentaiInput(form({ origin_kind: 'anime', source_anime: 'x'.repeat(201) })).error);
+  assert.ok(helpers.parseHentaiInput(form({ origin_kind: 'other' })).error);
+  assert.equal((await actions.updateHentaiEntry('1', 'r1', form({ origin_kind: 'anime', source_anime: '  Año   en 東京 ' }))).success, true);
+  assert.equal(state.rows[0].source_anime, 'Año en 東京');
+  assert.equal(state.rows[0].is_original, false);
+  assert.equal((await actions.updateHentaiEntry('2', 'r1', form({ type: 'doujin', origin_kind: 'original', source_anime: 'Ignorado' }))).success, true);
+  assert.equal(state.rows[1].source_anime, null);
+  assert.equal(state.rows[1].is_original, true);
+  state.rows[2].source_anime = 'Lucky*Star, 100%_';
+  state.rows[3].source_anime = 'Anime privado ajeno';
+  let result = await actions.getHentaiEntries(1, 1, '', { origin: 'original', type: 'doujin' });
+  assert.equal(result.count, 1);
+  assert.equal(result.data[0].id, '2');
+  result = await actions.getHentaiEntries(1, 1, '', { origin: 'anime:Lucky*Star, 100%_' });
+  assert.equal(result.count, 1);
+  assert.equal(result.data[0].id, '3');
+  const sources = await actions.getHentaiSourceAnimes();
+  assert.deepEqual([...sources.data], ['Año en 東京', 'Lucky*Star, 100%_']);
+  assert.equal((await actions.updateHentaiEntry('1', 'r2', form({ origin_kind: 'original' }))).success, true);
+  assert.equal(state.rows[0].source_anime, null);
+  assert.equal(state.rows[0].is_original, true);
+  assert.equal((await actions.createHentaiEntry(form({ origin_kind: 'anime', source_anime: 'Nuevo anime' }))).success, true);
+  assert.equal(state.rows.at(-1).source_anime, 'Nuevo anime');
+  assert.equal(state.rows.at(-1).is_original, false);
+  state.failure = 'sources';
+  assert.ok((await actions.getHentaiSourceAnimes()).error);
+  state.failure = 'sources-invalid';
+  assert.ok((await actions.getHentaiSourceAnimes()).error);
 });
 
 test('un conflicto o fallo conserva datos; quitar es idempotente y los errores no parecen colección vacía', async () => {

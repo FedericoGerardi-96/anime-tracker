@@ -11,13 +11,15 @@ interface HentaiModalProps {
   isOpen: boolean;
   onClose: () => void;
   entry?: HentaiEntry;
+  sourceAnimes?: string[];
 }
 
-export default function HentaiModal({ isOpen, onClose, entry }: Readonly<HentaiModalProps>) {
+export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [] }: Readonly<HentaiModalProps>) {
   const { success } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [origin, setOrigin] = useState(entry?.is_original ? 'original' : entry?.source_anime ? 'anime' : 'unspecified');
   if (!isOpen) return null;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -65,6 +67,18 @@ export default function HentaiModal({ isOpen, onClose, entry }: Readonly<HentaiM
               </select>
             </label>
             {linkedType && <><input type="hidden" name="type" value={entry.type} /><p className="text-xs text-muted-foreground">El tipo de los títulos del catálogo se conserva.</p></>}
+            <label className="block text-sm font-semibold" htmlFor="hentai-origin">Origen
+              <select id="hentai-origin" name="origin_kind" value={origin} onChange={event => setOrigin(event.target.value)} className={field}>
+                <option value="unspecified">Sin especificar</option><option value="original">Original</option><option value="anime">Pertenece a un anime</option>
+              </select>
+            </label>
+            <div hidden={origin !== 'anime'}>
+              <label className="block text-sm font-semibold" htmlFor="hentai-source-anime">Anime de origen
+                <input id="hentai-source-anime" name="source_anime" list="hentai-source-animes" required={origin === 'anime'} disabled={origin !== 'anime' || loading} maxLength={200} defaultValue={entry?.source_anime ?? ''} placeholder="Ej.: Naruto" className={field} aria-describedby="hentai-source-help" />
+              </label>
+              <datalist id="hentai-source-animes">{sourceAnimes.map(source => <option key={source} value={source} />)}</datalist>
+              <p id="hentai-source-help" className="mt-2 text-xs text-muted-foreground">Elegí uno guardado o escribí otro. Aparecerá en los filtros al guardar.</p>
+            </div>
             <label className="block text-sm font-semibold" htmlFor="hentai-image">URL de la portada
               <input id="hentai-image" name="image" type="url" maxLength={2000} defaultValue={entry?.image ?? ''} placeholder="https://ejemplo.com/portada.jpg" className={field} />
             </label>

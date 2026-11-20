@@ -1,5 +1,15 @@
 # Estado de AniTrack y continuidad entre chats
 
+### Anime de origen en la colección Hentai · 20 de noviembre de 2026
+
+Alta y edición permiten indicar «Original», «Pertenece a un anime» o «Sin especificar». El anime se escribe con sugerencias de los nombres guardados en la colección. La tabla muestra ese origen debajo del tipo. Los registros anteriores permanecen sin clasificar; no se presume que sean originales. Cambiar el origen limpia el valor incompatible y conserva el resto de los datos y la revisión del editor.
+
+El filtro «Anime de origen» incluye Todos, Original y los nombres distintos de toda la colección del usuario, ordenados alfabéticamente. No depende de la página ni de los otros filtros. Se conserva en `origin` en la URL, se combina con búsqueda/tipo/orden y se aplica antes de paginar. Los nombres se normalizan en espacios y Unicode y la coincidencia es exacta, incluidos signos como comas, `%`, `_` y `*`. La lista se obtiene con una lectura adicional en Supabase mediante RPC con sesión, `security invoker`, filtro por titular y RLS; no se consulta AniList ni MAL. Si falla esa lectura se informa y se permite reintentar.
+
+Requiere aplicar [`202611200002_hentai_source_anime.sql`](../supabase/migrations/202611200002_hentai_source_anime.sql) después de la migración del editor `202611200001`. Agrega `source_anime`, `is_original`, restricciones de consistencia, permisos sobre esas columnas, índice y RPC privado. El RPC devuelve un único array para evitar que el límite de filas REST recorte las opciones. No se aplicó al Supabase remoto.
+
+Pasaron ESLint enfocado, TypeScript, build con webpack y 15 pruebas de acciones, migraciones y pendientes sin omisiones. Las pruebas de SQL/PGlite cubren registros anteriores, consistencia, revisión, dos usuarios sin acceso cruzado y 1008 nombres de origen. En el navegador, con cuenta y datos simulados, se verificaron alta con un anime nuevo, normalización, edición a Original, opciones fuera de la página visible, persistencia al recargar, errores del RPC y reintento, validación del campo requerido, conservación del borrador al alternar origen, Escape y retorno del foco. Se inspeccionaron escritorio de 1280 px, móvil de 390 px y los tres temas, sin desborde horizontal. Una comprobación HTTP sobre el build final verificó el contrato del array del RPC y el filtrado por anime. Queda pendiente aplicar la migración y comprobar una cuenta real; no se desplegó ni se escribieron datos remotos.
+
 ### Colección Hentai y edición · 20 de noviembre de 2026
 
 `/hentai` usa textos en español y 32 px de separación respecto del navbar. La colección se muestra en una tabla de título, tipo, nota y acciones de editar, abrir enlace y quitar. En móvil cada fila se distribuye en bloques sin scroll horizontal. «Mi nota» reutiliza `description`, conservando los textos anteriores. La búsqueda, Anime/Doujin-Manga y los cuatro órdenes (fecha de agregado reciente/antigua y título A–Z/Z–A) se conservan en `q`, `type` y `sort` de la URL. Se filtra y ordena en Supabase antes de paginar, con 20 filas y orden secundario estable por ID. Una página que queda fuera de rango vuelve a la última disponible.

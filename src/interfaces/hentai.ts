@@ -5,6 +5,8 @@ export interface HentaiEntry {
   type: 'anime' | 'doujin';
   description: string | null;
   watch_link: string | null;
+  source_anime: string | null;
+  is_original: boolean;
   revision: string | null;
   mal_id: number | null;
   created_at: string;
@@ -14,5 +16,6 @@ export interface HentaiFilters {
   page: number;
   q: string;
   type: HentaiEntry['type'] | 'all';
+  origin: string;
   sort: 'newest' | 'oldest' | 'title-asc' | 'title-desc';
 }
