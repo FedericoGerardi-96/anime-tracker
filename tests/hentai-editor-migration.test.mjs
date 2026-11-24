@@ -53,7 +53,7 @@ test('la migración conserva entradas, renueva revisiones y limita la edición a
   } finally { await db.close(); }
 });
 
-test('el origen conserva registros anteriores, valida la clasificación y lista solo animes del titular', { skip: !process.env.PGLITE_MODULE }, async () => {
+test('origen y etiquetas preservan registros anteriores y aíslan los filtros y las escrituras por titular', { skip: !process.env.PGLITE_MODULE }, async () => {
   const { PGlite } = require(process.env.PGLITE_MODULE);
   const db = new PGlite();
   const owner = '00000000-0000-4000-8000-000000000001';
@@ -82,10 +82,14 @@ test('el origen conserva registros anteriores, valida la clasificación y lista 
     const migration = readFileSync('supabase/migrations/202611200002_hentai_source_anime.sql', 'utf8');
     await db.exec(migration);
     await db.exec(migration);
+    const tagsMigration = readFileSync('supabase/migrations/202611230001_hentai_tags.sql', 'utf8');
+    await db.exec(tagsMigration);
+    await db.exec(tagsMigration);
     const previous = (await rows('select * from public.hentai'))[0];
     assert.equal(previous.source_anime, null);
     assert.equal(previous.is_original, false);
     assert.equal(previous.description, 'Conservar');
+    assert.deepEqual(previous.tags, []);
     await asUser(owner);
     for (const source of ['Naruto', 'Naruto', 'Año en 東京', 'Lucky*Star, 100%_']) {
       await rows('insert into public.hentai(user_id, title, type, source_anime) values ($1, $2, $3, $4)', [owner, 'Guardado', 'doujin', source]);
@@ -101,10 +105,21 @@ test('el origen conserva registros anteriores, valida la clasificación y lista 
     assert.ok(sources.includes('Naruto'));
     assert.ok(sources.includes('Año en 東京'));
     assert.ok(sources.includes('Lucky*Star, 100%_'));
+    const tags = ['acción', 'a, "b" \\ c'];
+    const tagged = (await rows('update public.hentai set tags = $1 where id = $2 returning revision', [tags, previous.id]))[0];
+    assert.notEqual(tagged.revision, changed.revision);
+    const selection = '{"acción","a, \\"b\\" \\\\ c"}';
+    assert.deepEqual((await rows('select id from public.hentai where tags @> $1::text[]', [selection])).map(row => row.id), [previous.id]);
+    await assert.rejects(rows('update public.hentai set tags = $1 where id = $2', [[null], previous.id]), /check constraint/);
+    await assert.rejects(rows('update public.hentai set tags = $1 where id = $2', [Array(31).fill('tag'), previous.id]), /check constraint/);
+    const options = async () => (await rows('select public.get_hentai_filter_options() as data'))[0].data;
+    assert.deepEqual((await options()).tags.sort(), [...tags].sort());
     await rows("insert into public.hentai(user_id, title, source_anime) select $1, 'Otro título', 'Anime ' || n from generate_series(1, 1005) as n", [owner]);
     assert.equal((await readSources()).length, 1008);
     await asUser(other);
     assert.equal((await readSources()).length, 0);
+    assert.deepEqual(await options(), { sources: [], tags: [] });
+    assert.equal((await rows('update public.hentai set tags = $1 where id = $2 returning id', [['ajena'], previous.id])).length, 0);
     assert.equal((await rows('update public.hentai set source_anime = $1, is_original = false where id = $2 returning id', ['Ajeno', previous.id])).length, 0);
     await rows('insert into public.hentai(user_id, title, source_anime) values ($1, $2, $3)', [other, 'Privado ajeno', 'Anime privado']);
     assert.deepEqual(await readSources(), ['Anime privado']);
@@ -112,5 +127,6 @@ test('el origen conserva registros anteriores, valida la clasificación y lista 
     assert.equal((await readSources()).length, 1008);
     await db.exec('reset role; set role anon');
     await assert.rejects(rows('select * from public.get_hentai_source_animes()'), /permission denied/);
+    await assert.rejects(rows('select public.get_hentai_filter_options()'), /permission denied/);
   } finally { await db.close(); }
 });

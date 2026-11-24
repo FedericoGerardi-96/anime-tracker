@@ -1,6 +1,25 @@
 import { safeWatchLink } from '@/lib/library-editor';
 import type { HentaiEntry, HentaiFilters } from '@/interfaces/hentai';
 
+export const HENTAI_TAG_LIMIT = 30;
+export const HENTAI_TAG_LENGTH = 60;
+
+export function parseHentaiTag(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length > 1000) return null;
+  const tag = normalizeHentaiSource(value).toLowerCase().normalize('NFC');
+  // PostgreSQL text cannot contain NUL.
+  return tag && tag.length <= HENTAI_TAG_LENGTH && !tag.includes('\0') ? tag : null;
+}
+
+export function hentaiTags(values: readonly unknown[]): string[] {
+  return [...new Set(values.map(parseHentaiTag).filter(tag => tag !== null))].slice(0, HENTAI_TAG_LIMIT);
+}
+
+export function hentaiTagArrayLiteral(tags: string[]): string {
+  // PostgREST's array shorthand doesn't quote individual elements.
+  return '{' + tags.map(tag => '"' + tag.replace(/["\\]/g, '\\$&') + '"').join(',') + '}';
+}
+
 export function normalizeHentaiSource(value: string): string {
   return value.normalize('NFC').trim().replace(/\s+/gu, ' ');
 }
@@ -12,6 +31,7 @@ export function parseHentaiFilters(params: Record<string, unknown>): HentaiFilte
   return {
     page: Number.isSafeInteger(page) && page > 0 ? page : 1,
     q: typeof params.q === 'string' ? params.q.trim().slice(0, 200) : '',
+    tags: hentaiTags(Array.isArray(params.tag) ? params.tag : [params.tag]),
     type: params.type === 'anime' || params.type === 'doujin' ? params.type : 'all',
     origin: origin === 'original' ? origin : source && source.length <= 200 ? `anime:${source}` : 'all',
     sort: params.sort === 'oldest' || params.sort === 'title-asc' || params.sort === 'title-desc' ? params.sort : 'newest',
@@ -20,7 +40,7 @@ export function parseHentaiFilters(params: Record<string, unknown>): HentaiFilte
 
 export function parseHentaiInput(formData: FormData): { data: {
   title: string; type: HentaiEntry['type']; image: string | null; description: string | null; watch_link: string | null;
-  source_anime: string | null; is_original: boolean;
+  source_anime: string | null; is_original: boolean; tags: string[];
 } } | { error: string } {
   const title = formData.get('title');
   const type = formData.get('type');
@@ -29,6 +49,10 @@ export function parseHentaiInput(formData: FormData): { data: {
   const link = formData.get('watch_link') ?? '';
   const origin = formData.get('origin_kind') ?? 'unspecified';
   const rawSource = formData.get('source_anime') ?? '';
+  const tags = formData.getAll('tag');
+  if (tags.length > HENTAI_TAG_LIMIT || tags.some(tag => parseHentaiTag(tag) === null)) {
+    return { error: 'Podés guardar hasta 30 etiquetas de 60 caracteres cada una.' };
+  }
   if (typeof title !== 'string' || !title.trim() || title.trim().length > 300) return { error: 'Escribí un título de hasta 300 caracteres.' };
   if (type !== 'anime' && type !== 'doujin') return { error: 'Elegí Anime o Doujin/Manga.' };
   if (origin !== 'unspecified' && origin !== 'original' && origin !== 'anime') return { error: 'Elegí el origen del título.' };
@@ -39,7 +63,7 @@ export function parseHentaiInput(formData: FormData): { data: {
   if (typeof image !== 'string' || image.length > 2000 || (image.trim() && !safeWatchLink(image))) return { error: 'Usá una URL http o https válida para la portada.' };
   if (typeof link !== 'string' || link.length > 2000 || (link.trim() && !safeWatchLink(link))) return { error: 'Usá un enlace http o https válido.' };
   return { data: { title: title.trim(), type, image: safeWatchLink(image), description: description.trim() || null, watch_link: safeWatchLink(link),
-    source_anime: origin === 'anime' ? source : null, is_original: origin === 'original' } };
+    source_anime: origin === 'anime' ? source : null, is_original: origin === 'original', tags: hentaiTags(tags) } };
 }
 
 export function parseHentaiEntry(value: unknown): HentaiEntry | null {
@@ -56,6 +80,7 @@ export function parseHentaiEntry(value: unknown): HentaiEntry | null {
     watch_link: 'watch_link' in value && typeof value.watch_link === 'string' ? value.watch_link : null,
     source_anime: 'source_anime' in value && typeof value.source_anime === 'string' ? value.source_anime : null,
     is_original: 'is_original' in value && value.is_original === true,
+    tags: 'tags' in value && Array.isArray(value.tags) ? hentaiTags(value.tags) : [],
     revision: 'revision' in value && typeof value.revision === 'string' ? value.revision : null,
   };
 }

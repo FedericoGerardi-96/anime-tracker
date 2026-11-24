@@ -33,7 +33,7 @@ export default function HContentToggle({ enabled }: Readonly<{ enabled: boolean 
         <div>
           <p id="adult-content-label" className="text-sm font-bold">Mostrar contenido adulto</p>
           <p id="adult-content-description" className="mt-1 text-sm text-muted-foreground">
-            Agrega Hentai al menú principal.
+            Muestra la colección Hentai en Mis listas.
           </p>
         </div>
         <button

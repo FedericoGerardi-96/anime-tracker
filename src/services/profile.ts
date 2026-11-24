@@ -1,10 +1,11 @@
+import { cache } from "react";
 import { getSupabaseServer } from "@/services/supabase";
 import { IProfile } from "@/types/profile";
 
 /**
  * Fetches the user profile from the database.
  */
-export async function getUserProfile(userId: string): Promise<IProfile | null> {
+export const getUserProfile = cache(async (userId: string): Promise<IProfile | null> => {
   const supabase = await getSupabaseServer();
   const { data, error } = await supabase
     .from("profiles")
@@ -20,7 +21,7 @@ export async function getUserProfile(userId: string): Promise<IProfile | null> {
   }
 
   return data as IProfile;
-}
+});
 
 /**
  * Updates the 'show_h_content' flag in the user's profile.

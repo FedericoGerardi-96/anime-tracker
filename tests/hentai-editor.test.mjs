@@ -29,11 +29,15 @@ function fixture() {
   ];
   const state = { rows: structuredClone(initial), calls: [], sourceCalls: 0, invalidations: [], user: { id: 'owner' }, failure: '', race: false };
   const db = { auth: { getUser: async () => ({ data: { user: state.user } }) }, async rpc(name) {
-    assert.equal(name, 'get_hentai_source_animes');
     state.sourceCalls++;
     if (state.failure === 'sources') return { data: null, error: { message: 'Unavailable' } };
     if (state.failure === 'sources-invalid') return { data: [42], error: null };
-    return { data: [...new Set(state.rows.filter(row => row.user_id === state.user.id && row.source_anime).map(row => row.source_anime))].sort(), error: null };
+    const ownRows = state.rows.filter(row => row.user_id === state.user.id);
+    const sources = [...new Set(ownRows.map(row => row.source_anime).filter(Boolean))].sort();
+    if (name === 'get_hentai_source_animes') return { data: sources, error: null };
+    assert.equal(name, 'get_hentai_filter_options');
+    if (state.failure === 'tags-pending') return { data: null, error: { code: 'PGRST202' } };
+    return { data: { sources, tags: [...new Set(ownRows.flatMap(row => row.tags ?? []))] }, error: null };
   }, from(table) {
     assert.equal(table, 'hentai');
     const call = { op: 'read', filters: [], orders: [] };
@@ -42,6 +46,11 @@ function fixture() {
       if (call.limit === 0) return { data: [], error: state.failure === 'schema' ? { message: 'Missing columns' } : null };
       if (state.failure === call.op) return { data: null, error: { message: 'Database unavailable' } };
       let rows = state.rows.filter(row => call.filters.every(([key, value]) => row[key] === value));
+      if (call.tags) {
+        // The fixture decodes the quoted array sent in the PostgREST filter.
+        const tags = JSON.parse('[' + call.tags.slice(1, -1) + ']');
+        rows = rows.filter(row => tags.every(tag => row.tags?.includes(tag)));
+      }
       if (state.race && call.op === 'update') {
         state.rows.find(row => row.id === '1').revision = 'newer';
         rows = [];
@@ -57,6 +66,7 @@ function fixture() {
     const query = {
       select(fields) { call.fields = fields; return query; },
       eq(key, value) { call.filters.push([key, value]); return query; },
+      contains(key, value) { assert.equal(key, 'tags'); call.tags = value; return query; },
       limit(value) { call.limit = value; return query; },
       or(value) { call.search = value; return query; },
       order(column, options) { call.orders.push([column, options]); return query; },
@@ -138,7 +148,7 @@ test('rechaza escrituras ajenas y sin sesión y conserva la identidad de título
   assert.ok((await actions.deleteHentaiEntry('1')).error);
   assert.ok((await actions.getHentaiEntries()).error);
   assert.equal(state.calls.length, 0);
-  assert.ok((await actions.getHentaiSourceAnimes()).error);
+  assert.ok((await actions.getHentaiFilterOptions()).sourceError);
   assert.equal(state.sourceCalls, 0);
 });
 
@@ -165,8 +175,13 @@ test('clasifica el origen, lo filtra antes de paginar y lista animes de toda la 
   result = await actions.getHentaiEntries(1, 1, '', { origin: 'anime:Lucky*Star, 100%_' });
   assert.equal(result.count, 1);
   assert.equal(result.data[0].id, '3');
-  const sources = await actions.getHentaiSourceAnimes();
-  assert.deepEqual([...sources.data], ['Año en 東京', 'Lucky*Star, 100%_']);
+  const options = await actions.getHentaiFilterOptions();
+  assert.deepEqual([...options.sources], ['Año en 東京', 'Lucky*Star, 100%_']);
+  state.failure = 'tags-pending';
+  const fallback = await actions.getHentaiFilterOptions();
+  assert.ok(fallback.tagError);
+  assert.deepEqual([...fallback.sources], [...options.sources]);
+  state.failure = '';
   assert.equal((await actions.updateHentaiEntry('1', 'r2', form({ origin_kind: 'original' }))).success, true);
   assert.equal(state.rows[0].source_anime, null);
   assert.equal(state.rows[0].is_original, true);
@@ -174,9 +189,29 @@ test('clasifica el origen, lo filtra antes de paginar y lista animes de toda la 
   assert.equal(state.rows.at(-1).source_anime, 'Nuevo anime');
   assert.equal(state.rows.at(-1).is_original, false);
   state.failure = 'sources';
-  assert.ok((await actions.getHentaiSourceAnimes()).error);
+  assert.ok((await actions.getHentaiFilterOptions()).sourceError);
   state.failure = 'sources-invalid';
-  assert.ok((await actions.getHentaiSourceAnimes()).error);
+  assert.ok((await actions.getHentaiFilterOptions()).sourceError);
+});
+
+test('guarda etiquetas válidas y filtra por todas antes de paginar', async () => {
+  const { actions, state } = fixture();
+  const input = form();
+  for (const tag of ['  ACCIÓN  ', 'acción', 'a, "b" \\ c']) input.append('tag', tag);
+  assert.equal((await actions.updateHentaiEntry('1', 'r1', input)).success, true);
+  assert.deepEqual([...state.rows[0].tags], ['acción', 'a, "b" \\ c']);
+  state.rows[1].tags = ['acción'];
+  state.rows[2].tags = ['otra'];
+  state.rows[3].tags = ['privada', 'acción', 'a, "b" \\ c'];
+  const filtered = await actions.getHentaiEntries(1, 1, '', { tags: ['ACCIÓN', 'a, "b" \\ c'] });
+  assert.equal(filtered.count, 1);
+  assert.equal(filtered.data[0].id, '1');
+  assert.deepEqual([...(await actions.getHentaiFilterOptions()).tags].sort(), ['a, "b" \\ c', 'acción', 'otra']);
+  const invalid = form();
+  invalid.append('tag', 'z'.repeat(61));
+  assert.ok((await actions.updateHentaiEntry('1', 'r2', invalid)).error);
+  assert.equal((await actions.updateHentaiEntry('1', 'r2', form())).success, true);
+  assert.deepEqual([...state.rows[0].tags], []);
 });
 
 test('un conflicto o fallo conserva datos; quitar es idempotente y los errores no parecen colección vacía', async () => {

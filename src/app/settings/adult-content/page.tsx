@@ -11,7 +11,7 @@ export default async function AdultContentPage() {
   const profile = await getUserProfile(user.id);
 
   return (
-    <SettingsSection active="adult" description="Elegí si querés mostrar la sección Hentai en la navegación.">
+    <SettingsSection active="adult" description="Elegí si querés mostrar la colección Hentai en Mis listas.">
       {profile ? <HContentToggle enabled={profile.show_h_content ?? false} />
         : <p role="alert">No pudimos cargar tu preferencia. Recargá la página para volver a intentarlo.</p>}
     </SettingsSection>

@@ -7,6 +7,7 @@ export interface HentaiEntry {
   watch_link: string | null;
   source_anime: string | null;
   is_original: boolean;
+  tags: string[];
   revision: string | null;
   mal_id: number | null;
   created_at: string;
@@ -17,5 +18,6 @@ export interface HentaiFilters {
   q: string;
   type: HentaiEntry['type'] | 'all';
   origin: string;
+  tags: string[];
   sort: 'newest' | 'oldest' | 'title-asc' | 'title-desc';
 }

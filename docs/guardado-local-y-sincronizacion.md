@@ -52,6 +52,12 @@ Los títulos en inglés y romaji se conservan con los metadatos que ya devuelve 
 
 No se enviaron cambios a cuentas reales durante las pruebas.
 
+## Exportación local a Excel
+
+El modal de Mis listas y Hentai configura columnas, orden y tema del archivo. La preparación recién consulta datos al elegir Descargar. `GET /api/library/export` exige sesión y un origen válido y responde con `private, no-store` y `Vary: Cookie`. Biblioteca reúne referencias de favoritos, progreso y colecciones propias, deduplica por ID local de media y conserva notas, enlaces, etiquetas, IDs y nombres de listas. Hentai se lee de su tabla propia, incluidos registros manuales sin ID MAL. Las lecturas se paginan con orden único y fallan si faltan metadatos, evitando un archivo parcial anunciado como completo. No acepta un ID de usuario del cliente.
+
+La generación usa ExcelJS en el navegador mediante carga diferida. Los números y fechas son valores tipados; los títulos y notas se escriben como texto literal. El archivo mantiene el encabezado inmovilizado y los filtros de Excel. Las portadas opcionales se solicitan una vez por URL con concurrencia máxima de tres, credenciales omitidas, tiempo y tamaño acotados; se convierten a JPEG de hasta 80 × 88 px. Un fallo mantiene la URL en la celda y produce un aviso. Cancelar impide iniciar la descarga al terminar cualquier trabajo que ya estuviera en curso. No se usa un proxy de imágenes del servidor ni se accede a las APIs de AniList/MAL. No hay escrituras, cambios de permisos ni migraciones nuevas para esta función.
+
 ## Edición de la colección Hentai
 
 El editor de `/hentai` conserva las notas anteriores en `hentai.description` y guarda el enlace personal en `watch_link`. Requiere aplicar `supabase/migrations/202611200001_hentai_editor.sql`, que agrega el enlace, una revisión UUID y permisos de edición del titular con RLS. El trigger cambia la revisión en cada actualización; la edición compara la versión leída para rechazar escrituras desde una pestaña desactualizada. Título, portada, nota y enlace son metadatos locales. Los registros con ID MAL conservan su tipo original.
@@ -59,6 +65,8 @@ El editor de `/hentai` conserva las notas anteriores en `hentai.description` y g
 La migración mantiene los triggers de inserción y eliminación de la cola de pendientes. Quitar un título con ID MAL sigue registrando la eliminación para sus proveedores conectados. Un registro manual sin ID MAL no genera un envío remoto. Editar los metadatos no ejecuta escrituras en AniList ni MAL.
 
 La clasificación por anime de origen requiere además `supabase/migrations/202611200002_hentai_source_anime.sql`, después de la del editor. Guarda `source_anime` o `is_original`; ambos sin informar representan registros aún sin clasificar. El formulario no cambia IDs MAL ni relaciones de los proveedores. Los nombres del selector salen de `get_hentai_source_animes()`, una función con permisos del invocador y filtro por `auth.uid()`, que obtiene todos los nombres distintos del titular sin depender de la paginación. Es una lectura adicional en Supabase por visita, sin caché compartida ni llamados a AniList/MAL. Los filtros de origen se ejecutan en la lectura paginada existente. La migración es aditiva y no modifica los triggers de pendientes.
+
+Las etiquetas requieren `supabase/migrations/202611230001_hentai_tags.sql` después de la de origen. La migración agrega `hentai.tags` con lista vacía para los registros existentes. La edición del titular usa el mismo control por revisión. `get_hentai_filter_options()` reúne origen y etiquetas distintas del usuario en el mismo RPC, con RLS y permisos del invocador. La lectura paginada aplica todas las etiquetas elegidas mediante el índice de la columna. Las etiquetas son metadatos locales y están disponibles en la columna opcional «Etiquetas propias» de la exportación a Excel.
 
 
 ## Editor lateral de Mis listas

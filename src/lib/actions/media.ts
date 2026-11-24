@@ -1,7 +1,7 @@
 "use server"
 
 import { getAuthenticatedUser } from "@/services/supabase"
-import { getFavoritesWithMedia as fetchFavoritesWithMedia, getFavoriteMalIds as fetchFavoriteMalIds, getAllFavoritesFull } from "@/services/favorites"
+import { getFavoritesWithMedia as fetchFavoritesWithMedia, getFavoriteMalIds as fetchFavoriteMalIds } from "@/services/favorites"
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import type { MediaTitleVariants } from '@/interfaces/media-titles'
@@ -159,26 +159,4 @@ export async function toggleFavorite(mediaData: MediaTitleVariants & {
   revalidatePath('/profile')
   
   return { success: true, isFavorite: !existingFav, warning: undefined }
-}
-
-export async function exportFavoritesAction() {
-  const user = await getAuthenticatedUser();
-  if (!user) throw new Error("Not authenticated");
-  
-  const data = await getAllFavoritesFull(user.id);
-  return data.map((fav) => {
-    const media = Array.isArray(fav.media) ? fav.media[0] : fav.media;
-    return {
-      "ID": fav.id,
-      "MAL ID": media?.mal_id,
-      "Title": media?.title,
-      "Type": media?.type ? media.type.toUpperCase() : "",
-      "Score": media?.score || 0,
-      "Season": media?.season || "",
-      "Year": media?.year || "",
-      "Format": media?.format || "",
-      "Status": media?.status || "",
-      "Genres": Array.isArray(media?.genres) ? media.genres.join(", ") : "",
-    };
-  });
 }

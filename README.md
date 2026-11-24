@@ -54,7 +54,7 @@ Las escrituras de biblioteca/progreso se guardan en Supabase y los cambios pendi
 | `/friends`, `/users/[username]`, `/users/[username]/favorites` | Funciones sociales |
 | `/login`, `/register`, `/auth/callback` | Autenticación |
 | `/forgot-password`, `/auth/recovery`, `/reset-password` | Solicitud y confirmación de recuperación de contraseña |
-| `/hentai` | Colección privada en tabla, anime de origen u original, filtros, notas, enlaces y edición |
+| `/hentai` | Colección privada accesible desde Mis listas con la sección +18 habilitada. Incluye etiquetas, filtros, notas, enlaces y edición |
 | `/api/anilist/*`, `/api/mal/*`, `/api/library/sync*` | Conexiones y sincronización |
 
 Las rutas nuevas de los requisitos se incorporarán por fases. No sustituir enlaces actuales por rutas propuestas que todavía no existen.
@@ -105,6 +105,7 @@ Abrir `http://localhost:3000` si el servidor usa el puerto predeterminado. `pnpm
 | `node --test tests/adult-search-preference.test.mjs` | Preferencia +18, sesión, errores de guardado y consultas de ambos proveedores |
 | `node --test tests/hentai-editor.test.mjs` | Origen, filtros, paginación, validación, permisos y conflictos de edición de Hentai |
 | `node --test tests/hentai-editor-migration.test.mjs` | Migraciones del editor y anime de origen de Hentai, aislamiento con PGlite externo |
+| `node --test tests/library-export.test.mjs tests/export-workbook.test.mjs tests/export-images.test.mjs` | Exportación completa y privada, columnas, XLSX real con temas e imágenes, fallos y cancelación |
 | `node --test tests/theme.test.mjs` | Compatibilidad de temas anteriores, validación y resolución del modo automático |
 | `node --test tests/home-greeting.test.mjs` | Nombre y fecha local del saludo de Inicio (Node.js 24) |
 | `node --test tests/library-editor.test.mjs` | Validación, conflictos de edición, eliminación idempotente y filtros de listas (Node.js 24) |
@@ -123,3 +124,11 @@ La prueba de migración requiere `PGLITE_MODULE` apuntando a una instalación ex
 Al revisar este checkout, los scripts `test:anilist-sync`, `test:provider-sync`, `test:oauth-return`, `test:audit` y `test:sync` referencian archivos que no están presentes. No usarlos como evidencia de una suite completa hasta recuperar o actualizar esas pruebas. No se cambiaron los scripts en esta entrega documental.
 
 Next.js 16 no ejecuta lint durante `next build`: son verificaciones separadas. Para cambios de interfaz, sumar comprobación en navegador de responsive, temas, teclado y estados. Para documentación solamente, validar enlaces, rutas y consistencia. [Guía oficial de Next.js 16](https://nextjs.org/docs/app/guides/upgrading/version-16).
+
+## Exportación personalizada a Excel
+
+En Mis listas → Toda la biblioteca y en Hentai, «Exportar a Excel» abre un modal para elegir columnas, ordenarlas arrastrando o con flechas y seleccionar el color del encabezado entre Aurora nocturna, Aurora clara y Estreno. La vista previa usa tres títulos de ejemplo. El archivo incluye toda la colección correspondiente, sin limitarse a la página ni a los filtros visibles. Quitar columnas no modifica los datos guardados.
+
+El `.xlsx` conserva notas personales, progreso y colecciones propias; el puntaje de biblioteca corresponde al catálogo. Hentai ofrece sus campos existentes y no inventa puntaje ni estado. Las fechas se exportan en UTC como fechas de Excel. Se pueden incluir portadas; se descargan desde el navegador, se convierten a miniaturas JPEG y quedan dentro del archivo. Si una imagen falla o su servidor no permite leerla, se conserva su URL y se informa al terminar. Se puede cancelar la preparación.
+
+Se usa ExcelJS, cargado al descargar, para estilos e imágenes. El endpoint privado `GET /api/library/export?source=library|hentai` verifica sesión y consulta solo Supabase, con lecturas paginadas y respuestas sin caché. No consulta AniList/MAL ni escribe en la biblioteca. No requiere migraciones nuevas. La descarga es una copia de los campos elegidos; esta función no incorpora un importador de respaldos.

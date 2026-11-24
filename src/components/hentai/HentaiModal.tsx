@@ -3,8 +3,9 @@
 import { createHentaiEntry, updateHentaiEntry } from '@/lib/actions/hentai';
 import { useToast } from '@/components/ui/Toast';
 import Modal from '@/components/ui/Modal';
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { HENTAI_TAG_LENGTH, HENTAI_TAG_LIMIT, parseHentaiTag } from '@/lib/hentai';
 import type { HentaiEntry } from '@/interfaces/hentai';
 
 interface HentaiModalProps {
@@ -20,11 +21,42 @@ export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [] 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [origin, setOrigin] = useState(entry?.is_original ? 'original' : entry?.source_anime ? 'anime' : 'unspecified');
+  const [tags, setTags] = useState(entry?.tags ?? []);
+  const [tagDraft, setTagDraft] = useState('');
+  const [tagError, setTagError] = useState('');
+  const tagInput = useRef<HTMLInputElement>(null);
   if (!isOpen) return null;
+
+  function addTag() {
+    const tag = parseHentaiTag(tagDraft);
+    if (!tag) {
+      setTagError('Escribí una etiqueta de hasta 60 caracteres.');
+      return null;
+    }
+    if (tags.includes(tag)) {
+      setTagError('Esa etiqueta ya está agregada.');
+      return null;
+    }
+    if (tags.length >= HENTAI_TAG_LIMIT) {
+      setTagError('Podés guardar hasta 30 etiquetas.');
+      return null;
+    }
+    const next = [...tags, tag];
+    setTags(next);
+    setTagDraft('');
+    setTagError('');
+    return next;
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const nextTags = tagDraft.trim() ? addTag() : tags;
+    if (!nextTags) {
+      tagInput.current?.focus();
+      return;
+    }
+    for (const tag of nextTags) formData.append('tag', tag);
     setLoading(true);
     setError('');
     try {
@@ -85,6 +117,35 @@ export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [] 
             <label className="block text-sm font-semibold" htmlFor="hentai-note">Mi nota
               <textarea id="hentai-note" name="description" rows={6} maxLength={10000} defaultValue={entry?.description ?? ''} placeholder="Agregá una nota personal…" className={field + ' resize-y'} />
             </label>
+            <div>
+              <label htmlFor="hentai-tag" className="text-sm font-semibold">Etiquetas</label>
+              <div className="mt-2 flex items-center gap-2">
+                <input ref={tagInput} id="hentai-tag" value={tagDraft} maxLength={HENTAI_TAG_LENGTH}
+                  placeholder="Ej.: pendiente de leer" aria-invalid={Boolean(tagError)} aria-describedby={tagError ? 'hentai-tag-error' : undefined}
+                  onChange={event => { setTagDraft(event.target.value); setTagError(''); }}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+                      event.preventDefault();
+                      if (tagDraft.trim()) addTag();
+                    }
+                  }}
+                  className="min-h-11 min-w-0 flex-1 rounded-(--radius-control) border border-border bg-background px-3 text-sm" />
+                <button type="button" aria-label="Agregar etiqueta" disabled={!tagDraft.trim()}
+                  onClick={() => { addTag(); tagInput.current?.focus(); }}
+                  className="size-11 shrink-0 rounded-(--radius-control) border border-border bg-muted text-xl font-bold text-primary disabled:opacity-40">+</button>
+              </div>
+              {tagError && <p id="hentai-tag-error" role="alert" className="mt-2 text-xs text-foreground">{tagError}</p>}
+              {tags.length > 0 && <ul aria-label="Etiquetas agregadas" className="mt-3 flex flex-wrap gap-2">
+                {tags.map(tag => <li key={tag} className="flex max-w-full items-center rounded-full bg-muted pl-3 text-xs font-semibold">
+                  <span className="wrap-anywhere">{tag}</span>
+                  <button type="button" aria-label={`Quitar etiqueta ${tag}`} onClick={() => {
+                    setTags(current => current.filter(value => value !== tag));
+                    setTagError('');
+                    tagInput.current?.focus();
+                  }} className="size-11 shrink-0 rounded-full text-lg text-muted-foreground hover:text-foreground">×</button>
+                </li>)}
+              </ul>}
+            </div>
             <label className="block text-sm font-semibold" htmlFor="hentai-link">Enlace para ver o leer
               <input id="hentai-link" name="watch_link" type="url" maxLength={2000} defaultValue={entry?.watch_link ?? ''} placeholder="https://ejemplo.com/serie" className={field} />
             </label>

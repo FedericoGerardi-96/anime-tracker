@@ -4,12 +4,32 @@
   --list-completed: var(--brand-aurora);
   --list-paused: #8f5a00;
   --list-dropped: #b83a2b;
+  --list-adult: #a32159;
 }
 :global(.dark) .sidebar {
   --list-pending: #74c7ff;
   --list-completed: #b3a6ff;
   --list-paused: #ffc566;
   --list-dropped: #ff8a7a;
+  --list-adult: var(--brand-sakura);
+}
+:global(html[data-theme="estreno"]) .sidebar {
+  --list-adult: var(--list-dropped);
+}
+.adultLink {
+  color: var(--list-adult);
+  background: color-mix(in srgb, currentColor 7%, var(--card));
+  border-color: color-mix(in srgb, currentColor 30%, var(--card));
+}
+.adultLink:hover {
+  background: color-mix(in srgb, currentColor 12%, var(--card));
+}
+.adultLink:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.adultBadge {
+  background: color-mix(in srgb, currentColor 6%, transparent);
 }
 .heading {
   font-family: monospace;

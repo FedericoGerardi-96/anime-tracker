@@ -1,5 +1,39 @@
 # Estado de AniTrack y continuidad entre chats
 
+### Cierre del panel al seleccionar texto · 24 de noviembre de 2026
+
+El diálogo compartido cierra con el puntero cuando la pulsación empieza y termina en el fondo. Soltar el mouse fuera del panel después de seleccionar texto en el formulario de Hentai conserva la selección y el borrador. Se mantienen el botón de cierre, Escape y el retorno del foco al botón que abrió el diálogo. El cambio no requiere migración.
+
+En el navegador local con datos simulados se comprobó que arrastrar la selección del título más allá del borde mantiene abierto el panel. En escritorio también se verificaron el clic en el fondo y el botón de cierre. A 390 px se verificaron Escape y el retorno del foco. Pasaron ESLint del diálogo, TypeScript, el build con webpack y 13 pruebas de los editores.
+
+### Etiquetas en la colección Hentai · 23 de noviembre de 2026
+
+El modal de alta y edición acepta hasta 30 etiquetas de 60 caracteres. El botón «+» y Enter agregan un chip y «×» lo quita. Se normalizan espacios, mayúsculas y Unicode para evitar duplicados. La tabla muestra las etiquetas debajo del título. La exportación ofrece la columna opcional «Etiquetas propias».
+
+El filtro muestra las etiquetas de toda la colección privada. Seleccionar varias requiere que el título tenga todas. Las selecciones quedan en parámetros repetidos `tag` y se aplican junto con los demás filtros antes de paginar. Una sola llamada a Supabase reúne etiquetas y animes de origen.
+
+Aplicar [la migración de etiquetas](../supabase/migrations/202611230001_hentai_tags.sql) después de `202611200002_hentai_source_anime.sql`. La migración agrega una columna con valor vacío para los registros anteriores, un índice y el RPC de filtros. Aplica los permisos a la columna y conserva las políticas de titular y el control por revisión del editor. No se aplicó a Supabase remoto.
+
+Pasaron ESLint, TypeScript, el build con webpack y 21 pruebas enfocadas, incluidas las migraciones en PGlite con dos cuentas. En el navegador con datos simulados se verificaron alta y edición con «+», Enter y «×», duplicados, recarga, filtro múltiple con un resultado fuera de la primera página y cierre con Escape. Se revisaron escritorio y móvil de 390 px en los tres temas. Queda pendiente aplicar la migración en Supabase y comprobar el flujo con una cuenta real.
+
+### Acceso a la colección Hentai desde Mis listas · 22 de noviembre de 2026
+
+Hentai se accede desde el panel de Mis listas. En escritorio aparece junto a la navegación de colecciones y en móvil debajo del selector. El enlace lleva la etiqueta «+18», con acento rosa en Aurora y rojo en Estreno. La colección incluye un enlace de vuelta a Mis listas.
+
+El acceso aparece cuando el perfil autenticado tiene activada la sección en Ajustes → Contenido adulto. Mis listas y el encabezado comparten la lectura de perfil durante un mismo render. Cambiar la preferencia revalida Mis listas y la colección; `/hentai` conserva su propia comprobación en servidor. El cambio no requiere migración.
+
+Pasaron ESLint, TypeScript, el build con webpack y ocho pruebas enfocadas. En el navegador local con datos simulados se comprobó el acceso en escritorio y móvil, el color en los tres temas, la navegación por teclado, el enlace de vuelta y la desaparición del acceso al desactivar la preferencia. La comprobación HTTP confirmó una lectura de perfil por render de Mis listas y la redirección de la colección con la preferencia desactivada.
+
+### Exportación personalizada a Excel · 21 de noviembre de 2026
+
+Mis listas → Toda la biblioteca y Hentai comparten un modal para seleccionar columnas, ordenarlas mediante arrastre con puntero/táctil o flechas y elegir el encabezado de Aurora nocturna, Aurora clara o Estreno. La vista previa muestra tres títulos de ejemplo y actualiza campos, orden y colores. El tema inicial sigue el tema efectivo de la página. Las portadas son una columna opcional. Se mantienen las columnas anteriores de catálogo y se agregan notas, progreso y colecciones propias; Hentai ofrece sus campos guardados, sin inventar puntaje o estado personal.
+
+La descarga consulta un nuevo Route Handler privado y sin caché, con sesión comprobada y origen validado. Biblioteca combina favoritos, progreso y pertenencias a listas propias y deduplica por media local. Hentai incluye registros manuales y de catálogo. Se pagina toda la colección y se consulta media en tandas; un error no genera un archivo parcial. La descarga ignora los filtros y la página visible y lo informa en el modal. No consulta proveedores ni cambia datos. ExcelJS 4.4.0 reemplaza la dependencia XLSX y se carga al generar el archivo; conserva números, fechas UTC, texto literal, anchos, encabezado congelado, filtros y JPEG incluidos. Las imágenes se leen desde el navegador con límites y cancelación; ante fallo se conserva la URL y se avisa. No requiere migración ni incorpora restauración/importación de archivos.
+
+Pasaron ESLint enfocado, TypeScript, build con webpack y 17 pruebas enfocadas de exportación y sincronización pendiente, sin omisiones. Las pruebas de lectura cubren sesión, permisos por usuario, paginación con límite de servidor, unión de colecciones, datos faltantes y errores HTTP. Los XLSX reales reabiertos conservan orden, los tres colores, valores cero, fechas, texto que empieza con `=` e imagen binaria con respaldo por URL. Las pruebas de imágenes cubren concurrencia, deduplicación, contenido, tamaño y cancelación. La misma portada reutiliza un único archivo binario dentro del XLSX.
+
+En Chrome, sobre el build de producción con cuenta y proveedores simulados, se verificaron descarga de biblioteca (28 títulos frente a 15 visibles) y Hentai (23 frente a 20), selección y eliminación de columnas, orden por arrastre de varias posiciones y por teclado, vista previa, los tres temas, escritorio de 1440 px y móvil emulado de 390 px sin desborde horizontal, foco del modal y Escape. También error y reintento sin perder configuración, colección vacía, fallo de red en español y cancelación sin descarga posterior. Los archivos descargados se reabrieron para comparar cantidad, campos e imágenes; Artifact Tool importó y renderizó una muestra del XLSX con encabezado e imágenes correctos. El build final descargó 28 títulos con 27 anclajes de portada que comparten un binario y conservó por URL la portada fallida. Queda pendiente probar con una cuenta real y abrir el archivo en Excel de escritorio antes de desplegar. No se desplegó ni se escribieron datos en cuentas reales.
+
 ### Anime de origen en la colección Hentai · 20 de noviembre de 2026
 
 Alta y edición permiten indicar «Original», «Pertenece a un anime» o «Sin especificar». El anime se escribe con sugerencias de los nombres guardados en la colección. La tabla muestra ese origen debajo del tipo. Los registros anteriores permanecen sin clasificar; no se presume que sean originales. Cambiar el origen limpia el valor incompatible y conserva el resto de los datos y la revisión del editor.

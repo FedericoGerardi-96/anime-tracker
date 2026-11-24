@@ -28,7 +28,6 @@ const NAV_ITEMS = [
   { href: '/anime', label: 'Catálogo' },
   { href: '/anime/schedule', label: 'Calendario' },
   { href: '/lists', label: 'Mis listas', private: true },
-  { href: '/hentai', label: 'Hentai', private: true, adult: true },
 ];
 
 export default function TopbarClient({ user, profile }: Readonly<{ user?: User | null; profile?: IProfile | null }>) {
@@ -132,10 +131,7 @@ export default function TopbarClient({ user, profile }: Readonly<{ user?: User |
     router.push(`/${searchType}/${item.mal_id}-${slugify(item.title_english || item.title || '')}`);
   };
 
-  const visibleNavItems = NAV_ITEMS.filter((item) =>
-    (!item.private || Boolean(user))
-    && (!item.adult || Boolean(user && profile?.show_h_content))
-  );
+  const visibleNavItems = NAV_ITEMS.filter((item) => !item.private || Boolean(user));
   const activeNavHref = visibleNavItems
     .filter((item) => pathname === item.href || (item.href !== '/' && pathname.startsWith(`${item.href}/`)) || (item.href === '/anime' && (pathname === '/manga' || pathname.startsWith('/manga/'))))
     .sort((first, second) => second.href.length - first.href.length)[0]?.href;

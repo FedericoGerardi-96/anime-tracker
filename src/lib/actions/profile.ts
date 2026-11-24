@@ -16,6 +16,8 @@ export async function updateShowHContent(value: boolean) {
   if (result.error) return { error: result.error }
 
   revalidatePath("/settings/adult-content")
+  revalidatePath("/lists")
+  revalidatePath("/hentai")
   revalidatePath("/")
   return { success: true }
 }

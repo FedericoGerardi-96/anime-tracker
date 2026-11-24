@@ -21,8 +21,9 @@ interface Props {
   counts?: Record<string, number>;
   lists?: { id: string; name: string; count: number }[];
   unavailable?: boolean;
+  showHentai?: boolean;
 }
-export default function ListsTabs({ activeTab, listId, counts, lists, unavailable = false }: Readonly<Props>) {
+export default function ListsTabs({ activeTab, listId, counts, lists, unavailable = false, showHentai = false }: Readonly<Props>) {
   const router = useRouter();
   const selected = activeTab === 'custom_lists' && listId ? '/lists?tab=custom_lists&list=' + encodeURIComponent(listId) : '/lists?tab=' + activeTab;
   const linkClass = (active: boolean) => 'flex min-h-11 items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors ' + (active ? 'bg-card text-foreground shadow-[inset_3px_0_0_var(--brand-sakura)]' : 'text-muted-foreground hover:bg-card hover:text-primary');
@@ -56,6 +57,15 @@ export default function ListsTabs({ activeTab, listId, counts, lists, unavailabl
       {lists?.length === 0 && <p className="px-2.5 text-sm leading-relaxed text-muted-foreground">Todavía no creaste listas.</p>}
     </nav>
     {unavailable && <p role="status" className="px-2.5 text-sm text-muted-foreground">No pudimos cargar las cantidades ni tus colecciones. Recargá para reintentar.</p>}
+    {showHentai && (
+      <nav aria-label="Colección privada">
+        <Link href="/hentai" prefetch={false} className={styles.adultLink + ' flex min-h-11 items-center gap-3 rounded-xl border px-2.5 py-2 text-sm font-semibold transition-colors'}>
+          <span aria-hidden="true" className={styles.dot + ' bg-current'} />
+          Hentai
+          <span className={styles.adultBadge + ' ml-auto rounded px-1.5 py-0.5 text-xs font-bold'}>+18</span>
+        </Link>
+      </nav>
+    )}
     <nav aria-label="De amigos" className="hidden border-t border-border pt-5 lg:block">
       <p className={styles.heading + ' mb-2 px-2.5 text-muted-foreground'}>De amigos</p>
       <Link href={FOLLOWED_LISTS_PATH} aria-current={activeTab === 'friends' ? 'page' : undefined} className={linkClass(activeTab === 'friends')}>

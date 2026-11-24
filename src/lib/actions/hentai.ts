@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { parseHentaiEntry, parseHentaiFilters, parseHentaiInput } from '@/lib/hentai';
+import { hentaiTagArrayLiteral, parseHentaiEntry, parseHentaiFilters, parseHentaiInput } from '@/lib/hentai';
 import type { HentaiEntry } from '@/interfaces/hentai';
 export type { HentaiEntry } from '@/interfaces/hentai';
 
@@ -14,7 +14,7 @@ export async function createHentaiEntry(formData: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Iniciá sesión para agregar un título.' };
-  const schema = await supabase.from('hentai').select('revision,watch_link,source_anime,is_original').limit(0);
+  const schema = await supabase.from('hentai').select('revision,watch_link,source_anime,is_original,tags').limit(0);
   if (schema.error) return { error: preparationError };
   const { error } = await supabase.from('hentai').insert({ user_id: user.id, ...input.data });
   if (error) return { error: 'No pudimos agregar el título. Tus datos siguen en el formulario.' };
@@ -22,17 +22,18 @@ export async function createHentaiEntry(formData: FormData) {
   return { success: true };
 }
 
-export async function getHentaiEntries(page = 1, pageSize = 12, query = '', options: { type?: string; sort?: string; origin?: string } = {}): Promise<{ data: HentaiEntry[]; count: number; error?: string }> {
+export async function getHentaiEntries(page = 1, pageSize = 12, query = '', options: { type?: string; sort?: string; origin?: string; tags?: string[] } = {}): Promise<{ data: HentaiEntry[]; count: number; error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: [], count: 0, error: 'Iniciá sesión para ver tu colección.' };
-  const filters = parseHentaiFilters({ page: String(page), q: query, type: options?.type, sort: options?.sort, origin: options?.origin });
+  const filters = parseHentaiFilters({ page: String(page), q: query, type: options?.type, sort: options?.sort, origin: options?.origin, tag: options?.tags });
   const size = Number.isSafeInteger(pageSize) ? Math.min(100, Math.max(1, pageSize)) : 12;
   const from = (filters.page - 1) * size;
   let request = supabase.from('hentai').select('*', { count: 'exact' }).eq('user_id', user.id);
   if (filters.type !== 'all') request = request.eq('type', filters.type);
   if (filters.origin === 'original') request = request.eq('is_original', true);
   else if (filters.origin.startsWith('anime:')) request = request.eq('source_anime', filters.origin.slice(6));
+  if (filters.tags.length) request = request.contains('tags', hentaiTagArrayLiteral(filters.tags));
   if (filters.q) {
     // Keep Unicode titles while excluding PostgREST filter syntax and wildcards.
     const words = filters.q.normalize('NFC').match(/[\p{L}\p{N}]+/gu) ?? [];
@@ -49,16 +50,27 @@ export async function getHentaiEntries(page = 1, pageSize = 12, query = '', opti
   return { data: entries.filter((entry): entry is HentaiEntry => entry !== null), count: count ?? 0 };
 }
 
-export async function getHentaiSourceAnimes(): Promise<{ data: string[]; error?: string }> {
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item: unknown) => typeof item === 'string');
+}
+
+export async function getHentaiFilterOptions(): Promise<{ sources: string[]; tags: string[]; sourceError?: string; tagError?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: [], error: 'Iniciá sesión para ver los animes de tu colección.' };
-  // Distinct values across the entire private collection, regardless of pagination or filters.
-  const { data, error } = await supabase.rpc('get_hentai_source_animes');
-  if (error || !Array.isArray(data) || !data.every((source: unknown): source is string => typeof source === 'string')) {
-    return { data: [], error: 'No pudimos cargar el filtro de anime de origen. Revisá que la sección esté actualizada y reintentá.' };
+  const sourceError = 'No pudimos cargar el filtro de anime de origen.';
+  const tagError = 'No pudimos cargar las etiquetas. Revisá que la sección esté actualizada.';
+  if (!user) return { sources: [], tags: [], sourceError, tagError };
+  const { data: result, error } = await supabase.rpc('get_hentai_filter_options');
+  const data: unknown = result;
+  if (!error && data && typeof data === 'object' && 'sources' in data && 'tags' in data
+    && isStringArray(data.sources) && isStringArray(data.tags)) {
+    return { sources: data.sources, tags: data.tags.sort((a, b) => a.localeCompare(b, 'es-AR')) };
   }
-  return { data };
+  if (error?.code === 'PGRST202') {
+    const previous = await supabase.rpc('get_hentai_source_animes');
+    if (!previous.error && isStringArray(previous.data)) return { sources: previous.data, tags: [], tagError };
+  }
+  return { sources: [], tags: [], sourceError, tagError };
 }
 
 export async function updateHentaiEntry(id: string, revision: string, formData: FormData) {
