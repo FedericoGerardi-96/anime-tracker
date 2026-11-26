@@ -1,5 +1,13 @@
 # Estado de AniTrack y continuidad entre chats
 
+### Reutilización de etiquetas en Hentai · 25 de noviembre de 2026
+
+Los formularios de alta y edición muestran las etiquetas guardadas en la colección debajo del campo. Seleccionar una la agrega al título, limpia el texto del campo y marca la opción con el color primario y una tilde. La «×» la quita del título y permite volver a seleccionarla. El botón «+» y Enter siguen disponibles para crear etiquetas propias.
+
+El selector comparte las opciones del filtro de la colección privada y mantiene la normalización y el límite de etiquetas por título. No requiere consultas adicionales ni una migración.
+
+Pasaron ESLint de los archivos modificados, TypeScript, el build con webpack y siete pruebas del editor. En el navegador local con datos simulados se verificaron alta y edición, selección con clic y teclado, quitar y volver a agregar, rechazo de duplicados normalizados, creación con «+» y Enter, persistencia y retorno del foco con Escape. Se revisaron los tres temas y el ajuste de etiquetas largas a 390 px.
+
 ### Cierre del panel al seleccionar texto · 24 de noviembre de 2026
 
 El diálogo compartido cierra con el puntero cuando la pulsación empieza y termina en el fondo. Soltar el mouse fuera del panel después de seleccionar texto en el formulario de Hentai conserva la selección y el borrador. Se mantienen el botón de cierre, Escape y el retorno del foco al botón que abrió el diálogo. El cambio no requiere migración.

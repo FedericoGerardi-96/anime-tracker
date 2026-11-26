@@ -8,7 +8,9 @@ import HentaiModal from './HentaiModal';
 import DeleteHentaiButton from './DeleteHentaiButton';
 import styles from './HentaiTable.module.css';
 
-export default function HentaiTable({ entries, sourceAnimes = [] }: { entries: HentaiEntry[]; sourceAnimes?: string[] }) {
+export default function HentaiTable({ entries, sourceAnimes = [], availableTags }: {
+  entries: HentaiEntry[]; sourceAnimes?: string[]; availableTags: readonly string[];
+}) {
   const [editing, setEditing] = useState<HentaiEntry | null>(null);
   const actionClass = 'inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-35';
   return <>
@@ -42,6 +44,6 @@ export default function HentaiTable({ entries, sourceAnimes = [] }: { entries: H
         })}</tbody>
       </table>
     </div>
-    {editing && <HentaiModal isOpen entry={editing} sourceAnimes={sourceAnimes} onClose={() => setEditing(null)} />}
+    {editing && <HentaiModal isOpen entry={editing} sourceAnimes={sourceAnimes} availableTags={availableTags} onClose={() => setEditing(null)} />}
   </>;
 }

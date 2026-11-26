@@ -46,7 +46,7 @@ export default async function HentaiPage({ searchParams }: Readonly<{
       </Link>
       <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div><p className="mb-3 text-xs font-bold uppercase tracking-widest text-primary">Mi colección privada</p><h1 className="text-3xl font-black tracking-tight sm:text-4xl">Hentai</h1><p className="mt-3 max-w-2xl text-sm text-muted-foreground">Organizá tus anime, doujins y manga con notas y enlaces personales.</p></div>
-        <div className="flex flex-wrap items-center gap-3"><ExportCollectionButton source="hentai" /><HentaiActions sourceAnimes={sourceAnimes} /></div>
+        <div className="flex flex-wrap items-center gap-3"><ExportCollectionButton source="hentai" /><HentaiActions sourceAnimes={sourceAnimes} availableTags={tags} /></div>
       </header>
       <Suspense fallback={<div className="h-24 rounded-xl bg-muted motion-safe:animate-pulse" />}>
         <HentaiSearch key={JSON.stringify(filters)} filters={filters} sourceAnimes={sourceAnimes} sourceError={sourceError} tags={tags} tagError={tagError} />
@@ -54,7 +54,7 @@ export default async function HentaiPage({ searchParams }: Readonly<{
       {error ? <div role="alert" className="rounded-(--radius-panel) border border-border bg-card p-6"><p>{error}</p><a href="" className="mt-4 inline-flex min-h-11 items-center font-semibold text-primary underline">Reintentar</a></div>
         : entries.length ? <>
           <p className="text-sm text-muted-foreground">Mostrando {(filters.page - 1) * PAGE_SIZE + 1}–{Math.min(filters.page * PAGE_SIZE, count)} de {count} títulos</p>
-          <HentaiTable entries={entries} sourceAnimes={sourceAnimes} />
+          <HentaiTable entries={entries} sourceAnimes={sourceAnimes} availableTags={tags} />
           <Suspense fallback={null}><Pagination currentPage={filters.page} totalPages={totalPages} /></Suspense>
         </> : <section className="rounded-(--radius-panel) border border-dashed border-border bg-card px-5 py-16 text-center">
           <h2 className="text-lg font-bold">{filtered ? 'No encontramos títulos con esos filtros' : 'Tu colección está vacía'}</h2>

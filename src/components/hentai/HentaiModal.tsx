@@ -13,9 +13,10 @@ interface HentaiModalProps {
   onClose: () => void;
   entry?: HentaiEntry;
   sourceAnimes?: string[];
+  availableTags: readonly string[];
 }
 
-export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [] }: Readonly<HentaiModalProps>) {
+export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [], availableTags }: Readonly<HentaiModalProps>) {
   const { success } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -27,8 +28,8 @@ export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [] 
   const tagInput = useRef<HTMLInputElement>(null);
   if (!isOpen) return null;
 
-  function addTag() {
-    const tag = parseHentaiTag(tagDraft);
+  function addTag(value: string) {
+    const tag = parseHentaiTag(value);
     if (!tag) {
       setTagError('Escribí una etiqueta de hasta 60 caracteres.');
       return null;
@@ -51,7 +52,7 @@ export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [] 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const nextTags = tagDraft.trim() ? addTag() : tags;
+    const nextTags = tagDraft.trim() ? addTag(tagDraft) : tags;
     if (!nextTags) {
       tagInput.current?.focus();
       return;
@@ -126,15 +127,31 @@ export default function HentaiModal({ isOpen, onClose, entry, sourceAnimes = [] 
                   onKeyDown={event => {
                     if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
                       event.preventDefault();
-                      if (tagDraft.trim()) addTag();
+                      if (tagDraft.trim()) addTag(tagDraft);
                     }
                   }}
                   className="min-h-11 min-w-0 flex-1 rounded-(--radius-control) border border-border bg-background px-3 text-sm" />
                 <button type="button" aria-label="Agregar etiqueta" disabled={!tagDraft.trim()}
-                  onClick={() => { addTag(); tagInput.current?.focus(); }}
+                  onClick={() => { addTag(tagDraft); tagInput.current?.focus(); }}
                   className="size-11 shrink-0 rounded-(--radius-control) border border-border bg-muted text-xl font-bold text-primary disabled:opacity-40">+</button>
               </div>
               {tagError && <p id="hentai-tag-error" role="alert" className="mt-2 text-xs text-foreground">{tagError}</p>}
+              {availableTags.length > 0 && <div className="mt-3">
+                <p id="hentai-available-tags" className="mb-2 text-xs text-muted-foreground">Etiquetas guardadas</p>
+                <ul aria-labelledby="hentai-available-tags" className="flex max-h-48 flex-wrap content-start gap-2 overflow-y-auto p-1">
+                  {availableTags.map(tag => {
+                    const selected = tags.includes(tag);
+                    return <li key={tag} className="min-w-0 max-w-full">
+                      <button type="button" aria-pressed={selected} aria-disabled={selected}
+                        onClick={() => { if (!selected) addTag(tag); }}
+                        className="inline-flex min-h-11 max-w-full cursor-pointer items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-start text-xs font-semibold hover:border-primary! hover:text-primary focus-visible:border-primary! focus-visible:text-primary aria-disabled:cursor-default aria-pressed:border-primary! aria-pressed:text-primary">
+                        <span className="min-w-0 wrap-anywhere">{tag}</span>
+                        {selected && <span aria-hidden="true">✓</span>}
+                      </button>
+                    </li>;
+                  })}
+                </ul>
+              </div>}
               {tags.length > 0 && <ul aria-label="Etiquetas agregadas" className="mt-3 flex flex-wrap gap-2">
                 {tags.map(tag => <li key={tag} className="flex max-w-full items-center rounded-full bg-muted pl-3 text-xs font-semibold">
                   <span className="wrap-anywhere">{tag}</span>

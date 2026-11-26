@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import HentaiModal from "./HentaiModal";
 
-export default function HentaiActions({ sourceAnimes = [] }: { sourceAnimes?: string[] }) {
+export default function HentaiActions({ sourceAnimes = [], availableTags }: { sourceAnimes?: string[]; availableTags: readonly string[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -21,6 +21,7 @@ export default function HentaiActions({ sourceAnimes = [] }: { sourceAnimes?: st
       {isModalOpen && <HentaiModal
         isOpen={isModalOpen}
         sourceAnimes={sourceAnimes}
+        availableTags={availableTags}
         onClose={() => setIsModalOpen(false)}
       />}
     </>
